@@ -246,7 +246,7 @@ var diagramsjs = (function() {
 		node._ = node.link;			// alias (-)
 		node.$_ = node.outin;		// alias (<<) <-
 		node._$ = node.inout;		// alias (>>) ->
-		node.$_$ = node.inout;		// alias (<< >>) <->
+		node.$_$ = node.both;		// alias (<< >>) <->
 		node.left = node.outin;		// alias (<<)
 		node.right = node.inout;	// alias (>>)
 		
@@ -287,7 +287,7 @@ var diagramsjs = (function() {
 		group._ = group.link;		// alias (-)
 		group.$_ = group.outin;		// alias (<<) <-
 		group._$ = group.inout;		// alias (>>) ->
-		group.$_$ = group.inout;	// alias (<< >>) <->
+		group.$_$ = group.both;	// alias (<< >>) <->
 		group.left = group.outin;	// alias (<<)
 		group.right = group.inout;	// alias (>>)
 		return group;
