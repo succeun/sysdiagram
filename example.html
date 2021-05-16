@@ -1,0 +1,413 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style>
+		.group {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-evenly;
+		}
+		
+		code {
+			display: none;
+		}
+		
+		.CodeMirror {
+			border: 1px solid #444;
+			width: 700px;
+			height: 400px !important;
+			margin-bottom: 30px;
+		}
+		
+		.graphContainer {
+			text-align: center; 
+			border: 1px solid #444;
+			width: 700px;
+			height: 400px;
+		}
+	</style>
+	
+	<!-- code mirror -->
+	<link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
+	<script>
+		window.addEventListener('DOMContentLoaded', function(event) {
+			var btnEls = document.querySelectorAll("button");
+			for (var i = 0 ; i < btnEls.length; i++) {
+				addButtonEvent(i);
+			}
+		
+			var codeEls = document.querySelectorAll("code");
+			for (var i = 0 ; i < codeEls.length; i++) {
+				run(i, true);
+			}
+		});
+		
+		function addButtonEvent(i) {
+			var btnEl = document.querySelectorAll("button")[i];
+			btnEl.addEventListener("click", function(evt) {
+				run(i, false);
+			});
+		}
+		
+		function run(index, init) {
+			var codeEl = document.querySelectorAll("code")[index];
+			var graphEl = document.querySelectorAll(".graphContainer")[index];
+			
+			var code = "";
+			if (init) {
+				code = codeEl.innerText;
+				codeEl.innerHTML = null;
+				codeEl.style.display = "block";
+				codeEl.editor = CodeMirror(codeEl, {
+					value: code,
+					lineNumbers: true,
+					matchBrackets: true,
+				});
+				
+			} else {
+				code = codeEl.editor.getValue();
+			}
+			
+			diagramsjs.render(graphEl, code);
+		}		
+	</script>
+</head>
+<body>
+
+	<h3>Grouped Workers on AWS <button>Run</button></h3>
+	<div class="group">
+		<code>
+var EC2 = diagrams.aws.compute.EC2
+var RDS = diagrams.aws.database.RDS
+var ELB = diagrams.aws.network.ELB
+
+Diagram("Grouped Workers", function() {
+	ELB("lb")._$([EC2("worker1"), 
+				EC2("worker2"),
+				EC2("worker3"),
+				EC2("worker4"),
+				EC2("worker5")])._$(RDS("events"))
+}, {rankdir: "TB"})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Clustered Web Services <button>Run</button></h3>
+	<div class="group">
+		<code>
+var ECS = diagrams.aws.compute.ECS
+var ElastiCache = diagrams.aws.database.ElastiCache
+var RDS = diagrams.aws.database.RDS
+var ELB = diagrams.aws.network.ELB
+var Route53 = diagrams.aws.network.Route53
+
+Diagram("Clustered Web Services", function() {
+	ctx.dns = Route53("dns")
+    ctx.lb = ELB("lb")
+	
+	Cluster("Services", function() {
+		ctx.svc_group = [ECS("web1"),
+						ECS("web2"),
+						ECS("web3")]
+	})
+	
+	Cluster("DB Cluster", function() {
+		ctx.db_master = RDS("userdb")
+		ctx.db_master._([RDS("userdb ro")])
+	})
+	
+	ctx.memcached = ElastiCache("memcached")
+	
+	ctx.dns._$(ctx.lb)._$(ctx.svc_group)
+    ctx.svc_group._$(ctx.db_master)
+    ctx.svc_group._$(ctx.memcached)
+	
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Event Processing on AWS <button>Run</button></h3>
+	<div class="group">
+		<code>
+var ECS = diagrams.aws.compute.ECS
+var EKS = diagrams.aws.compute.EKS
+var Lambda = diagrams.aws.compute.Lambda
+var Redshift = diagrams.aws.database.Redshift
+var SQS = diagrams.aws.integration .SQS
+var S3 = diagrams.aws.storage.S3
+
+Diagram("Event Processing", function() {
+	ctx.source = EKS("k8s source")
+	Cluster("Event Flows", function() {
+		Cluster("Event Workers", function() {
+			ctx.workers = [ECS("worker1"),
+						   ECS("worker2"),
+						   ECS("worker3")]
+		})
+	
+		ctx.queue = SQS("event queue")
+	
+		Cluster("Event Flows", function() {
+			ctx.handlers = [Lambda("proc1"),
+							Lambda("proc2"),
+							Lambda("proc3")]
+		})
+	})
+	
+	ctx.store = S3("events store")
+    ctx.dw = Redshift("analytics")
+
+    ctx.source._$(ctx.workers)._$(ctx.queue)._$(ctx.handlers)
+    ctx.handlers._$(ctx.store)
+    ctx.handlers._$(ctx.dw)
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Message Collecting System on GCP <button>Run</button></h3>
+	<div class="group">
+		<code>
+var BigQuery = diagrams.gcp.analytics.BigQuery
+var Dataflow = diagrams.gcp.analytics.Dataflow
+var PubSub = diagrams.gcp.analytics.PubSub
+var AppEngine = diagrams.gcp.compute.AppEngine
+var Functions = diagrams.gcp.compute.Functions
+var BigTable = diagrams.gcp.database.BigTable
+var IotCore = diagrams.gcp.iot.IotCore
+var GCS = diagrams.gcp.storage.GCS
+
+Diagram("Message Collecting", () => {
+	ctx.pubsub = PubSub("pubsub")
+	
+	Cluster("Source of Data", () => {
+        /*
+		ctx.iots = [IotCore("core1"),
+					IotCore("core2"),
+					IotCore("core3")]
+		ctx.iots._$(ctx.pubsub)
+		*/
+		ArrayGroup([IotCore("core1"),
+		IotCore("core2"),
+		IotCore("core3")])._$(ctx.pubsub)
+	})
+
+    Cluster("Targets", () => {
+        Cluster("Data Flow", () => {
+            ctx.flow = Dataflow("data flow")
+		})
+		
+        Cluster("Data Lake", () => {
+            ctx.flow._$([BigQuery("bq"),
+                     GCS("storage")])
+		})
+
+        Cluster("Event Driven", () => {
+            Cluster("Processing", () => {
+                ctx.flow._$(AppEngine("engine"))._$(BigTable("bigtable"))
+			})
+
+            Cluster("Serverless", () => {
+                ctx.flow._$(Functions("func"))._$(AppEngine("appengine"))
+			})
+		})
+	})
+    ctx.pubsub._$(ctx.flow)
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Exposed Pod with 3 Replicas on Kubernetes <button>Run</button></h3>
+	<div class="group">
+		<code>
+var HPA = diagrams.k8s.clusterconfig.HPA
+var Deployment = diagrams.k8s.compute.Deployment
+var Pod = diagrams.k8s.compute.Pod
+var ReplicaSet = diagrams.k8s.compute.ReplicaSet
+var Ingress = diagrams.k8s.network.Ingress
+var Service = diagrams.k8s.network.Service
+
+Diagram("Exposed Pod with 3 Replicas", () => {
+	ctx.net = Ingress("domain.com")._$(Service("svc"))
+    ctx.net._$([Pod("pod1"),
+            Pod("pod2"),
+            Pod("pod3")]).$_(ReplicaSet("rs")).$_(Deployment("dp")).$_(HPA("hpa"))
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Stateful Architecture on Kubernetes <button>Run</button></h3>
+	<div class="group">
+		<code>
+var Pod = diagrams.k8s.compute.Pod
+var StatefulSet = diagrams.k8s.compute.StatefulSet
+var Service = diagrams.k8s.network.Service
+var PV = diagrams.k8s.storage.PV
+var PVC = diagrams.k8s.storage.PVC
+var StorageClass = diagrams.k8s.storage.StorageClass
+
+Diagram("Stateful Architecture", () => {
+	Cluster("Apps", () => {
+        ctx.svc = Service("svc")
+        ctx.sts = StatefulSet("sts")
+
+        ctx.apps = []
+        for (var i = 0; i < 3; i++) {
+            ctx.pod = Pod("pod")
+            ctx.pvc = PVC("pvc")
+            ctx.pod._(ctx.sts)._(ctx.pvc)
+            ctx.apps.push(ctx.svc._$(ctx.pod)._$(ctx.pvc))
+		}
+	})
+
+    ctx.apps.$_(PV("pv")).$_(StorageClass("sc"))
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Advanced Web Service with On-Premise <button>Run</button></h3>
+	<div class="group">
+		<code>
+var Spark = diagrams.onprem.analytics.Spark
+var Server = diagrams.onprem.compute.Server
+var PostgreSQL = diagrams.onprem.database.Postgresql
+var Redis = diagrams.onprem.inmemory.Redis
+var Fluentd = diagrams.onprem.aggregator.Fluentd
+var Grafana = diagrams.onprem.monitoring.Grafana
+var Prometheus = diagrams.onprem.monitoring.Prometheus
+var Nginx = diagrams.onprem.network.Nginx
+var Kafka = diagrams.onprem.queue.Kafka
+
+Diagram("Advanced Web Service with On-Premise", function() {
+	ctx.ingress = Nginx("ingress")
+	
+	ctx.metrics = Prometheus("metric")
+	ctx.metrics.$_(Grafana("monitoring"))
+
+	Cluster("Service Cluster", () => {
+		ctx.grpcsvc = [
+			Server("grpc1"), 
+			Server("grpc2"), 
+			Server("grpc3")]
+	})
+
+	Cluster("Sessions HA", () => {
+		ctx.master = Redis("session")
+		ctx.master._(Redis("replica")).$_(ctx.metrics)
+		ctx.grpcsvc._$(ctx.master)
+	})
+
+	Cluster("Database HA", () => {
+		ctx.master = PostgreSQL("users")
+		ctx.master._(PostgreSQL("slave")).$_(ctx.metrics)
+		ctx.grpcsvc._$(ctx.master)
+	})
+	
+	ctx.aggregator = Fluentd("logging")
+	ctx.aggregator._$(Kafka("stream"))._$(Spark("analytics"))
+
+	ctx.ingress._$(ctx.grpcsvc)._$(ctx.aggregator)
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>Advanced Web Service with On-Premise (with colors and labels) <button>Run</button></h3>
+	<div class="group">
+		<code>
+var Spark = diagrams.onprem.analytics.Spark
+var Server = diagrams.onprem.compute.Server
+var PostgreSQL = diagrams.onprem.database.Postgresql
+var Redis = diagrams.onprem.inmemory.Redis
+var Fluentd = diagrams.onprem.aggregator.Fluentd
+var Grafana = diagrams.onprem.monitoring.Grafana
+var Prometheus = diagrams.onprem.monitoring.Prometheus
+var Nginx = diagrams.onprem.network.Nginx
+var Kafka = diagrams.onprem.queue.Kafka
+
+Diagram("Advanced Web Service with On-Premise (colored)", function() {
+	ctx.ingress = Nginx("ingress")
+	
+	ctx.metrics = Prometheus("metric")
+	ctx.metrics.$_(Edge({color: "firebrick", style: "dashed"})).$_(Grafana("monitoring"))
+
+	Cluster("Service Cluster", () => {
+		ctx.grpcsvc = [
+			Server("grpc1"), 
+			Server("grpc2"), 
+			Server("grpc3")]
+	})
+
+	Cluster("Sessions HA", () => {
+		ctx.master = Redis("session")
+		ctx.master._(Edge({color: "brown", style: "dashed"}))._(Redis("replica")).$_(Edge({label: "collect"})).$_(ctx.metrics)
+		ctx.grpcsvc._$(Edge({color: "brown"}))._$(ctx.master)
+	})
+
+	Cluster("Database HA", () => {
+		ctx.master = PostgreSQL("users")
+		ctx.master._(Edge({color: "brown", style: "dotted"}))._(PostgreSQL("slave")).$_(Edge({label: "collect"})).$_(ctx.metrics)
+		ctx.grpcsvc._$(Edge({color: "black"}))._$(ctx.master)
+	})
+	
+	ctx.aggregator = Fluentd("logging")
+	ctx.aggregator._$(Edge({label: "parse"}))._$(Kafka("stream"))._$(Edge({color: "black", style: "bold"}))._$(Spark("analytics"))
+
+	ctx.ingress.$_$(Edge({color: "darkgreen"})).$_$(ctx.grpcsvc)._$(Edge({color: "darkorange"}))._$(ctx.aggregator)
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	<h3>RabbitMQ Consumers with Custom Nodes <button>Run</button></h3>
+	<div class="group">
+		<code>
+var Aurora = diagrams.aws.database.Aurora
+var Pod = diagrams.k8s.compute.Pod
+
+var Custom = function(name, attrs){
+	return Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png");
+};
+
+Diagram("Broker Consumers", function() {
+	Cluster("Consumers", function() {
+        ctx.consumers = [
+            Pod("worker"),
+            Pod("worker"),
+            Pod("worker")]
+	})
+
+    ctx.queue = Custom("Message queue")
+
+    ctx.queue._$(ctx.consumers)._$(Aurora("Database"))
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
+	
+	
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+	<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+
+	<script type="text/javascript" src="diagramsjs_resources.js"></script>
+	<script type="text/javascript" src="diagramsjs.js"></script>
+</body>
+</html>
