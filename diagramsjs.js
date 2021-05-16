@@ -37,124 +37,121 @@ var diagramsjs = (function() {
 	
 	////////////////////////////////////////////////////////////
 	
-	// image urls of Node
-	var icons = {};
-	
-	var context = {
-		_defaultAttrs_: {
-			digraph: {
-				fontcolor: "#2D3436",
-				fontname: "Sans-Serif",
-				fontsize: "15",
-				nodesep: "0.60",
-				pad: "2.0",
-				ranksep: "0.75",
-				splines: "ortho",
-				
-				rankdir: "LR",
-			},
-			node: {
-				shape: "box",
-				style: "rounded",
-				fixedsize: true,
-				width: "1.4",
-				height: "1.9",
-				labelloc: "b",
-				// imagepos attribute is not backward compatible
-				// TODO: check graphviz version to see if "imagepos" is available >= 2.40
-				// https://github.com/xflr6/graphviz/blob/master/graphviz/backend.py#L248
-				// "imagepos": "tc",
-				imagescale: true,
-				fontname: "Sans-Serif",
-				fontsize: "13",
-				fontcolor: "#2D3436",
-				shape: "none",
-			},
-			edge: {
-				color: "#7B8894"
-			},
-			subgraph: {
-				shape: "box",
-				style: "rounded",
-				labeljust: "l",
-				pencolor: "#AEB6BE",
-				fontname: "Sans-Serif",
-				fontsize: "12",
-				
-				bgcolor: "#E5F5FD",
-				rankdir: "LR",
-			},
-			subgraphBgcolors: ["#E5F5FD", "#EBF3E7", "#ECE8F6", "#FDF7E3"]
-		},
-		
-		_root_: null,
-		_queue_: [],
-		_current_: null,
-		_allNodes_: {},	// To determine if it has been created at least once per uuid
-		_edges_: {},
-		
-		reset: function() {
-			this._root_ = null;
-			this._queue_ = [];
-			this._current_ = null;
-			this._allNodes_ = {};
-			this._edges_ = {};
-		},
-		
-		addNode: function(node) {
-			if (this._allNodes_[node.uuid] == null) {
-				this._current_[node.uuid] = node;
-				this._allNodes_[node.uuid] = node;
-			}
-		},
-		
-		addEdge: function(startNode, endNode, direct, attrs) {	//	direct: none, forward, back
-			attrs = attrs || {};
-			attrs.dir = direct;
+	var defaultAttrs = {
+		digraph: {
+			fontcolor: "#2D3436",
+			fontname: "Sans-Serif",
+			fontsize: "15",
+			nodesep: "0.60",
+			pad: "2.0",
+			ranksep: "0.75",
+			splines: "ortho",
 			
-			var key = startNode.uuid + '_' + endNode.uuid;
-			if (this._edges_[key] == null) {
-				this._edges_[key] = {
-					startnode: startNode, 
-					endnode: endNode, 
-					direct: direct,
-					attrs: function() {
-						return attrs;
-					},
-				};
-			}
+			rankdir: "LR",
 		},
-		
-		diagram_enter: function(diagram) {
-			this._root_ = diagram;
-			this._current_ = this._root_;
-			this._queue_.push(this._current_);
+		node: {
+			shape: "box",
+			style: "rounded",
+			fixedsize: true,
+			width: "1.4",
+			height: "1.9",
+			labelloc: "b",
+			// imagepos attribute is not backward compatible
+			// TODO: check graphviz version to see if "imagepos" is available >= 2.40
+			// https://github.com/xflr6/graphviz/blob/master/graphviz/backend.py#L248
+			// "imagepos": "tc",
+			imagescale: true,
+			fontname: "Sans-Serif",
+			fontsize: "13",
+			fontcolor: "#2D3436",
+			shape: "none",
 		},
-		diagram_exit: function(diagram) {
-			this._current_ = this._queue_.splice(-1,1)[0];	// remove last element
+		edge: {
+			color: "#7B8894"
 		},
-		
-		cluster_enter: function(cluster) {
-			this._current_['cluster_' + cluster.uuid] = cluster;
-			this._current_ = cluster;
-			this._queue_.push(this._current_);
+		subgraph: {
+			shape: "box",
+			style: "rounded",
+			labeljust: "l",
+			pencolor: "#AEB6BE",
+			fontname: "Sans-Serif",
+			fontsize: "12",
+			
+			bgcolor: "#E5F5FD",
+			rankdir: "LR",
 		},
-		cluster_exit: function(cluster) {
-			this._queue_.pop();
-			this._current_ = this._queue_[this._queue_.length - 1];
-		}
+		subgraphBgcolors: ["#E5F5FD", "#EBF3E7", "#ECE8F6", "#FDF7E3"]
 	};
+
+	var rootNode = null;
+	var nodeQueue = [];
+	var currentNode = null;
+	var allNodes = {};	// To determine if it has been created at least once per uuid
+	var edges = {};
+	
+	var icons = {};	// image urls of Node
+	
+	function reset() {
+		rootNode = null;
+		nodeQueue = [];
+		currentNode = null;
+		allNodes = {};
+		edges = {};
+	}
+	
+	function addNode(node) {
+		if (allNodes[node.uuid] == null) {
+			currentNode[node.uuid] = node;
+			allNodes[node.uuid] = node;
+		}
+	}
+	
+	function addEdge(startNode, endNode, direct, attrs) {	//	direct: none, forward, back
+		attrs = attrs || {};
+		attrs.dir = direct;
+		
+		var key = startNode.uuid + '_' + endNode.uuid;
+		if (edges[key] == null) {
+			edges[key] = {
+				startnode: startNode, 
+				endnode: endNode, 
+				direct: direct,
+				attrs: function() {
+					return attrs;
+				},
+			};
+		}
+	}
+	
+	function diagram_enter(diagram) {
+		rootNode = diagram;
+		currentNode = rootNode;
+		nodeQueue.push(currentNode);
+	}
+	
+	function diagram_exit(diagram) {
+		currentNode = nodeQueue.splice(-1,1)[0];	// remove last element
+	}
+	
+	function cluster_enter(cluster) {
+		currentNode['cluster_' + cluster.uuid] = cluster;
+		currentNode = cluster;
+		nodeQueue.push(currentNode);
+	}
+	
+	function cluster_exit(cluster) {
+		nodeQueue.pop();
+		currentNode = nodeQueue[nodeQueue.length - 1];
+	}
+	
+	var context = { };	// Storing variables in scripts
 
 	var ctx = new Proxy(context, {
 	  get: function(target, prop) {
-		if (prop && !prop.startsWith('_') && !prop.endsWith('_')) {
-			//console.log({ type: 'get', target, prop });
-		}
 		return Reflect.get(target, prop);
 	  },
 	  set: function(target, prop, value) {
-		if (prop && !prop.startsWith('_') && !prop.endsWith('_')) {
-			//console.log({ type: 'set', target, prop, value });
+		if (prop) {
 			if (Array.isArray(value)) {
 				value = ArrayGroup(value);
 			}
@@ -184,12 +181,12 @@ var diagramsjs = (function() {
 			} else if (node.type == 'array_group') {	// arraygroup
 				var nodes = node.nodes;
 				for (var i = 0; i < nodes.length; i++) {
-					ctx.addNode(nodes[i]);
-					ctx.addEdge(me, nodes[i], direct, me.edgeattrs);
+					addNode(nodes[i]);
+					addEdge(me, nodes[i], direct, me.edgeattrs);
 				}
 			} else {
-				ctx.addNode(node);
-				ctx.addEdge(me, node, direct, me.edgeattrs);
+				addNode(node);
+				addEdge(me, node, direct, me.edgeattrs);
 			}
 		}
 		return node;
@@ -203,9 +200,9 @@ var diagramsjs = (function() {
 			}
 			node.srcNode = nodes;
 		} else {
-			ctx.addNode(node);
+			addNode(node);
 			for (var i = 0; i < nodes.length; i++) {
-				ctx.addEdge(nodes[i], node, direct, nodes[i].edgeattrs);
+				addEdge(nodes[i], node, direct, nodes[i].edgeattrs);
 			}
 		}
 		return node;
@@ -213,7 +210,7 @@ var diagramsjs = (function() {
 
 	function Node(name, attrs, image) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(context._defaultAttrs_.node, attrs);
+		attrs = mergeAttrs(defaultAttrs.node, attrs);
 		
 		attrs.label = name;
 		if (image) {
@@ -250,7 +247,7 @@ var diagramsjs = (function() {
 		node.left = node.outin;		// alias (<<)
 		node.right = node.inout;	// alias (>>)
 		
-		ctx.addNode(node);
+		addNode(node);
 		return node;
 	}
 	
@@ -260,7 +257,7 @@ var diagramsjs = (function() {
 		}
 		
 		nodes.forEach(function(element) {
-			ctx.addNode(element);
+			addNode(element);
 		});
 		
 		var group = {
@@ -295,7 +292,7 @@ var diagramsjs = (function() {
 	
 	function Edge(attrs) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(context._defaultAttrs_.edge, attrs);
+		attrs = mergeAttrs(defaultAttrs.edge, attrs);
 		
 		var node = {
 			type: 'edge',
@@ -329,7 +326,7 @@ var diagramsjs = (function() {
 
 	function Cluster(name, callbackFunc, attrs) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(context._defaultAttrs_.subgraph, attrs);
+		attrs = mergeAttrs(defaultAttrs.subgraph, attrs);
 		attrs.label = name;
 		
 		var cluster = {
@@ -341,15 +338,15 @@ var diagramsjs = (function() {
 				return attrs;
 			},
 		};
-		ctx.cluster_enter(cluster);
+		cluster_enter(cluster);
 		callbackFunc.call(ctx, cluster);
-		ctx.cluster_exit(cluster);
+		cluster_exit(cluster);
 		return cluster;
 	}
 
 	function Diagram(name, callbackFunc, attrs) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(context._defaultAttrs_.digraph, attrs);
+		attrs = mergeAttrs(defaultAttrs.digraph, attrs);
 		
 		var diagram = {
 			type: 'diagram',
@@ -359,9 +356,9 @@ var diagramsjs = (function() {
 				return attrs;
 			},
 		}
-		ctx.diagram_enter(diagram);
+		diagram_enter(diagram);
 		callbackFunc.call(ctx, diagram);
-		ctx.diagram_exit(diagram);
+		diagram_exit(diagram);
 		return diagram;
 	}
 
@@ -370,27 +367,27 @@ var diagramsjs = (function() {
 	
 	
 	function generate(expr) {
-		context.reset();
+		reset();
 		eval(expr);
 		var viz = generateScript();
 		return viz;
 	}
 	
 	function generateScript() {
-		var root = context._root_;
+		var root = rootNode;
 		
 		var lines = [];
-		lines.push(`digraph "${context._root_.name}" {`);
-		lines.push(`	graph ${toAttrs(context._root_.attrs())}`);
-		lines.push(`	node ${toAttrs(context._defaultAttrs_.node)}`);
-		lines.push(`	edge ${toAttrs(context._defaultAttrs_.edge)}`);
+		lines.push(`digraph "${rootNode.name}" {`);
+		lines.push(`	graph ${toAttrs(rootNode.attrs())}`);
+		lines.push(`	node ${toAttrs(defaultAttrs.node)}`);
+		lines.push(`	edge ${toAttrs(defaultAttrs.edge)}`);
 		lines.push(``);
 		
 		generateScriptNode(lines, root, 1);
 		
 		lines.push(``);
 		
-		generateScriptEdge(lines, context._edges_);
+		generateScriptEdge(lines, edges);
 		
 		lines.push(`}`);
 		return lines.join('\n');
@@ -404,7 +401,7 @@ var diagramsjs = (function() {
 				if (node.type == 'cluster') {
 					lines.push(`${tab}subgraph "cluster_${node.name}" {`);
 					var attrs = node.attrs();
-					attrs.bgcolor = context._defaultAttrs_.subgraphBgcolors[depth - 1];
+					attrs.bgcolor = defaultAttrs.subgraphBgcolors[depth - 1];
 					lines.push(`${tabs(depth + 1)}graph ${toAttrs(attrs)}`);
 					generateScriptNode(lines, node, depth + 1);
 					lines.push(`${tab}}`);
@@ -418,7 +415,6 @@ var diagramsjs = (function() {
 	function generateScriptEdge(lines, edges) {
 		for (var key in edges){
 			var edge = edges[key];
-			//var edgeattrs = ctx._allNodes_[edge.startnode.uuid] ? ;
 			lines.push(`	"${edge.startnode.uuid}" -> "${edge.endnode.uuid}" ${toAttrs(edge.attrs())}`);
 		}
 	}
