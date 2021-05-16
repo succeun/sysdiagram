@@ -454,6 +454,9 @@ var diagramsjs = (function() {
 		cbFunc = cbFunc || function(){};
 		
 		var vizScript = generate(code);
+		if (options.Verbose && options.Verbose == true) {
+			console.log(vizScript);
+		}
 
 		var graphviz = d3.select(selectorOrObj).graphviz(options);
 
