@@ -23,7 +23,7 @@
 		.graphContainer {
 			text-align: center; 
 			border: 1px solid #444;
-			width: 700px;
+			width: 500px;
 			height: 400px;
 		}
 	</style>
@@ -65,21 +65,35 @@
 					value: code,
 					lineNumbers: true,
 					matchBrackets: true,
+					//lineWrapping: true,
+					extraKeys: {
+						"Ctrl-Enter": function(cm) { 
+							run(index, false); 
+						},     
+					}
 				});
 				
 			} else {
 				code = codeEl.editor.getValue();
 			}
 			
-			diagramsjs.render(graphEl, code);
-		}		
+			// Change default attribute(options)
+			// diagramsjs.attributes.graphviz.fit = false;
+			diagramsjs.attributes.digraph.splines = "spline";
+			
+			var result = diagramsjs.render(graphEl, code);
+			var dot = result.dot;	// generated dot script
+			var graphviz = result.graphviz;
+		}
 	</script>
 </head>
 <body>
 
-	<h3>Grouped Workers on AWS <button>Run</button></h3>
+	<h3>Grouped Workers on AWS <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
+ctx.attributes.digraph.splines = 'curved'
+		
 var EC2 = diagrams.aws.compute.EC2
 var RDS = diagrams.aws.database.RDS
 var ELB = diagrams.aws.network.ELB
@@ -96,12 +110,21 @@ Diagram("Grouped Workers", function() {
 	</div>
 	
 	
-	<h3>Clustered Web Services <button>Run</button></h3>
+	<h3>Clustered Web Services <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var ECS = diagrams.aws.compute.ECS
+
+// import 1 
 var ElastiCache = diagrams.aws.database.ElastiCache
 var RDS = diagrams.aws.database.RDS
+
+// import 2 (ES6: Destructuring assignment)
+var [ElastiCache, RDS] = [diagrams.aws.database.ElastiCache, diagrams.aws.database.RDS]
+
+// import 3 (ES6: Destructuring assignment)
+var [ElastiCache, RDS] = diagrams.aws.database.import('ElastiCache', 'RDS')
+
 var ELB = diagrams.aws.network.ELB
 var Route53 = diagrams.aws.network.Route53
 
@@ -132,7 +155,7 @@ Diagram("Clustered Web Services", function() {
 	</div>
 	
 	
-	<h3>Event Processing on AWS <button>Run</button></h3>
+	<h3>Event Processing on AWS <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var ECS = diagrams.aws.compute.ECS
@@ -172,7 +195,7 @@ Diagram("Event Processing", function() {
 	</div>
 	
 	
-	<h3>Message Collecting System on GCP <button>Run</button></h3>
+	<h3>Message Collecting System on GCP <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var BigQuery = diagrams.gcp.analytics.BigQuery
@@ -194,9 +217,9 @@ Diagram("Message Collecting", () => {
 					IotCore("core3")]
 		ctx.iots._$(ctx.pubsub)
 		*/
-		ArrayGroup([IotCore("core1"),
-		IotCore("core2"),
-		IotCore("core3")])._$(ctx.pubsub)
+		ArrayNode([IotCore("core1"),
+				IotCore("core2"),
+				IotCore("core3")])._$(ctx.pubsub)
 	})
 
     Cluster("Targets", () => {
@@ -226,7 +249,7 @@ Diagram("Message Collecting", () => {
 	</div>
 	
 	
-	<h3>Exposed Pod with 3 Replicas on Kubernetes <button>Run</button></h3>
+	<h3>Exposed Pod with 3 Replicas on Kubernetes <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var HPA = diagrams.k8s.clusterconfig.HPA
@@ -247,7 +270,7 @@ Diagram("Exposed Pod with 3 Replicas", () => {
 	</div>
 	
 	
-	<h3>Stateful Architecture on Kubernetes <button>Run</button></h3>
+	<h3>Stateful Architecture on Kubernetes <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var Pod = diagrams.k8s.compute.Pod
@@ -278,7 +301,7 @@ Diagram("Stateful Architecture", () => {
 	</div>
 	
 	
-	<h3>Advanced Web Service with On-Premise <button>Run</button></h3>
+	<h3>Advanced Web Service with On-Premise <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var Spark = diagrams.onprem.analytics.Spark
@@ -326,7 +349,7 @@ Diagram("Advanced Web Service with On-Premise", function() {
 	</div>
 	
 	
-	<h3>Advanced Web Service with On-Premise (with colors and labels) <button>Run</button></h3>
+	<h3>Advanced Web Service with On-Premise (with colors and labels) <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var Spark = diagrams.onprem.analytics.Spark
@@ -374,15 +397,18 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 	</div>
 	
 	
-	<h3>RabbitMQ Consumers with Custom Nodes <button>Run</button></h3>
+	<h3>RabbitMQ Consumers with Custom Nodes <button>Run(Ctrl-Enter)</button></h3>
 	<div class="group">
 		<code>
 var Aurora = diagrams.aws.database.Aurora
 var Pod = diagrams.k8s.compute.Pod
 
-var Custom = function(name, attrs){
+var rabbitmq_icon = "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png";
+
+var RabbitMQ = (name, attrs) => Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png");
+var RabbitMQ = function(name, attrs) {
 	return Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png");
-};
+}
 
 Diagram("Broker Consumers", function() {
 	Cluster("Consumers", function() {
@@ -392,7 +418,8 @@ Diagram("Broker Consumers", function() {
             Pod("worker")]
 	})
 
-    ctx.queue = Custom("Message queue")
+    ctx.queue = Custom("Message queue", rabbitmq_icon);
+	ctx.queue1 = RabbitMQ("Message queue1", rabbitmq_icon);
 
     ctx.queue.$_$(ctx.consumers).$_$(Aurora("Database"))
 })

@@ -1,6 +1,6 @@
 (function(w) {
 	w.diagramsjs_resources = {
-		baseUrl: "https://github.com/mingrammer/diagrams/raw/master/resources",
+		baseUrl: "https://cdn.jsdelivr.net/gh/mingrammer/diagrams/resources", //"https://github.com/mingrammer/diagrams/raw/master/resources",
 		alibabacloud: {
 			analytics: {
 				AnalyticDb: "analytic-db.png",

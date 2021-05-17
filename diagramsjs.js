@@ -28,6 +28,18 @@ var diagramsjs = (function() {
 		return attrs;
 	}
 	
+	function cloneObject(obj) {
+		var clone = {};
+		for (var key in obj) {
+			if (typeof obj[key] == "object" && obj[key] != null) {
+				clone[key] = cloneObject(obj[key]);
+			} else {
+				clone[key] = obj[key];
+			}
+		}
+		return clone;
+	}
+	
 	function getFromUrl(yourUrl){
 		var httpreq = new XMLHttpRequest(); // a new request
 		httpreq.open("GET",yourUrl,false);
@@ -45,7 +57,7 @@ var diagramsjs = (function() {
 			nodesep: "0.60",
 			pad: "2.0",
 			ranksep: "0.75",
-			splines: "ortho",
+			splines: "ortho",	// none(""), line(false), polyline, curved, ortho, spline(true)
 			
 			rankdir: "LR",
 		},
@@ -77,10 +89,22 @@ var diagramsjs = (function() {
 			fontname: "Sans-Serif",
 			fontsize: "12",
 			
-			bgcolor: "#E5F5FD",
+			bgcolor: null,
 			rankdir: "LR",
 		},
-		subgraphBgcolors: ["#E5F5FD", "#EBF3E7", "#ECE8F6", "#FDF7E3"]
+		subgraphBgcolors: [
+			"#E5F5FD", "#EBF3E7", "#ECE8F6", "#FDF7E3"
+		],
+		graphviz: {
+			width: "100%", 
+			height: "100%", 
+			fit: true, 
+			engine: "dot"	// circo, dot (default), fdp, neato, osage, patchwork, twopi
+		},
+		iconSize: {
+			width: "50px",
+			height: "50px"
+		},
 	};
 
 	var rootNode = null;
@@ -91,12 +115,40 @@ var diagramsjs = (function() {
 	
 	var icons = {};	// image urls of Node
 	
+	// Storing variables in scripts
+	var context = { 
+		eval: function(expr) { return eval(expr); },
+		attributes: null,
+	};
+
+	var ctx = new Proxy(context, {
+	  get: function(target, prop) {
+		return Reflect.get(target, prop);
+	  },
+	  set: function(target, prop, value) {
+		if (prop) {
+			if (Array.isArray(value)) {
+				value = ArrayNode(value);
+			}
+		}
+		return Reflect.set(target, prop, value);
+	  }
+	});
+	
 	function reset() {
 		rootNode = null;
 		nodeQueue = [];
 		currentNode = null;
 		allNodes = {};
 		edges = {};
+		
+		// remove variables in context
+		for (var key in context) {
+			if (key == 'eval' || key == 'attributes') continue;
+			
+			delete context[key];
+		}
+		context.attributes = cloneObject(defaultAttrs);	// Define attributes to be used within scripts, not global default attributes
 	}
 	
 	function addNode(node) {
@@ -106,9 +158,14 @@ var diagramsjs = (function() {
 		}
 	}
 	
-	function addEdge(startNode, endNode, direct, attrs) {	//	direct: none, forward, back
+	var directs = {'none': '-','forward': '->','back': '<-','both': '<->'};
+	
+	function addEdge(startNode, endNode, direct, attrs) {	//	direct: none, forward, back, both
 		attrs = attrs || {};
 		attrs.dir = direct;
+		if (startNode.name && endNode.name && direct && !attrs.edgetooltip) {
+			attrs.edgetooltip = `${startNode.name} ${directs[direct]} ${endNode.name}`; 
+		}
 		
 		var key = startNode.uuid + '_' + endNode.uuid;
 		if (edges[key] == null) {
@@ -144,27 +201,11 @@ var diagramsjs = (function() {
 		currentNode = nodeQueue[nodeQueue.length - 1];
 	}
 	
-	var context = { };	// Storing variables in scripts
-
-	var ctx = new Proxy(context, {
-	  get: function(target, prop) {
-		return Reflect.get(target, prop);
-	  },
-	  set: function(target, prop, value) {
-		if (prop) {
-			if (Array.isArray(value)) {
-				value = ArrayGroup(value);
-			}
-		}
-		return Reflect.set(target, prop, value);
-	  }
-	});
-	
 	///////////////////////////////////////////////////////////
 	
 	function connect(me, node, direct) {
 		if (Array.isArray(node)) {	// natvie array
-			node = ArrayGroup(node);
+			node = ArrayNode(node);
 		}
 		
 		if (me.type == 'edge') {
@@ -208,14 +249,18 @@ var diagramsjs = (function() {
 		return node;
 	}
 
-	function Node(name, attrs, image) {
+	function Node(name, attrs, icon) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(defaultAttrs.node, attrs);
+		attrs = mergeAttrs(ctx.attributes.node, attrs);
 		
 		attrs.label = name;
-		if (image) {
-			icons[image] = true;
-			attrs.image = image;
+		if (!attrs.tooltip) {
+			attrs.tooltip = name;
+		}
+		
+		if (icon) {
+			icons[icon] = true;
+			attrs.image = icon;
 		}
 		
 		var node = {
@@ -251,7 +296,7 @@ var diagramsjs = (function() {
 		return node;
 	}
 	
-	function ArrayGroup(nodes) {
+	function ArrayNode(nodes) {
 		if (!Array.isArray(nodes)) {
 			throw new Error('Nodes is not array.');
 		}
@@ -292,7 +337,7 @@ var diagramsjs = (function() {
 	
 	function Edge(attrs) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(defaultAttrs.edge, attrs);
+		attrs = mergeAttrs(ctx.attributes.edge, attrs);
 		
 		var node = {
 			type: 'edge',
@@ -326,7 +371,7 @@ var diagramsjs = (function() {
 
 	function Cluster(name, callbackFunc, attrs) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(defaultAttrs.subgraph, attrs);
+		attrs = mergeAttrs(ctx.attributes.subgraph, attrs);
 		attrs.label = name;
 		
 		var cluster = {
@@ -346,7 +391,7 @@ var diagramsjs = (function() {
 
 	function Diagram(name, callbackFunc, attrs) {
 		attrs = attrs || {};
-		attrs = mergeAttrs(defaultAttrs.digraph, attrs);
+		attrs = mergeAttrs(ctx.attributes.digraph, attrs);
 		
 		var diagram = {
 			type: 'diagram',
@@ -361,39 +406,44 @@ var diagramsjs = (function() {
 		diagram_exit(diagram);
 		return diagram;
 	}
-
+	
+	var Custom = function(name, icon, attrs){
+		return Node(name, attrs, icon);
+	};
 
 	///////////////////////////////////////////////////
 	
 	
-	function generate(expr) {
+	function generate(script) {
+		if (!script || script.trim().length == 0) {
+			throw new Error("Script for rendering is null or empty.");
+		}
+		
 		reset();
-		eval(expr);
-		var viz = generateScript();
-		return viz;
+		ctx.eval(script);
+		var dot = generateDot();
+		return dot;
 	}
 	
-	function generateScript() {
-		var root = rootNode;
-		
+	function generateDot() {
 		var lines = [];
 		lines.push(`digraph "${rootNode.name}" {`);
 		lines.push(`	graph ${toAttrs(rootNode.attrs())}`);
-		lines.push(`	node ${toAttrs(defaultAttrs.node)}`);
-		lines.push(`	edge ${toAttrs(defaultAttrs.edge)}`);
+		lines.push(`	node ${toAttrs(ctx.attributes.node)}`);
+		lines.push(`	edge ${toAttrs(ctx.attributes.edge)}`);
 		lines.push(``);
 		
-		generateScriptNode(lines, root, 1);
+		generateDotNode(lines, rootNode, 1);
 		
 		lines.push(``);
 		
-		generateScriptEdge(lines, edges);
+		generateDotEdge(lines, edges);
 		
 		lines.push(`}`);
 		return lines.join('\n');
 	}
 	
-	function generateScriptNode(lines, parent, depth) {
+	function generateDotNode(lines, parent, depth) {
 		var tab = tabs(depth);
 		for (var key in parent){
 			var node = parent[key];
@@ -401,9 +451,11 @@ var diagramsjs = (function() {
 				if (node.type == 'cluster') {
 					lines.push(`${tab}subgraph "cluster_${node.name}" {`);
 					var attrs = node.attrs();
-					attrs.bgcolor = defaultAttrs.subgraphBgcolors[depth - 1];
+					if (!attrs.bgcolor) {
+						attrs.bgcolor = ctx.attributes.subgraphBgcolors[depth - 1];
+					}
 					lines.push(`${tabs(depth + 1)}graph ${toAttrs(attrs)}`);
-					generateScriptNode(lines, node, depth + 1);
+					generateDotNode(lines, node, depth + 1);
 					lines.push(`${tab}}`);
 				} else {
 					lines.push(`${tab}"${key}" ${toAttrs(node.attrs())}`);
@@ -412,66 +464,95 @@ var diagramsjs = (function() {
 		}
 	}
 	
-	function generateScriptEdge(lines, edges) {
+	function generateDotEdge(lines, edges) {
 		for (var key in edges){
 			var edge = edges[key];
 			lines.push(`	"${edge.startnode.uuid}" -> "${edge.endnode.uuid}" ${toAttrs(edge.attrs())}`);
 		}
 	}
 	
-	function predefineNodes(dir, namespace) {
-		function redefineNode(dir, namespace, key) {
-			var image = namespace[key];
-			image = dir ? dir + image : image;
-			namespace[key] = function() {
-				var args = [];
-				args[0] = arguments[0];
-				args[1] = arguments[1];
-				args[2] = image;
-				var node = Node.apply(null, args);
-				return node;
-			}
-		}
-		
+	function defineNamespaceResources(dir, namespace) {
 		for (var key in namespace) {
 			if (!namespace[key] || typeof namespace[key] == "function") {
 				continue;
 			}
-			redefineNode(dir, namespace, key);
+			defineResource(dir, namespace, key);
+			
+			if (!namespace.import) {
+				namespace.import = function() {
+					var resources = [];
+					for (var i = 0; i < arguments.length; i++) {
+						var typeName = arguments[i];
+						var res = namespace[typeName];
+						if (!res) {
+							throw new Error('Not found resource. ['+typeName+']');
+						}
+						resources.push(res);
+					}
+					return resources;
+				}
+			}
 		}
 	}
 	
-	function render(selectorOrObj, code, options, cbFunc) {
-		if (!code || code.trim().length == 0) {
-			throw new Error("Code for rendering is null or empty.");
+	function defineResource(dir, namespace, key) {
+		var image = namespace[key];
+		image = dir ? dir + image : image;
+		namespace[key] = function() {
+			var args = [];
+			args[0] = arguments[0];
+			args[1] = arguments[1];
+			args[2] = image;
+			var node = Node.apply(null, args);
+			return node;
 		}
-		
-		// engine: circo, dot (default), fdp, neato, osage, patchwork, twopi
-		var defaultVizOptions = {width: "100%", height: "100%", fit: true, engine: "dot"};
+	}
+	
+	function render(selectorOrObj, script, options, cbFunc) {
+		var dot = generate(script);
+		var graphviz = createGraphviz(selectorOrObj, options);
+		return renderDot(graphviz, dot, cbFunc);
+	}
+	
+	function createGraphviz(selectorOrObj, options) {
 		options = options || {};
-		options = mergeAttrs(defaultVizOptions, options);
+		options = mergeAttrs(ctx.attributes.graphviz, options);
 		
-		cbFunc = cbFunc || function(){};
+		var element = ("string" == typeof selectorOrObj) ? document.querySelector(selectorOrObj) : selectorOrObj;
 		
-		var vizScript = generate(code);
-		if (options.Verbose && options.Verbose == true) {
-			console.log(vizScript);
-		}
-
 		var graphviz = d3.select(selectorOrObj).graphviz(options);
+		
+		element.graphviz = graphviz;
+		// hack
+		graphviz.getSVG = function() {
+			var root = this._selection;
+			var svg = root.selectWithoutDataPropagation("svg");
+			return svg;
+		}
 
 		Object.entries(icons).forEach(([key, value]) => {
-			graphviz.addImage(key, "50px", "50px");
+			graphviz.addImage(key, ctx.attributes.iconSize.width, ctx.attributes.iconSize.height);
 		});
-		
-		graphviz.renderDot(vizScript, function() {
+		return graphviz;
+	}
+	
+	function renderDot(graphviz, dot, cbFunc) {
+		cbFunc = cbFunc || function(){};
+
+		graphviz.renderDot(dot, function() {
+			
 			cbFunc();
 		});
+		
+		return {
+			dot: dot,
+			graphviz: graphviz
+		}
 	}
 	
 	///////////////////////////////////////////////////
 
-	var diagrams = {};	// Preset namespace variables to be used in scripts
+	var diagrams = {};	// Preset namespace resources to be used in scripts
 	
 	if (diagramsjs_resources) {
 		var baseUrl = diagramsjs_resources.baseUrl || "https://github.com/mingrammer/diagrams/raw/master/resources";
@@ -480,8 +561,8 @@ var diagramsjs = (function() {
 			
 			diagrams[x] = diagramsjs_resources[x];
 			for (var y in diagramsjs_resources[x]) {
-				var dir = `${baseUrl}/${x}/${y}/`
-				predefineNodes(dir, diagramsjs_resources[x][y]);
+				var dir = `${baseUrl}/${x}/${y}/`;
+				defineNamespaceResources(dir, diagramsjs_resources[x][y]);
 			}
 		}
 	}
@@ -489,6 +570,7 @@ var diagramsjs = (function() {
 	///////////////////////////////////////////////////
 	
 	return {
+		attributes: defaultAttrs,
 		generate: generate,
 		render: render
 	};
