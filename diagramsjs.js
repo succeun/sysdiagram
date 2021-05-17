@@ -10,7 +10,15 @@ var diagramsjs = (function() {
 	}
 	
 	function toAttrs(obj) {
-		return '[' + Object.keys(obj).map(function(k){ return `${k}="${obj[k]}"`; }).join(", ") + ']';
+		return '[' + Object.keys(obj).map(function(k){
+			// if HTML Tag contain, ex: label=< <b>..</b> >
+			if (k == "label" && obj[k]) {
+				if (obj[k].match(/^< +.+ +>$/g)) {
+					return `label=${obj[k]}`;
+				}
+			}
+			return `${k}="${obj[k]}"`; 
+		}).join(", ") + ']';
 	}
 	
 	function tabs(count) {
@@ -21,23 +29,24 @@ var diagramsjs = (function() {
 		return tabs.join('');
 	}
 	
-	function mergeAttrs(src, target) {
-		var attrs = {};
-		Object.assign(attrs, src);
-		Object.assign(attrs, target);
-		return attrs;
-	}
-	
-	function cloneObject(obj) {
-		var clone = {};
+	function cloneObject(obj, target) {
+		target = target || {};
 		for (var key in obj) {
 			if (typeof obj[key] == "object" && obj[key] != null) {
-				clone[key] = cloneObject(obj[key]);
+				var child = target[key] || {};
+				target[key] = cloneObject(obj[key], child);
 			} else {
-				clone[key] = obj[key];
+				target[key] = obj[key];
 			}
 		}
-		return clone;
+		return target;
+	}
+	
+	function mergeAttrs(src, target) {
+		var attrs = {};
+		cloneObject(src, attrs);
+		cloneObject(target, attrs);
+		return attrs;
 	}
 	
 	function getFromUrl(yourUrl){
@@ -47,7 +56,7 @@ var diagramsjs = (function() {
 		return httpreq.responseText;          
 	}
 	
-	////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////
 	
 	var defaultAttrs = {
 		digraph: {
@@ -57,7 +66,8 @@ var diagramsjs = (function() {
 			nodesep: "0.60",
 			pad: "2.0",
 			ranksep: "0.75",
-			splines: "ortho",	// none(""), line(false), polyline, curved, ortho, spline(true)
+			splines: "ortho",			// none(""), line(false), polyline, curved, ortho, spline(true)
+			//labelloc: "b",			// t(top), b(bottom, default), c(center)
 			
 			rankdir: "LR",
 		},
@@ -67,7 +77,8 @@ var diagramsjs = (function() {
 			fixedsize: true,
 			width: "1.4",
 			height: "1.9",
-			labelloc: "b",
+			labelloc: "b",				// t(top), b(bottom), c(center, default)
+			
 			// imagepos attribute is not backward compatible
 			// TODO: check graphviz version to see if "imagepos" is available >= 2.40
 			// https://github.com/xflr6/graphviz/blob/master/graphviz/backend.py#L248
@@ -84,10 +95,11 @@ var diagramsjs = (function() {
 		subgraph: {
 			shape: "box",
 			style: "rounded",
-			labeljust: "l",
+			labeljust: "l",				// l(left), r(right), c(center)
 			pencolor: "#AEB6BE",
 			fontname: "Sans-Serif",
 			fontsize: "12",
+			//labelloc: "t",			// t(top, default), b(bottom), c(center)
 			
 			bgcolor: null,
 			rankdir: "LR",
@@ -99,11 +111,11 @@ var diagramsjs = (function() {
 			width: "100%", 
 			height: "100%", 
 			fit: true, 
-			engine: "dot"	// circo, dot (default), fdp, neato, osage, patchwork, twopi
+			engine: "dot"				// circo, dot (default), fdp, neato, osage, patchwork, twopi
 		},
 		iconSize: {
-			width: "50px",
-			height: "50px"
+			width: "256px",
+			height: "256px"
 		},
 	};
 
@@ -201,7 +213,7 @@ var diagramsjs = (function() {
 		currentNode = nodeQueue[nodeQueue.length - 1];
 	}
 	
-	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 	
 	function connect(me, node, direct) {
 		if (Array.isArray(node)) {	// natvie array
@@ -374,6 +386,10 @@ var diagramsjs = (function() {
 		attrs = mergeAttrs(ctx.attributes.subgraph, attrs);
 		attrs.label = name;
 		
+		if (!attrs.tooltip) {
+			attrs.tooltip = name;
+		}
+		
 		var cluster = {
 			type: 'cluster',
 			uuid: uuid(),
@@ -411,10 +427,16 @@ var diagramsjs = (function() {
 		return Node(name, attrs, icon);
 	};
 
-	///////////////////////////////////////////////////
-	
+	///////////////////////////////////////////////////////////////////////////
+	var isLoadedResources = false;
 	
 	function generate(script) {
+		if (!isLoadedResources) {
+			if (diagramsjs_resources) {
+				loadResources(diagramsjs_resources, diagramsjs_resources.baseUrl);
+			}
+		}
+		
 		if (!script || script.trim().length == 0) {
 			throw new Error("Script for rendering is null or empty.");
 		}
@@ -550,26 +572,33 @@ var diagramsjs = (function() {
 		}
 	}
 	
-	///////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 
 	var diagrams = {};	// Preset namespace resources to be used in scripts
 	
-	if (diagramsjs_resources) {
-		var baseUrl = diagramsjs_resources.baseUrl || "https://github.com/mingrammer/diagrams/raw/master/resources";
-		for (var x in diagramsjs_resources) {
-			if (x == 'baseUrl') continue;
+	function loadResources(resourceJson, baseUrl) {
+		if (resourceJson) {
+			diagrams = {};
 			
-			diagrams[x] = diagramsjs_resources[x];
-			for (var y in diagramsjs_resources[x]) {
-				var dir = `${baseUrl}/${x}/${y}/`;
-				defineNamespaceResources(dir, diagramsjs_resources[x][y]);
+			var baseUrl = baseUrl || "https://github.com/mingrammer/diagrams/raw/master/resources";
+			baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+			for (var x in resourceJson) {
+				if (x == 'baseUrl') continue;
+				
+				diagrams[x] = resourceJson[x];
+				for (var y in resourceJson[x]) {
+					var dir = `${baseUrl}/${x}/${y}/`;
+					defineNamespaceResources(dir, resourceJson[x][y]);
+				}
 			}
+			isLoadedResources = true;
 		}
 	}
 	
-	///////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 	
 	return {
+		loadResources: loadResources,
 		attributes: defaultAttrs,
 		generate: generate,
 		render: render

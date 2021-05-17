@@ -1,6 +1,7 @@
 (function(w) {
 	w.diagramsjs_resources = {
-		baseUrl: "https://cdn.jsdelivr.net/gh/mingrammer/diagrams/resources", //"https://github.com/mingrammer/diagrams/raw/master/resources",
+		baseUrl: "https://cdn.jsdelivr.net/gh/mingrammer/diagrams/resources/",
+		
 		alibabacloud: {
 			analytics: {
 				AnalyticDb: "analytic-db.png",
@@ -1764,337 +1765,379 @@
 			}
 		}
 	};
-
-	// Aliases
-	var ns = null;
 	
-	// alibabacloud
-	ns = diagramsjs_resources.alibabacloud.application
-		ns.SLS = ns.LogService
-		ns.MNS = ns.MessageNotificationService
-		ns.PTS = ns.PerformanceTestingService
-		ns.SCA = ns.SmartConversationAnalysis
-
-	ns = diagramsjs_resources.alibabacloud.compute
-		ns.ESS = ns.AutoScaling
-		ns.ECS = ns.ElasticComputeService
-		ns.ECI = ns.ElasticContainerInstance
-		ns.EHPC = ns.ElasticHighPerformanceComputing
-		ns.FC = ns.FunctionCompute
-		ns.OOS = ns.OperationOrchestrationService
-		ns.ROS = ns.ResourceOrchestrationService
-		ns.SLB = ns.ServerLoadBalancer
-		ns.SAE = ns.ServerlessAppEngine
-		ns.SAS = ns.SimpleApplicationServer
-		ns.WAS = ns.WebAppService
-
-	ns = diagramsjs_resources.alibabacloud.database
-		ns.DMS = ns.DataManagementService
-		ns.DTS = ns.DataTransmissionService
-		ns.DBS = ns.DatabaseBackupService
-		ns.DRDS = ns.DisributeRelationalDatabaseService
-		ns.GDS = ns.GraphDatabaseService
-		ns.RDS = ns.RelationalDatabaseService
-
-	ns = diagramsjs_resources.alibabacloud.network
-		ns.CEN = ns.CloudEnterpriseNetwork
-		ns.EIP = ns.ElasticIpAddress
-		ns.SLB = ns.ServerLoadBalancer
-		ns.VPC = ns.VirtualPrivateCloud
-
-	ns = diagramsjs_resources.alibabacloud.security
-		ns.ABS = ns.AntiBotService
-		ns.AS = ns.AntifraudService
-		ns.CFW = ns.CloudFirewall
-		ns.CM = ns.ContentModeration
-		ns.DES = ns.DataEncryptionService
-		ns.WAF = ns.WebApplicationFirewall
-
-	ns = diagramsjs_resources.alibabacloud.storage
-		ns.HDFS = ns.FileStorageHdfs
-		ns.NAS = ns.FileStorageNas
-		ns.HBR = ns.HybridBackupRecovery
-		ns.HDR = ns.HybridCloudDisasterRecovery
-		ns.OSS = ns.ObjectStorageService
-		ns.OTS = ns.ObjectTableStore
-
-	// aws
-	ns = diagramsjs_resources.aws.analytics
-		ns.ES = ns.ElasticsearchService
-
-	ns = diagramsjs_resources.aws.blockchain
-		ns.QLDB = ns.QuantumLedgerDatabaseQldb
-
-	ns = diagramsjs_resources.aws.business
-		ns.A4B = ns.AlexaForBusiness
-
-	ns = diagramsjs_resources.aws.compute
-		ns.AutoScaling = ns.ApplicationAutoScaling
-		ns.AMI = ns.EC2Ami
-		ns.ECR = ns.EC2ContainerRegistry
-		ns.EB = ns.ElasticBeanstalk
-		ns.ECS = ns.ElasticContainerService
-		ns.EKS = ns.ElasticKubernetesService
-		ns.SAR = ns.ServerlessApplicationRepository
-
-	ns = diagramsjs_resources.aws.database
-		ns.DMS = ns.DatabaseMigrationService
-		ns.DocumentDB = ns.DocumentdbMongodbCompatibility
-		ns.DAX = ns.DynamodbDax
-		ns.DynamodbGSI = ns.DynamodbGlobalSecondaryIndex
-		ns.DB = ns.Database
-		ns.DDB = ns.Dynamodb
-		ns.ElastiCache = ns.Elasticache
-		ns.QLDB = ns.QuantumLedgerDatabaseQldb
-
-	ns = diagramsjs_resources.aws.devtools
-		ns.CLI = ns.CommandLineInterface
-		ns.DevTools = ns.DeveloperTools
-
-	ns = diagramsjs_resources.aws.engagement
-		ns.SES = ns.SimpleEmailServiceSes
-
-	ns = diagramsjs_resources.aws.general
-		ns.OfficeBuilding = ns.GenericOfficeBuilding
-
-	ns = diagramsjs_resources.aws.integration
-		ns.SNS = ns.SimpleNotificationServiceSns
-		ns.SQS = ns.SimpleQueueServiceSqs
-		ns.SF = ns.StepFunctions
-
-	ns = diagramsjs_resources.aws.iot
-		ns.FreeRTOS = ns.Freertos
-		ns.IotBoard = ns.IotHardwareBoard
-
-	ns = diagramsjs_resources.aws.management
-		ns.SSM = ns.SystemsManager
-		ns.ParameterStore = ns.SystemsManagerParameterStore
-
-	ns = diagramsjs_resources.aws.migration
-		ns.ADS = ns.ApplicationDiscoveryService
-		ns.CEM = ns.CloudendureMigration
-		ns.DMS = ns.DatabaseMigrationService
-		ns.MAT = ns.MigrationAndTransfer
-		ns.SMS = ns.ServerMigrationService
-
-	ns = diagramsjs_resources.aws.ml
-		ns.DLC = ns.DeepLearningContainers
-
-	ns = diagramsjs_resources.aws.network
-		ns.CF = ns.CloudFront
-		ns.ELB = ns.ElasticLoadBalancing
-		ns.ALB = ns.ElbApplicationLoadBalancer
-		ns.CLB = ns.ElbClassicLoadBalancer
-		ns.NLB = ns.ElbNetworkLoadBalancer
-		ns.GAX = ns.GlobalAccelerator
-
-	ns = diagramsjs_resources.aws.security
-		ns.ACM = ns.CertificateManager
-		ns.CloudHSM = ns.Cloudhsm
-		ns.DS = ns.DirectoryService
-		ns.FMS = ns.FirewallManager
-		ns.IAMAccessAnalyzer = ns.IdentityAndAccessManagementIamAccessAnalyzer
-		ns.IAMAWSSts = ns.IdentityAndAccessManagementIamAWSSts
-		ns.IAMPermissions = ns.IdentityAndAccessManagementIamPermissions
-		ns.IAMRole = ns.IdentityAndAccessManagementIamRole
-		ns.IAM = ns.IdentityAndAccessManagementIam
-		ns.KMS = ns.KeyManagementService
-		ns.RAM = ns.ResourceAccessManager
-
-	ns = diagramsjs_resources.aws.storage
-		ns.CDR = ns.CloudendureDisasterRecovery
-		ns.EBS = ns.ElasticBlockStoreEBS
-		ns.EFS = ns.ElasticFileSystemEFS
-		ns.FSx = ns.Fsx
-		ns.S3 = ns.SimpleStorageServiceS3
-
-	// azure
-	ns = diagramsjs_resources.azure.storage
-		ns.ACR = ns.ContainerRegistries
-		ns.AKS = ns.KubernetesServices
-		ns.VMSS = ns.VMScaleSet
-
-	// elastic	
-	ns = diagramsjs_resources.elastic.elasticsearch
-		ns.LogStash = ns.Logstash
-
-	// firebase
-	ns = diagramsjs_resources.firebase.grow	
-		ns.FCM = ns.Messaging
-
-	// gcp	
-	ns = diagramsjs_resources.gcp.analytics	
-		ns.BigQuery = ns.Bigquery
-		ns.PubSub = ns.Pubsub	
-
-	ns = diagramsjs_resources.gcp.compute	
-		ns.GAE = ns.AppEngine
-		ns.GCF = ns.Functions
-		ns.GCE = ns.ComputeEngine
-		ns.GKE = ns.KubernetesEngine
-		
-		
-	ns = diagramsjs_resources.gcp.database	
-		ns.BigTable = ns.Bigtable
-		
-	ns = diagramsjs_resources.gcp.devtools		
-		ns.GCR = ns.ContainerRegistry	
-		
-	ns = diagramsjs_resources.gcp.ml
-		ns.AutoML = ns.Automl
-		ns.NLAPI = ns.NaturalLanguageAPI
-		ns.STT = ns.SpeechToText
-		ns.TTS = ns.TextToSpeech	
-		
-	ns = diagramsjs_resources.gcp.network
-		ns.VPC = ns.VirtualPrivateCloud	
-		
-	ns = diagramsjs_resources.gcp.security	
-		ns.KMS = ns.KeyManagementService
-		ns.SCC = ns.SecurityCommandCenter	
-
-	ns = diagramsjs_resources.gcp.storage	
-		ns.GCS = ns.Storage
-
-	// k8s
-	ns = diagramsjs_resources.k8s.clusterconfig
-		ns.LimitRange = ns.Limits
-		ns.HorizontalPodAutoscaler = ns.HPA
-
-	ns = diagramsjs_resources.k8s.compute
-		ns.Deployment = ns.Deploy
-		ns.DaemonSet = ns.DS
-		ns.ReplicaSet = ns.RS
-		ns.StatefulSet = ns.STS	
-		
-	ns = diagramsjs_resources.k8s.controlplane
-		ns.APIServer = ns.API
-		ns.ControllerManager = ns.CM
-		ns.KubeProxy = ns.KProxy
-		ns.Scheduler = ns.Sched
-
-	ns = diagramsjs_resources.k8s.group
-		
-
-	ns = diagramsjs_resources.k8s.network
-		ns.Endpoint = ns.Ep
-		ns.Ingress = ns.Ing
-		ns.NetworkPolicy = ns.Netpol
-		ns.Service = ns.SVC
-
-	ns = diagramsjs_resources.k8s.podconfig
-		
-
-	ns = diagramsjs_resources.k8s.rbac
-		ns.ClusterRole = ns.CRole
-		ns.ClusterRoleBinding = ns.CRB
-		ns.RoleBinding = ns.RB
-		ns.ServiceAccount = ns.SA
-
-	ns = diagramsjs_resources.k8s.storage
-		ns.PersistentVolume = ns.PV
-		ns.PersistentVolumeClaim = ns.PVC
-		ns.StorageClass = ns.SC
-		ns.Volume = ns.Vol
-
-	// oci
-	ns = diagramsjs_resources.oci.compute
-		ns.VirtualMachine = ns.VM
-		ns.VirtualMachineWhite = ns.VMWhite
-		ns.BareMetal = ns.BM
-		ns.BareMetalWhite = ns.BMWhite
-		ns.OCIRegistry = ns.OCIR
-		ns.OCIRegistryWhite = ns.OCIRWhite
-		ns.ContainerEngine = ns.OKE
-		ns.ContainerEngineWhite = ns.OKEWhite
-
-	ns = diagramsjs_resources.oci.database
-		ns.ADB = ns.Autonomous
-		ns.ADBWhite = ns.AutonomousWhite
-		ns.DBService = ns.DatabaseService
-		ns.DBServiceWhite = ns.DatabaseServiceWhite
-
-	// onprem
-	ns = diagramsjs_resources.onprem.analytics
-		ns.PowerBI = ns.Powerbi
-
-	ns = diagramsjs_resources.onprem.ci
-		ns.CircleCI = ns.Circleci
-		ns.ConcourseCI = ns.Concourseci
-		ns.DroneCI = ns.Droneci
-		ns.GitlabCI = ns.Gitlabci
-		ns.TravisCI = ns.Travisci
-		ns.TC = ns.Teamcity
-		ns.ZuulCI = ns.Zuulci
-
-	ns = diagramsjs_resources.onprem.container
-		ns.LXC = ns.Lxc
-		ns.RKT = ns.Rkt
-
-	ns = diagramsjs_resources.onprem.database
-		ns.ClickHouse = ns.Clickhouse
-		ns.CockroachDB = ns.Cockroachdb
-		ns.CouchDB = ns.Couchdb
-		ns.HBase = ns.Hbase
-		ns.InfluxDB = ns.Influxdb
-		ns.JanusGraph = ns.Janusgraph
-		ns.MariaDB = ns.Mariadb
-		ns.MongoDB = ns.Mongodb
-		ns.MSSQL = ns.Mssql
-		ns.MySQL = ns.Mysql
-		ns.PostgreSQL = ns.Postgresql
-
-	ns = diagramsjs_resources.onprem.gitops
-		ns.ArgoCD = ns.Argocd
-
-	ns = diagramsjs_resources.onprem.logging
-		ns.FluentBit = ns.Fluentbit
-		ns.RSyslog = ns.Rsyslog
-
-	ns = diagramsjs_resources.onprem.network
-		ns.ETCD = ns.Etcd
-		ns.HAProxy = ns.Haproxy
-		ns.OSM = ns.OpenServiceMesh
-		ns.OPNSense = ns.Opnsense
-		ns.PFSense = ns.Pfsense
-		ns.VyOS = ns.Vyos
-
-	ns = diagramsjs_resources.onprem.proxmox
-		ns.ProxmoxVE = ns.Pve
-
-	ns = diagramsjs_resources.onprem.queue
-		ns.ActiveMQ = ns.Activemq
-		ns.RabbitMQ = ns.Rabbitmq
-		ns.ZeroMQ = ns.Zeromq
-
-	ns = diagramsjs_resources.onprem.storage
-		ns.CEPH = ns.Ceph
-		ns.CEPH_OSD = ns.CephOsd
-
-	ns = diagramsjs_resources.onprem.workflow
-		ns.KubeFlow = ns.Kubeflow
-		ns.NiFi = ns.Nifi
-
-	ns = diagramsjs_resources.openstack.billing
-		ns.CloudKitty = ns.Cloudkitty
-
-	ns = diagramsjs_resources.openstack.deployment
-		ns.KollaAnsible = ns.Kolla
-		ns.TripleO = ns.Tripleo
-
-	ns = diagramsjs_resources.openstack.user
-		ns.OpenStackClient = ns.Openstackclient
-
-	ns = diagramsjs_resources.programming.framework
-		ns.FastAPI = ns.Fastapi
-
-	ns = diagramsjs_resources.programming.language
-		ns.JavaScript = ns.Javascript
-		ns.NodeJS = ns.Nodejs
-		ns.PHP = ns.Php
-		ns.TypeScript = ns.Typescript
-
-	ns = diagramsjs_resources.saas.logging
-		ns.DataDog = ns.Datadog
-		ns.NewRelic = ns.Newrelic
+	///////////////////////////////////////////////////////////////////////////
+	// copy from https://github.com/mingrammer/diagrams/blob/master/config.py
+	
+	var ALIASES = {
+		"onprem": {
+			"analytics": {
+				"Powerbi": "PowerBI"
+			},
+			"ci": {
+				"Circleci": "CircleCI",
+				"Concourseci": "ConcourseCI",
+				"Droneci": "DroneCI",
+				"Gitlabci": "GitlabCI",
+				"Travisci": "TravisCI",
+				"Teamcity": "TC",
+				"Zuulci": "ZuulCI",
+			},
+			"container": {
+				"Lxc": "LXC",
+				"Rkt": "RKT",
+			},
+			"database": {
+				"Clickhouse": "ClickHouse",
+				"Cockroachdb": "CockroachDB",
+				"Couchdb": "CouchDB",
+				"Hbase": "HBase",
+				"Influxdb": "InfluxDB",
+				"Janusgraph": "JanusGraph",
+				"Mariadb": "MariaDB",
+				"Mongodb": "MongoDB",
+				"Mssql": "MSSQL",
+				"Mysql": "MySQL",
+				"Postgresql": "PostgreSQL",
+			},
+			"gitops": {
+				"Argocd": "ArgoCD",
+			},
+			"logging": {
+				"Fluentbit": "FluentBit",
+				"Rsyslog": "RSyslog",
+			},
+			"network": {
+				"Etcd": "ETCD",
+				"Haproxy": "HAProxy",
+				"OpenServiceMesh": "OSM",
+				"Opnsense": "OPNSense",
+				"Pfsense": "PFSense",
+				"Vyos": "VyOS"
+			},
+			"proxmox": {
+				"Pve": "ProxmoxVE",
+			},
+			"queue": {
+				"Activemq": "ActiveMQ",
+				"Rabbitmq": "RabbitMQ",
+				"Zeromq": "ZeroMQ",
+			},
+			"storage": {
+				"Ceph": "CEPH",
+				"CephOsd": "CEPH_OSD",
+			},
+			"workflow": {
+				"Kubeflow": "KubeFlow",
+				"Nifi": "NiFi",
+			}
+		},
+		"aws": {
+			"analytics": {
+				"ElasticsearchService": "ES",
+			},
+			"business": {
+				"AlexaForBusiness": "A4B"
+			},
+			"blockchain": {
+				"QuantumLedgerDatabaseQldb": "QLDB"
+			},
+			"compute": {
+				"ApplicationAutoScaling": "AutoScaling",
+				"EC2Ami": "AMI",
+				"EC2ContainerRegistry": "ECR",
+				"ElasticBeanstalk": "EB",
+				"ElasticContainerService": "ECS",
+				"ElasticKubernetesService": "EKS",
+				"ServerlessApplicationRepository": "SAR",
+			},
+			"database": {
+				"DatabaseMigrationService": "DMS",
+				"DocumentdbMongodbCompatibility": "DocumentDB",
+				"DynamodbDax": "DAX",
+				"DynamodbGlobalSecondaryIndex": "DynamodbGSI",
+				"Database": "DB",
+				"Dynamodb": "DDB",
+				"Elasticache": "ElastiCache",
+				"QuantumLedgerDatabaseQldb": "QLDB",
+			},
+			"devtools": {
+				"CommandLineInterface": "CLI",
+				"DeveloperTools": "DevTools",
+			},
+			"engagement": {
+				"SimpleEmailServiceSes": "SES",
+			},
+			"general": {
+				"GenericOfficeBuilding": "OfficeBuilding",
+			},
+			"integration": {
+				"SimpleNotificationServiceSns": "SNS",
+				"SimpleQueueServiceSqs": "SQS",
+				"StepFunctions": "SF",
+			},
+			"iot": {
+				"Freertos": "FreeRTOS",
+				"IotHardwareBoard": "IotBoard",
+			},
+			"management": {
+				"SystemsManager": "SSM",
+				"SystemsManagerParameterStore": "ParameterStore",
+			},
+			"migration": {
+				"ApplicationDiscoveryService": "ADS",
+				"CloudendureMigration": "CEM",
+				"DatabaseMigrationService": "DMS",
+				"MigrationAndTransfer": "MAT",
+				"ServerMigrationService": "SMS",
+			},
+			"ml": {
+				"DeepLearningContainers": "DLC",
+			},
+			"network": {
+				"CloudFront": "CF",
+				"ElasticLoadBalancing": "ELB",
+				"ElbApplicationLoadBalancer": "ALB",
+				"ElbClassicLoadBalancer": "CLB",
+				"ElbNetworkLoadBalancer": "NLB",
+				"GlobalAccelerator": "GAX",
+			},
+			"security": {
+				"CertificateManager": "ACM",
+				"Cloudhsm": "CloudHSM",
+				"DirectoryService": "DS",
+				"FirewallManager": "FMS",
+				"IdentityAndAccessManagementIamAccessAnalyzer": "IAMAccessAnalyzer",
+				"IdentityAndAccessManagementIamAWSSts": "IAMAWSSts",
+				"IdentityAndAccessManagementIamPermissions": "IAMPermissions",
+				"IdentityAndAccessManagementIamRole": "IAMRole",
+				"IdentityAndAccessManagementIam": "IAM",
+				"KeyManagementService": "KMS",
+				"ResourceAccessManager": "RAM",
+			},
+			"storage": {
+				"CloudendureDisasterRecovery": "CDR",
+				"ElasticBlockStoreEBS": "EBS",
+				"ElasticFileSystemEFS": "EFS",
+				"Fsx": "FSx",
+				"SimpleStorageServiceS3": "S3",
+			},
+		},
+		"azure": {
+			"compute": {
+				"ContainerRegistries": "ACR",
+				"KubernetesServices": "AKS",
+				"VMScaleSet": "VMSS"
+			},
+		},
+		"gcp": {
+			"analytics": {
+				"Bigquery": "BigQuery",
+				"Pubsub": "PubSub",
+			},
+			"compute": {
+				"AppEngine": "GAE",
+				"Functions": "GCF",
+				"ComputeEngine": "GCE",
+				"KubernetesEngine": "GKE",
+			},
+			"database": {
+				"Bigtable": "BigTable",
+			},
+			"devtools": {
+				"ContainerRegistry": "GCR",
+			},
+			"ml": {
+				"Automl": "AutoML",
+				"NaturalLanguageAPI": "NLAPI",
+				"SpeechToText": "STT",
+				"TextToSpeech": "TTS",
+			},
+			"network": {
+				"VirtualPrivateCloud": "VPC"
+			},
+			"security": {
+				"KeyManagementService": "KMS",
+				"SecurityCommandCenter": "SCC",
+			},
+			"storage": {
+				"Storage": "GCS",
+			},
+		},
+		"firebase": {
+			"grow": {
+				"Messaging": "FCM"
+			}
+		},
+		"k8s": {
+			"clusterconfig": {
+				"Limits": "LimitRange",
+				"HPA": "HorizontalPodAutoscaler",
+			},
+			"compute": {
+				"Deploy": "Deployment",
+				"DS": "DaemonSet",
+				"RS": "ReplicaSet",
+				"STS": "StatefulSet"
+			},
+			"controlplane": {
+				"API": "APIServer",
+				"CM": "ControllerManager",
+				"KProxy": "KubeProxy",
+				"Sched": "Scheduler",
+			},
+			"group": {
+				"NS": "Namespace",
+			},
+			"network": {
+				"Ep": "Endpoint",
+				"Ing": "Ingress",
+				"Netpol": "NetworkPolicy",
+				"SVC": "Service",
+			},
+			"podconfig": {
+				"CM": "ConfigMap",
+			},
+			"rbac": {
+				"CRole": "ClusterRole",
+				"CRB": "ClusterRoleBinding",
+				"RB": "RoleBinding",
+				"SA": "ServiceAccount",
+			},
+			"storage": {
+				"PV": "PersistentVolume",
+				"PVC": "PersistentVolumeClaim",
+				"SC": "StorageClass",
+				"Vol": "Volume",
+			},
+		},
+		"alibabacloud": {
+			"application": {
+				"LogService": "SLS",
+				"MessageNotificationService": "MNS",
+				"PerformanceTestingService": "PTS",
+				"SmartConversationAnalysis": "SCA",
+			},
+			"compute": {
+				"AutoScaling": "ESS",
+				"ElasticComputeService": "ECS",
+				"ElasticContainerInstance": "ECI",
+				"ElasticHighPerformanceComputing": "EHPC",
+				"FunctionCompute": "FC",
+				"OperationOrchestrationService": "OOS",
+				"ResourceOrchestrationService": "ROS",
+				"ServerLoadBalancer": "SLB",
+				"ServerlessAppEngine": "SAE",
+				"SimpleApplicationServer": "SAS",
+				"WebAppService": "WAS",
+			},
+			"database": {
+				"DataManagementService": "DMS",
+				"DataTransmissionService": "DTS",
+				"DatabaseBackupService": "DBS",
+				"DisributeRelationalDatabaseService": "DRDS",
+				"GraphDatabaseService": "GDS",
+				"RelationalDatabaseService": "RDS",
+			},
+			"network": {
+				"CloudEnterpriseNetwork": "CEN",
+				"ElasticIpAddress": "EIP",
+				"ServerLoadBalancer": "SLB",
+				"VirtualPrivateCloud": "VPC",
+			},
+			"security": {
+				"AntiBotService": "ABS",
+				"AntifraudService": "AS",
+				"CloudFirewall": "CFW",
+				"ContentModeration": "CM",
+				"DataEncryptionService": "DES",
+				"WebApplicationFirewall": "WAF",
+			},
+			"storage": {
+				"FileStorageHdfs": "HDFS",
+				"FileStorageNas": "NAS",
+				"HybridBackupRecovery": "HBR",
+				"HybridCloudDisasterRecovery": "HDR",
+				"ObjectStorageService": "OSS",
+				"ObjectTableStore": "OTS",
+			}
+		},
+		"oci": {
+			"compute": {
+				"VM": "VirtualMachine",
+				"VMWhite": "VirtualMachineWhite",
+				"BM": "BareMetal",
+				"BMWhite": "BareMetalWhite",
+				"OCIR": "OCIRegistry",
+				"OCIRWhite": "OCIRegistryWhite",
+				"OKE": "ContainerEngine",
+				"OKEWhite": "ContainerEngineWhite",
+			},
+			"database": {
+				"Autonomous": "ADB",
+				"AutonomousWhite": "ADBWhite",
+				"DatabaseService": "DBService",
+				"DatabaseServiceWhite": "DBServiceWhite",
+			}
+		},
+		"programming": {
+			"framework": {
+				"Fastapi": "FastAPI"
+			},
+			"language": {
+				"Javascript": "JavaScript",
+				"Nodejs": "NodeJS",
+				"Php": "PHP",
+				"Typescript": "TypeScript"
+			},
+		},
+		"saas": {
+			"logging": {
+				"Datadog": "DataDog",
+				"Newrelic": "NewRelic"
+			}
+		},
+		"elastic": {
+			"elasticsearch": {
+				"Logstash": "LogStash",
+			}
+		},
+		"outscale": {
+			"Osc": "OSC",
+		},
+		"generic": {},
+		"openstack": {
+			"user": {
+				"Openstackclient": "OpenStackClient",
+			},
+			"billing": {
+				"Cloudkitty": "CloudKitty",
+			},
+			"deployment": {
+				"Kolla": "KollaAnsible",
+				"Tripleo": "TripleO",
+			}
+		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	
+	function merge(src, node) {
+		for (var x in node) {
+			var aliase = node[x];
+			if (aliase) {
+				if (typeof aliase == "string") {
+					var obj = src[x];
+					if (obj) {
+						src[aliase] = obj;
+					}
+				} else {
+					merge(src[x], node[x]);
+				}
+			}
+		}
+	}
+	
+	merge(diagramsjs_resources, ALIASES);
+	
 })(window)

@@ -32,6 +32,15 @@
 	<link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
+	
+	<!-- diagramsjs -->
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+	<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+
+	<script type="text/javascript" src="diagramsjs_resources.js"></script>
+	<script type="text/javascript" src="diagramsjs.js"></script>
+	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
 			var btnEls = document.querySelectorAll("button");
@@ -79,7 +88,7 @@
 			
 			// Change default attribute(options)
 			// diagramsjs.attributes.graphviz.fit = false;
-			diagramsjs.attributes.digraph.splines = "spline";
+			//diagramsjs.attributes.digraph.splines = "spline";
 			
 			var result = diagramsjs.render(graphEl, code);
 			var dot = result.dot;	// generated dot script
@@ -162,7 +171,7 @@ var ECS = diagrams.aws.compute.ECS
 var EKS = diagrams.aws.compute.EKS
 var Lambda = diagrams.aws.compute.Lambda
 var Redshift = diagrams.aws.database.Redshift
-var SQS = diagrams.aws.integration .SQS
+var SQS = diagrams.aws.integration.SQS
 var S3 = diagrams.aws.storage.S3
 
 Diagram("Event Processing", function() {
@@ -403,11 +412,12 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 var Aurora = diagrams.aws.database.Aurora
 var Pod = diagrams.k8s.compute.Pod
 
+// 참고 https://vecta.io/symbols
 var rabbitmq_icon = "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png";
 
-var RabbitMQ = (name, attrs) => Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png");
+var RabbitMQ = (name, attrs) => Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png")
 var RabbitMQ = function(name, attrs) {
-	return Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png");
+	return Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png")
 }
 
 Diagram("Broker Consumers", function() {
@@ -427,14 +437,87 @@ Diagram("Broker Consumers", function() {
 		<div class="graphContainer"></div>
 	</div>
 	
-	
-	
-	
-	<script src="https://d3js.org/d3.v5.min.js"></script>
-	<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-	<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+	<h3>Circled Workers on AWS <button>Run(Ctrl-Enter)</button></h3>
+	<div class="group">
+		<code>
+ctx.attributes.graphviz.engine = 'circo'
+ctx.attributes.digraph.splines = 'curved'
+		
+var EC2 = diagrams.aws.compute.EC2
+var RDS = diagrams.aws.database.RDS
+var APIGateway = diagrams.aws.network.APIGateway
 
-	<script type="text/javascript" src="diagramsjs_resources.js"></script>
-	<script type="text/javascript" src="diagramsjs.js"></script>
+Diagram("Grouped Workers", function() {
+	ctx.worker1 = EC2("worker1")
+    ctx.worker4 = EC2("worker4")
+  	ctx.worker6 = EC2("worker6")
+  
+    ctx.worker1.$_$(EC2("worker2")).$_$(EC2("worker3")).$_$(ctx.worker4).$_$(EC2("worker5")).$_$(ctx.worker6)
+  	ctx.worker6.$_$(ctx.worker1)
+	
+	ctx.gateway = APIGateway("gateway")
+    ctx.userdb = RDS("userdb")
+  	
+  	ctx.gateway._$(ctx.worker1)
+	ctx.worker4._$(ctx.userdb)
+})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	<h3>Company organization chart (with HTML-like labels) <button>Run(Ctrl-Enter)</button></h3>
+	<div class="group">
+		<code>
+
+var Man1 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/88_man-office-worker.513fcaf81c.png")
+var Woman1 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/184_woman-office-worker.aba5c81a53.png")
+
+var Man2 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/40_man-office-worker-medium-skin-tone.c786d46670.png");
+var Woman2 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/136_woman-office-worker-medium-skin-tone.5c2ed59d9e.png");
+
+var Man3 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/8_man-office-worker-light-skin-tone.ecedebb915.png");
+var Woman3 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/104_woman-office-worker-light-skin-tone.0b9478b0dc.png");
+
+var Man4 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/56_man-office-worker-medium-dark-skin-tone.dbc929b244.png");
+var Woman4 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/152_woman-office-worker-medium-dark-skin-tone.e47159e659.png");
+
+Diagram("Organization", function() {
+  	Cluster("CEO", function() {
+      	ctx.ceo = Woman4("Roxy")
+    }, {fontcolor: "orange"})
+  	
+  	Cluster("< &lt;b&gt;Operation Team&lt;/b&gt; >", function() {
+      	ctx.team1 = Man1("Hugh")
+        ctx.team1.$_(Woman1("Belle"))
+        ctx.team1.$_(Man1("Bruno"))
+        ctx.team1.$_(Man3("Eric"))
+    }, {fontcolor: "#FF0000", tooltip: "Operation Team"})
+  
+  	Cluster("< &lt;b&gt;Technical Team&lt;/b&gt; >", function() {
+     	ctx.team2 = Woman2("Judith")
+  		ctx.team2.$_(Man2("Tom"))
+    }, {fontcolor: "blue", tooltip: "Technical Team"})
+  
+  	Cluster("Commercial Team", function() {
+      	ctx.team3 = Man3("Leonard")
+		ctx.team3.$_(Woman3("Calla"))
+  		ctx.team3.$_(Man2("woman"))
+    }, {fontcolor: "green"})
+  
+  	Cluster("Human Resources Team", function() {
+      	ctx.team4 = Man4("Maggie")
+		ctx.team4.$_(Woman4("Silly"))
+  		ctx.team4.$_(Woman2("Sam"))
+    })
+  
+  	ctx.ceo.$_([ctx.team1, ctx.team2, ctx.team3, ctx.team4])
+  
+}, {rankdir: "TB"})	
+		
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	
 </body>
 </html>
