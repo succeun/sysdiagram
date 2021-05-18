@@ -1,6 +1,9 @@
-// https://diagrams.mingrammer.com/docs/getting-started/examples#rabbitmq-consumers-with-custom-nodes
+//     sysdiagram.js 0.1.0
+//     https://succeun.github.io/sysdiagram
+//     (c) 2021-2021 Jeong-Ho, Eun
+//     diagrams.js may be freely distributed under the MIT license.
 
-var diagramsjs = (function() {
+var sysdiagram = (function() {
 	
 	function uuid() {
 	  return 'yxxxxxxxxxxxxxxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -117,6 +120,12 @@ var diagramsjs = (function() {
 			width: "256px",
 			height: "256px"
 		},
+		toImage: {
+			delay: 200,
+			format: "png",
+			quality: 1,
+			scale: 1
+		}
 	};
 
 	var rootNode = null;
@@ -432,8 +441,8 @@ var diagramsjs = (function() {
 	
 	function generate(script) {
 		if (!isLoadedResources) {
-			if (diagramsjs_resources) {
-				loadResources(diagramsjs_resources, diagramsjs_resources.baseUrl);
+			if (sysdiagram_resources) {
+				loadResources(sysdiagram_resources, sysdiagram_resources.baseUrl);
 			}
 		}
 		
@@ -519,7 +528,11 @@ var diagramsjs = (function() {
 	
 	function defineResource(dir, namespace, key) {
 		var image = namespace[key];
-		image = dir ? dir + image : image;
+		if (image.startsWith('http:') || image.startsWith('https:') || image.startsWith('file:')) {
+			image = image;
+		} else {
+			image = dir ? dir + image : image;
+		}
 		namespace[key] = function() {
 			var args = [];
 			args[0] = arguments[0];
@@ -530,27 +543,31 @@ var diagramsjs = (function() {
 		}
 	}
 	
-	function render(selectorOrObj, script, options, cbFunc) {
+	function render(selectorOrElement, script, options, cbFunc) {
 		var dot = generate(script);
-		var graphviz = createGraphviz(selectorOrObj, options);
-		return renderDot(graphviz, dot, cbFunc);
+		var graphviz = createGraphviz(selectorOrElement, options);
+		return renderDot(selectorOrElement, graphviz, dot, cbFunc);
 	}
 	
-	function createGraphviz(selectorOrObj, options) {
+	function createGraphviz(selectorOrElement, options) {
 		options = options || {};
 		options = mergeAttrs(ctx.attributes.graphviz, options);
 		
-		var element = ("string" == typeof selectorOrObj) ? document.querySelector(selectorOrObj) : selectorOrObj;
+		var element = ("string" == typeof selectorOrElement) ? document.querySelector(selectorOrElement) : selectorOrElement;
 		
-		var graphviz = d3.select(selectorOrObj).graphviz(options);
+		var graphviz = d3.select(selectorOrElement).graphviz(options);
 		
 		element.graphviz = graphviz;
+		
 		// hack
+		graphviz.toImage = function(name, options) {
+			var svg = this.getSVG();
+			return svg ? toImage(svg, name, options) : null;
+		};
+		
 		graphviz.getSVG = function() {
-			var root = this._selection;
-			var svg = root.selectWithoutDataPropagation("svg");
-			return svg;
-		}
+			return element.querySelector('svg');
+		};
 
 		Object.entries(icons).forEach(([key, value]) => {
 			graphviz.addImage(key, ctx.attributes.iconSize.width, ctx.attributes.iconSize.height);
@@ -558,12 +575,14 @@ var diagramsjs = (function() {
 		return graphviz;
 	}
 	
-	function renderDot(graphviz, dot, cbFunc) {
+	function renderDot(selectorOrElement, graphviz, dot, cbFunc) {
 		cbFunc = cbFunc || function(){};
+		
+		var element = ("string" == typeof selectorOrElement) ? document.querySelector(selectorOrElement) : selectorOrElement;
 
 		graphviz.renderDot(dot, function() {
 			
-			cbFunc();
+			cbFunc(element, graphviz);
 		});
 		
 		return {
@@ -578,8 +597,6 @@ var diagramsjs = (function() {
 	
 	function loadResources(resourceJson, baseUrl) {
 		if (resourceJson) {
-			diagrams = {};
-			
 			var baseUrl = baseUrl || "https://github.com/mingrammer/diagrams/raw/master/resources";
 			baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
 			for (var x in resourceJson) {
@@ -597,10 +614,76 @@ var diagramsjs = (function() {
 	
 	///////////////////////////////////////////////////////////////////////////
 	
+	async function copyToCanvas(selectorOrElement, format, quality, scale) {
+		var svg = (typeof selectorOrElement == "string") ? document.querySelector(selectorOrElement) : selectorOrElement;
+		var svgData = new XMLSerializer().serializeToString(svg);
+		
+		var svgSize = svg.getBoundingClientRect();
+		var canvas = document.createElement('canvas');
+		
+		//Resize can break shadows
+		canvas.width = svgSize.width * scale;
+		canvas.height = svgSize.height * scale;
+		canvas.style.width = svgSize.width;
+		canvas.style.height = svgSize.height;
+		
+		var canvasCtx = canvas.getContext("2d");
+		canvasCtx.scale(scale, scale);
+		var v = canvg.Canvg.fromString(canvasCtx, svgData, {
+				ignoreMouse: true,
+				ignoreAnimation: true,
+				createImage: function(src, anonymousCrossOrigin) {
+					return new Promise(function(resolve) {
+						var img = new Image();
+						img.crossOrigin = "Anonymous";
+						img.addEventListener("load", function() {
+							resolve(img);
+						}, false);
+						img.src = src;
+					});
+				},
+			});
+		
+		await v.start();
+		
+		return new Promise(function(resolve) {
+			setTimeout(function() {
+				var file = canvas.toDataURL("image/" + format, quality);
+				resolve(file);
+			}, defaultAttrs.toImage.delay);
+		});
+	}
+	
+	function downloadImage(file, filename, format) {
+		var a = document.createElement('a');
+		a.download = filename + "." + format;
+		a.href = file;
+		document.body.appendChild(a);
+		a.click();
+	}
+
+	async function toImage(target, name, options) {
+		options = options || {}
+		options.format = options.format || defaultAttrs.toImage.format;
+		options.scale = options.scale || defaultAttrs.toImage.scale;
+		options.quality = options.quality || defaultAttrs.toImage.quality;
+		options.download = (options.download == null) ? true : options.download;
+		
+		return await copyToCanvas(target,options.format, options.quality, options.scale).then(function(file) {
+				if (options.download) { 
+					downloadImage(file, name, options.format);
+				}
+				return file;
+			})
+			.catch(console.error);
+	}
+	///////////////////////////////////////////////////////////////////////////
+	
 	return {
 		loadResources: loadResources,
 		attributes: defaultAttrs,
 		generate: generate,
-		render: render
+		render: render,
+		toImage: toImage
 	};
 })();

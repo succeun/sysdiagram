@@ -1,5 +1,5 @@
 (function(w) {
-	w.diagramsjs_resources = {
+	w.sysdiagram_resources = {
 		baseUrl: "https://cdn.jsdelivr.net/gh/mingrammer/diagrams/resources/",
 		
 		alibabacloud: {
@@ -2138,6 +2138,6 @@
 		}
 	}
 	
-	merge(diagramsjs_resources, ALIASES);
+	merge(sysdiagram_resources, ALIASES);
 	
 })(window)

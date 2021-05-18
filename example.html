@@ -18,6 +18,8 @@
 			width: 700px;
 			height: 400px !important;
 			margin-bottom: 30px;
+			font-family: Operator Mono SSm A,Operator Mono SSm B,Source Code Pro,Menlo,Consolas,Monaco,monospace !important;
+			font-size: 16px;
 		}
 		
 		.graphContainer {
@@ -30,22 +32,32 @@
 	
 	<!-- code mirror -->
 	<link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/dracula.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lesser-dark.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lucario.min.css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
 	
-	<!-- diagramsjs -->
+	<!-- sysdiagram -->
 	<script src="https://d3js.org/d3.v5.min.js"></script>
 	<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
 	<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+	
+	<script type="text/javascript" src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
-	<script type="text/javascript" src="diagramsjs_resources.js"></script>
-	<script type="text/javascript" src="diagramsjs.js"></script>
+	<script type="text/javascript" src="sysdiagram_resources.js"></script>
+	<script type="text/javascript" src="sysdiagram.js"></script>
 	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
-			var btnEls = document.querySelectorAll("button");
-			for (var i = 0 ; i < btnEls.length; i++) {
-				addButtonEvent(i);
+			var btnRun = document.querySelectorAll("button.run");
+			for (var i = 0 ; i < btnRun.length; i++) {
+				addButtonRunEvent(i);
+			}
+			
+			var btnDownload = document.querySelectorAll("button.download");
+			for (var i = 0 ; i < btnDownload.length; i++) {
+				addButtonDownloadEvent(i);
 			}
 		
 			var codeEls = document.querySelectorAll("code");
@@ -54,10 +66,20 @@
 			}
 		});
 		
-		function addButtonEvent(i) {
-			var btnEl = document.querySelectorAll("button")[i];
-			btnEl.addEventListener("click", function(evt) {
+		function addButtonRunEvent(i) {
+			var btn = document.querySelectorAll("button.run")[i];
+			btn.addEventListener("click", function(evt) {
 				run(i, false);
+			});
+		}
+		
+		function addButtonDownloadEvent(i) {
+			var btn = document.querySelectorAll("button.download")[i];
+			btn.addEventListener("click", function(evt) {
+				var graphEl = document.querySelectorAll(".graphContainer")[i];
+				if (graphEl && graphEl.graphviz) {
+					graphEl.graphviz.toImage("example-" + i);
+				}
 			});
 		}
 		
@@ -79,7 +101,8 @@
 						"Ctrl-Enter": function(cm) { 
 							run(index, false); 
 						},     
-					}
+					},
+					theme: "lucario",	// dracula, lesser-dark
 				});
 				
 			} else {
@@ -87,10 +110,35 @@
 			}
 			
 			// Change default attribute(options)
-			// diagramsjs.attributes.graphviz.fit = false;
-			//diagramsjs.attributes.digraph.splines = "spline";
+			// sysdiagram.attributes.graphviz.fit = false;
+			//sysdiagram.attributes.digraph.splines = "spline";
 			
-			var result = diagramsjs.render(graphEl, code);
+			var result = sysdiagram.render(graphEl, code, {}, function(element, graphviz) {
+				var elt = d3.select(element);
+				var nodes = elt.selectAll(".node");
+				var edges = elt.selectAll(".edge");
+				
+				nodes.on("click", function() {
+					var event = d3.event;
+					event.preventDefault();
+					event.stopPropagation();
+					console.log("node:", event);
+				});
+				nodes.on("mouseover", function(){
+					this.old_stroke = d3.select(this).style("stroke");
+					d3.select(this).style("stroke", "crimson");
+				})
+				.on("mouseout", function(){
+					d3.select(this).style("stroke", this.old_stroke);
+				});
+				
+				edges.on("click", function() {
+					var event = d3.event;
+					event.preventDefault();
+					event.stopPropagation();
+					console.log("edge:", event);
+				});
+			});
 			var dot = result.dot;	// generated dot script
 			var graphviz = result.graphviz;
 		}
@@ -98,7 +146,7 @@
 </head>
 <body>
 
-	<h3>Grouped Workers on AWS <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Grouped Workers on AWS <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 ctx.attributes.digraph.splines = 'curved'
@@ -119,7 +167,7 @@ Diagram("Grouped Workers", function() {
 	</div>
 	
 	
-	<h3>Clustered Web Services <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Clustered Web Services <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var ECS = diagrams.aws.compute.ECS
@@ -164,7 +212,7 @@ Diagram("Clustered Web Services", function() {
 	</div>
 	
 	
-	<h3>Event Processing on AWS <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Event Processing on AWS <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var ECS = diagrams.aws.compute.ECS
@@ -204,7 +252,7 @@ Diagram("Event Processing", function() {
 	</div>
 	
 	
-	<h3>Message Collecting System on GCP <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Message Collecting System on GCP <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var BigQuery = diagrams.gcp.analytics.BigQuery
@@ -258,7 +306,7 @@ Diagram("Message Collecting", () => {
 	</div>
 	
 	
-	<h3>Exposed Pod with 3 Replicas on Kubernetes <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Exposed Pod with 3 Replicas on Kubernetes <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var HPA = diagrams.k8s.clusterconfig.HPA
@@ -279,7 +327,7 @@ Diagram("Exposed Pod with 3 Replicas", () => {
 	</div>
 	
 	
-	<h3>Stateful Architecture on Kubernetes <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Stateful Architecture on Kubernetes <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var Pod = diagrams.k8s.compute.Pod
@@ -310,7 +358,7 @@ Diagram("Stateful Architecture", () => {
 	</div>
 	
 	
-	<h3>Advanced Web Service with On-Premise <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Advanced Web Service with On-Premise <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var Spark = diagrams.onprem.analytics.Spark
@@ -358,7 +406,7 @@ Diagram("Advanced Web Service with On-Premise", function() {
 	</div>
 	
 	
-	<h3>Advanced Web Service with On-Premise (with colors and labels) <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Advanced Web Service with On-Premise (with colors and labels) <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var Spark = diagrams.onprem.analytics.Spark
@@ -406,7 +454,7 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 	</div>
 	
 	
-	<h3>RabbitMQ Consumers with Custom Nodes <button>Run(Ctrl-Enter)</button></h3>
+	<h3>RabbitMQ Consumers with Custom Nodes <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 var Aurora = diagrams.aws.database.Aurora
@@ -437,7 +485,7 @@ Diagram("Broker Consumers", function() {
 		<div class="graphContainer"></div>
 	</div>
 	
-	<h3>Circled Workers on AWS <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Circled Workers on AWS <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
 ctx.attributes.graphviz.engine = 'circo'
@@ -465,9 +513,10 @@ Diagram("Grouped Workers", function() {
 		<div class="graphContainer"></div>
 	</div>
 	
-	<h3>Company organization chart (with HTML-like labels) <button>Run(Ctrl-Enter)</button></h3>
+	<h3>Company organization chart (with HTML-like labels) <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
 	<div class="group">
 		<code>
+ctx.attributes.subgraph.labeljust = 'c'
 
 var Man1 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/88_man-office-worker.513fcaf81c.png")
 var Woman1 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/184_woman-office-worker.aba5c81a53.png")
@@ -496,18 +545,20 @@ Diagram("Organization", function() {
   	Cluster("< &lt;b&gt;Technical Team&lt;/b&gt; >", function() {
      	ctx.team2 = Woman2("Judith")
   		ctx.team2.$_(Man2("Tom"))
+		ctx.team2.$_(Man1("Andrew"))
     }, {fontcolor: "blue", tooltip: "Technical Team"})
   
   	Cluster("Commercial Team", function() {
       	ctx.team3 = Man3("Leonard")
 		ctx.team3.$_(Woman3("Calla"))
-  		ctx.team3.$_(Man2("woman"))
+  		ctx.team3.$_(Man2("Mac"))
+		ctx.team3.$_(Woman1("Ruby"))
     }, {fontcolor: "green"})
   
   	Cluster("Human Resources Team", function() {
-      	ctx.team4 = Man4("Maggie")
+      	ctx.team4 = Man4("Sam")
 		ctx.team4.$_(Woman4("Silly"))
-  		ctx.team4.$_(Woman2("Sam"))
+  		ctx.team4.$_(Woman2("Maggie"))
     })
   
   	ctx.ceo.$_([ctx.team1, ctx.team2, ctx.team3, ctx.team4])
@@ -517,7 +568,5 @@ Diagram("Organization", function() {
 		</code>
 		<div class="graphContainer"></div>
 	</div>
-	
-	
 </body>
 </html>
