@@ -601,7 +601,7 @@ var sysdiagram = sysdiagram || (function() {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
-	// With Document Ready
+	// On window ready
 	
 	function initialize(attributes, callbackFunc) {
 		attributes = attributes || {};
