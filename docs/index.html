@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>sysdiagram - Diagram as Code for prototyping cloud system architectures in Javascript.</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  
+  <style>
+    .sysdiagram {
+	  text-align: center;
+	  border: 1px solid #aaa;
+	  width: 100%;
+	  height: 600px;
+	  border-radius: 8px;
+	  padding: 5px;
+	}
+  </style>
+  
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: 'Sysdiagram.js',
+      repo: 'https://github.com/succeun/sysdiagram',
+	  loadSidebar: true,
+	  plugins: [
+		function(hook, vm) {
+			hook.afterEach(function (html, next) {
+				// We load the HTML inside a DOM node to allow for manipulation
+				/*var htmlElement = document.createElement('div');
+				htmlElement.innerHTML = html;
+
+				htmlElement.querySelectorAll('pre[data-lang=sysdiagram]').forEach((element, index) => {
+					// Create a <div class="sysdiagram"> to replace the <pre> 
+					var replacement = document.createElement('div');
+					replacement.textContent = element.textContent;
+					replacement.classList.add('sysdiagram');
+
+					// Replace
+					element.parentNode.replaceChild(replacement, element);
+				});*/
+				
+				// We load the HTML inside a DOM node to allow for manipulation
+				var htmlElement = document.createElement('div');
+				htmlElement.innerHTML = html;
+				
+				htmlElement.querySelectorAll('pre[data-lang=js]').forEach((element, index) => {
+					// Create a <div class="sysdiagram"> to replace the <pre> 
+					var replacement = document.createElement('div');
+					replacement.textContent = element.textContent;
+					replacement.classList.add('sysdiagram');
+
+					// Replace
+					element.parentNode.insertBefore(replacement, element.nextSibling);
+				});
+
+				next(htmlElement.innerHTML);
+			});
+
+			hook.doneEach(function () {
+				sysdiagram.init({}, '.sysdiagram');
+			});
+		},
+		function(hook) {
+          var footer = [
+            '<hr/>',
+            '<footer>',
+            '<span>Proudly published with <a href="https://docsify.js.org" target="_blank">docsify</a>.</span>',
+            '</footer>'
+          ].join('');
+
+          hook.afterEach(function(html) {
+            return html + footer;
+          });
+        }
+	  ],
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  
+  <!-- sysdiagram -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+  <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+
+  <script type="text/javascript" src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram/sysdiagram_resources.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram/sysdiagram.js"></script>
+</body>
+</html>
