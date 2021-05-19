@@ -3,10 +3,13 @@
 	<meta charset="utf-8">
 	<title></title>
 	<style>
+		body {
+			margin: 40px;
+		}
 		.group {
 			display: flex;
-			flex-direction: row;
-			justify-content: space-evenly;
+			/*flex-direction: row;
+			justify-content: space-evenly;*/
 		}
 		
 		code {
@@ -25,8 +28,72 @@
 		.graphContainer {
 			text-align: center; 
 			border: 1px solid #444;
-			width: 500px;
+			width: calc(100% - 700px);
 			height: 400px;
+			margin-left: 50px;
+		}
+		
+		button {
+			font-family: Operator Mono SSm A,Operator Mono SSm B,Source Code Pro,Menlo,Consolas,Monaco,monospace !important;
+			font-size: 14px;
+			padding: 6px 12px;
+			margin-bottom: 0;
+
+			display: inline-block;
+			text-decoration: none;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: middle;
+			-ms-touch-action: manipulation;
+			touch-action: manipulation;
+			cursor: pointer;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			background-image: none;
+			border: 2px solid transparent;
+			border-radius: 4px;
+		}
+		button:focus,
+		button:active:focus {
+			outline: thin dotted;
+			outline: 5px auto -webkit-focus-ring-color;
+			outline-offset: -2px;
+		}
+		button:hover,
+		button:focus {
+			color: #333;
+			text-decoration: none;
+		}
+		button:active {
+			background-image: none;
+			outline: 0;
+			-webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+			box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+		}
+		
+		/* default
+		---------------------------- */
+		.btn-default {
+			color: #333;
+			background-color: #7e7;
+			border-color: #ccc;
+		}
+		.btn-default:focus {
+			color: #333;
+			background-color: #e6e6e6;
+			border-color: #8c8c8c;
+		}
+		.btn-default:hover {
+			color: #333;
+			background-color: #e6e6e6;
+			border-color: #adadad;
+		}
+		.btn-default:active {
+			color: #333;
+			background-color: #e6e6e6;
+			border-color: #adadad;
 		}
 	</style>
 	
@@ -89,7 +156,7 @@
 			
 			var code = "";
 			if (init) {
-				code = codeEl.innerText;
+				code = codeEl.textContent;
 				codeEl.innerHTML = null;
 				codeEl.style.display = "block";
 				codeEl.editor = CodeMirror(codeEl, {
@@ -145,12 +212,13 @@
 	</script>
 </head>
 <body>
-
-	<h3>Grouped Workers on AWS <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h1>Sysdiagram Examples</h1>
+	
+	<h2>Grouped Workers on AWS <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 ctx.attributes.digraph.splines = 'curved'
-		
+
 var EC2 = diagrams.aws.compute.EC2
 var RDS = diagrams.aws.database.RDS
 var ELB = diagrams.aws.network.ELB
@@ -167,21 +235,11 @@ Diagram("Grouped Workers", function() {
 	</div>
 	
 	
-	<h3>Clustered Web Services <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Clustered Web Services <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 var ECS = diagrams.aws.compute.ECS
-
-// import 1 
-var ElastiCache = diagrams.aws.database.ElastiCache
-var RDS = diagrams.aws.database.RDS
-
-// import 2 (ES6: Destructuring assignment)
-var [ElastiCache, RDS] = [diagrams.aws.database.ElastiCache, diagrams.aws.database.RDS]
-
-// import 3 (ES6: Destructuring assignment)
-var [ElastiCache, RDS] = diagrams.aws.database.import('ElastiCache', 'RDS')
-
+var { ElastiCache, RDS } = diagrams.aws.database
 var ELB = diagrams.aws.network.ELB
 var Route53 = diagrams.aws.network.Route53
 
@@ -207,17 +265,16 @@ Diagram("Clustered Web Services", function() {
     ctx.svc_group._$(ctx.memcached)
 	
 })
+//ctx.onCompleted = function(element, graphviz) { graphviz.toImage('test') }
 		</code>
 		<div class="graphContainer"></div>
 	</div>
 	
 	
-	<h3>Event Processing on AWS <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Event Processing on AWS <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
-var ECS = diagrams.aws.compute.ECS
-var EKS = diagrams.aws.compute.EKS
-var Lambda = diagrams.aws.compute.Lambda
+var { ECS, EKS, Lambda } = diagrams.aws.compute
 var Redshift = diagrams.aws.database.Redshift
 var SQS = diagrams.aws.integration.SQS
 var S3 = diagrams.aws.storage.S3
@@ -252,14 +309,11 @@ Diagram("Event Processing", function() {
 	</div>
 	
 	
-	<h3>Message Collecting System on GCP <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Message Collecting System on GCP <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
-var BigQuery = diagrams.gcp.analytics.BigQuery
-var Dataflow = diagrams.gcp.analytics.Dataflow
-var PubSub = diagrams.gcp.analytics.PubSub
-var AppEngine = diagrams.gcp.compute.AppEngine
-var Functions = diagrams.gcp.compute.Functions
+var { BigQuery, Dataflow, PubSub } = diagrams.gcp.analytics
+var {AppEngine, Functions } = diagrams.gcp.compute
 var BigTable = diagrams.gcp.database.BigTable
 var IotCore = diagrams.gcp.iot.IotCore
 var GCS = diagrams.gcp.storage.GCS
@@ -306,15 +360,12 @@ Diagram("Message Collecting", () => {
 	</div>
 	
 	
-	<h3>Exposed Pod with 3 Replicas on Kubernetes <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Exposed Pod with 3 Replicas on Kubernetes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 var HPA = diagrams.k8s.clusterconfig.HPA
-var Deployment = diagrams.k8s.compute.Deployment
-var Pod = diagrams.k8s.compute.Pod
-var ReplicaSet = diagrams.k8s.compute.ReplicaSet
-var Ingress = diagrams.k8s.network.Ingress
-var Service = diagrams.k8s.network.Service
+var { Deployment, Pod, ReplicaSet }  = diagrams.k8s.compute
+var { Ingress, Service } = diagrams.k8s.network
 
 Diagram("Exposed Pod with 3 Replicas", () => {
 	ctx.net = Ingress("domain.com")._$(Service("svc"))
@@ -327,15 +378,12 @@ Diagram("Exposed Pod with 3 Replicas", () => {
 	</div>
 	
 	
-	<h3>Stateful Architecture on Kubernetes <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Stateful Architecture on Kubernetes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
-var Pod = diagrams.k8s.compute.Pod
-var StatefulSet = diagrams.k8s.compute.StatefulSet
+var { Pod, StatefulSet } = diagrams.k8s.compute
 var Service = diagrams.k8s.network.Service
-var PV = diagrams.k8s.storage.PV
-var PVC = diagrams.k8s.storage.PVC
-var StorageClass = diagrams.k8s.storage.StorageClass
+var { PV, PVC, StorageClass } = diagrams.k8s.storage
 
 Diagram("Stateful Architecture", () => {
 	Cluster("Apps", () => {
@@ -358,7 +406,7 @@ Diagram("Stateful Architecture", () => {
 	</div>
 	
 	
-	<h3>Advanced Web Service with On-Premise <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Advanced Web Service with On-Premise <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 var Spark = diagrams.onprem.analytics.Spark
@@ -366,8 +414,7 @@ var Server = diagrams.onprem.compute.Server
 var PostgreSQL = diagrams.onprem.database.Postgresql
 var Redis = diagrams.onprem.inmemory.Redis
 var Fluentd = diagrams.onprem.aggregator.Fluentd
-var Grafana = diagrams.onprem.monitoring.Grafana
-var Prometheus = diagrams.onprem.monitoring.Prometheus
+var { Grafana, Prometheus } = diagrams.onprem.monitoring
 var Nginx = diagrams.onprem.network.Nginx
 var Kafka = diagrams.onprem.queue.Kafka
 
@@ -406,7 +453,7 @@ Diagram("Advanced Web Service with On-Premise", function() {
 	</div>
 	
 	
-	<h3>Advanced Web Service with On-Premise (with colors and labels) <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Advanced Web Service with On-Premise (with colors and labels) <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 var Spark = diagrams.onprem.analytics.Spark
@@ -414,8 +461,7 @@ var Server = diagrams.onprem.compute.Server
 var PostgreSQL = diagrams.onprem.database.Postgresql
 var Redis = diagrams.onprem.inmemory.Redis
 var Fluentd = diagrams.onprem.aggregator.Fluentd
-var Grafana = diagrams.onprem.monitoring.Grafana
-var Prometheus = diagrams.onprem.monitoring.Prometheus
+var { Grafana, Prometheus } = diagrams.onprem.monitoring
 var Nginx = diagrams.onprem.network.Nginx
 var Kafka = diagrams.onprem.queue.Kafka
 
@@ -454,7 +500,7 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 	</div>
 	
 	
-	<h3>RabbitMQ Consumers with Custom Nodes <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>RabbitMQ Consumers with Custom Nodes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 var Aurora = diagrams.aws.database.Aurora
@@ -485,7 +531,7 @@ Diagram("Broker Consumers", function() {
 		<div class="graphContainer"></div>
 	</div>
 	
-	<h3>Circled Workers on AWS <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Circled Workers on AWS <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 ctx.attributes.graphviz.engine = 'circo'
@@ -513,7 +559,7 @@ Diagram("Grouped Workers", function() {
 		<div class="graphContainer"></div>
 	</div>
 	
-	<h3>Company organization chart (with HTML-like labels) <button class="run">Run(Ctrl-Enter)</button> <button class="download">Image Download</button></h3>
+	<h2>Company organization chart (with HTML-like labels) <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 ctx.attributes.subgraph.labeljust = 'c'

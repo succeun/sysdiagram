@@ -1,9 +1,10 @@
 //     sysdiagram.js 0.1.0
 //     https://succeun.github.io/sysdiagram
-//     (c) 2021-2021 Jeong-Ho, Eun
-//     diagrams.js may be freely distributed under the MIT license.
-
-var sysdiagram = (function() {
+//     Copyright (c) 2021 Jeong-Ho, Eun Licensed under the MIT license.
+var sysdiagram = sysdiagram || (function() {
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	// Util function
 	
 	function uuid() {
 	  return 'yxxxxxxxxxxxxxxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -60,6 +61,7 @@ var sysdiagram = (function() {
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////
+	// Default Attributes, Context
 	
 	var defaultAttrs = {
 		digraph: {
@@ -125,7 +127,9 @@ var sysdiagram = (function() {
 			format: "png",
 			quality: 1,
 			scale: 1
-		}
+		},
+		selector: ".sysdiagram",
+		startOnLoad: true,
 	};
 
 	var rootNode = null;
@@ -138,7 +142,9 @@ var sysdiagram = (function() {
 	
 	// Storing variables in scripts
 	var context = { 
-		eval: function(expr) { return eval(expr); },
+		eval: function(expr) { 
+				return eval(expr); 
+		},
 		attributes: null,
 	};
 
@@ -165,7 +171,7 @@ var sysdiagram = (function() {
 		
 		// remove variables in context
 		for (var key in context) {
-			if (key == 'eval' || key == 'attributes') continue;
+			if (key == 'eval') continue;
 			
 			delete context[key];
 		}
@@ -223,6 +229,7 @@ var sysdiagram = (function() {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
+	// Diagram, Cluster, Node, Edge, ArrayNode
 	
 	function connect(me, node, direct) {
 		if (Array.isArray(node)) {	// natvie array
@@ -436,7 +443,9 @@ var sysdiagram = (function() {
 		return Node(name, attrs, icon);
 	};
 
-	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+	// Public function
+	
 	var isLoadedResources = false;
 	
 	function generate(script) {
@@ -451,7 +460,15 @@ var sysdiagram = (function() {
 		}
 		
 		reset();
-		ctx.eval(script);
+		try {
+			ctx.eval(script);
+		} catch(e) {
+			if (ctx.onErrorOccurred) {
+				ctx.onErrorOccurred(e);
+			} else {
+				throw e;
+			}
+		}
 		var dot = generateDot();
 		return dot;
 	}
@@ -508,21 +525,6 @@ var sysdiagram = (function() {
 				continue;
 			}
 			defineResource(dir, namespace, key);
-			
-			if (!namespace.import) {
-				namespace.import = function() {
-					var resources = [];
-					for (var i = 0; i < arguments.length; i++) {
-						var typeName = arguments[i];
-						var res = namespace[typeName];
-						if (!res) {
-							throw new Error('Not found resource. ['+typeName+']');
-						}
-						resources.push(res);
-					}
-					return resources;
-				}
-			}
 		}
 	}
 	
@@ -543,19 +545,19 @@ var sysdiagram = (function() {
 		}
 	}
 	
-	function render(selectorOrElement, script, options, cbFunc) {
+	function render(selectorOrElement, script, graphvizOptions, cbFunc) {
 		var dot = generate(script);
-		var graphviz = createGraphviz(selectorOrElement, options);
+		var graphviz = createGraphviz(selectorOrElement, graphvizOptions);
 		return renderDot(selectorOrElement, graphviz, dot, cbFunc);
 	}
 	
-	function createGraphviz(selectorOrElement, options) {
-		options = options || {};
-		options = mergeAttrs(ctx.attributes.graphviz, options);
+	function createGraphviz(selectorOrElement, graphvizOptions) {
+		graphvizOptions = graphvizOptions || {};
+		graphvizOptions = mergeAttrs(ctx.attributes.graphviz, graphvizOptions);
 		
 		var element = ("string" == typeof selectorOrElement) ? document.querySelector(selectorOrElement) : selectorOrElement;
 		
-		var graphviz = d3.select(selectorOrElement).graphviz(options);
+		var graphviz = d3.select(selectorOrElement).graphviz(graphvizOptions);
 		
 		element.graphviz = graphviz;
 		
@@ -575,14 +577,21 @@ var sysdiagram = (function() {
 		return graphviz;
 	}
 	
-	function renderDot(selectorOrElement, graphviz, dot, cbFunc) {
-		cbFunc = cbFunc || function(){};
+	function renderDot(selectorOrElement, graphviz, dot, callbackFunc) {
+		callbackFunc = callbackFunc || function(){};
 		
 		var element = ("string" == typeof selectorOrElement) ? document.querySelector(selectorOrElement) : selectorOrElement;
 
+		var tmp = {};
+		cloneObject(ctx, tmp);
+		
 		graphviz.renderDot(dot, function() {
+			element.setAttribute("data-sysdiagram-processed", "true");
 			
-			cbFunc(element, graphviz);
+			if (tmp.onCompleted) {
+				tmp.onCompleted(element, this);
+			}
+			callbackFunc(element, graphviz);
 		});
 		
 		return {
@@ -592,7 +601,43 @@ var sysdiagram = (function() {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
-
+	// With Document Ready
+	
+	function initialize(attributes, callbackFunc) {
+		attributes = attributes || {};
+		var selector = attributes.selector || defaultAttrs.selector;
+		var startOnLoad = (attributes.startOnLoad != null) ? attributes.startOnLoad : defaultAttrs.startOnLoad;
+		if (startOnLoad) {
+			window.addEventListener('DOMContentLoaded', function(event) {
+				init(attributes, selector);
+			});
+		} else {
+			init(attributes, selector);
+		}
+	}
+	
+	function init(attributes, selector) {
+		// Change default attributes
+		defaultAttrs = mergeAttrs(defaultAttrs, attributes);
+		
+		var diagrams = document.querySelectorAll(selector);
+		for (var i = 0 ; i < diagrams.length; i++) {
+			var diagram = diagrams[i];
+			var code = diagram.textContent;
+			diagram.innerHTML = "";
+			sysdiagram.render(diagram, code, {}, function(element, graphviz) {
+				if (callbackFunc) {
+					callbackFunc(element, graphviz);
+				}
+			});
+		}
+	}
+		
+		
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Load Resources
+	
 	var diagrams = {};	// Preset namespace resources to be used in scripts
 	
 	function loadResources(resourceJson, baseUrl) {
@@ -613,8 +658,9 @@ var sysdiagram = (function() {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
+	// To Image from Canvas, SVG
 	
-	async function copyToCanvas(selectorOrElement, format, quality, scale) {
+	async function copyToCanvas(selectorOrElement, format, quality, scale, delay) {
 		var svg = (typeof selectorOrElement == "string") ? document.querySelector(selectorOrElement) : selectorOrElement;
 		var svgData = new XMLSerializer().serializeToString(svg);
 		
@@ -650,7 +696,7 @@ var sysdiagram = (function() {
 			setTimeout(function() {
 				var file = canvas.toDataURL("image/" + format, quality);
 				resolve(file);
-			}, defaultAttrs.toImage.delay);
+			}, delay);
 		});
 	}
 	
@@ -663,13 +709,17 @@ var sysdiagram = (function() {
 	}
 
 	async function toImage(target, name, options) {
+		if (!canvg) {
+			throw new Error('Require canvg.js.\nNeed to add <script type="text/javascript" src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script>');
+		}
 		options = options || {}
 		options.format = options.format || defaultAttrs.toImage.format;
 		options.scale = options.scale || defaultAttrs.toImage.scale;
 		options.quality = options.quality || defaultAttrs.toImage.quality;
 		options.download = (options.download == null) ? true : options.download;
+		options.delay = options.delay || defaultAttrs.toImage.delay;
 		
-		return await copyToCanvas(target,options.format, options.quality, options.scale).then(function(file) {
+		return await copyToCanvas(target,options.format, options.quality, options.scale, options.delay).then(function(file) {
 				if (options.download) { 
 					downloadImage(file, name, options.format);
 				}
@@ -677,9 +727,12 @@ var sysdiagram = (function() {
 			})
 			.catch(console.error);
 	}
+	
 	///////////////////////////////////////////////////////////////////////////
 	
 	return {
+		initialize: initialize,
+		init: init,
 		loadResources: loadResources,
 		attributes: defaultAttrs,
 		generate: generate,

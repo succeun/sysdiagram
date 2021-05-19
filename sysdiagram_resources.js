@@ -1,5 +1,6 @@
-(function(w) {
-	w.sysdiagram_resources = {
+var sysdiagram_resources = sysdiagram_resources || (function() {
+
+	var sysdiagram_resources = {
 		baseUrl: "https://cdn.jsdelivr.net/gh/mingrammer/diagrams/resources/",
 		
 		alibabacloud: {
@@ -1767,7 +1768,7 @@
 	};
 	
 	///////////////////////////////////////////////////////////////////////////
-	// copy from https://github.com/mingrammer/diagrams/blob/master/config.py
+	// https://github.com/mingrammer/diagrams/blob/master/config.py
 	
 	var ALIASES = {
 		"onprem": {
@@ -2140,4 +2141,5 @@
 	
 	merge(sysdiagram_resources, ALIASES);
 	
-})(window)
+	return sysdiagram_resources;
+})()
