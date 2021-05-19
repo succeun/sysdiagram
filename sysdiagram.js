@@ -612,11 +612,11 @@ var sysdiagram = sysdiagram || (function() {
 				init(attributes, selector);
 			});
 		} else {
-			init(attributes, selector);
+			init(attributes, selector, callbackFunc);
 		}
 	}
 	
-	function init(attributes, selector) {
+	function init(attributes, selector, callbackFunc) {
 		// Change default attributes
 		defaultAttrs = mergeAttrs(defaultAttrs, attributes);
 		
