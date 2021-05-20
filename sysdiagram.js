@@ -440,7 +440,7 @@ var sysdiagram = sysdiagram || (function() {
 	}
 	
 	var Custom = function(name, icon, attrs){
-		return Node(name, attrs, icon);
+		return Node(name || "Custom", attrs, icon);
 	};
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -537,12 +537,13 @@ var sysdiagram = sysdiagram || (function() {
 		}
 		namespace[key] = function() {
 			var args = [];
-			args[0] = arguments[0];
+			args[0] = arguments[0] || key;
 			args[1] = arguments[1];
 			args[2] = image;
 			var node = Node.apply(null, args);
 			return node;
-		}
+		};
+		namespace[key]._name_ = key;
 	}
 	
 	function render(selectorOrElement, script, graphvizOptions, cbFunc) {
