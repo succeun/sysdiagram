@@ -614,5 +614,25 @@ Diagram("Organization", function() {
 		</code>
 		<div class="graphContainer"></div>
 	</div>
+	
+	<h2>Grouped Workers by Grouped Lbs<button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<div class="group">
+		<code>
+ctx.attributes.digraph.splines = 'curved'
+		
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+
+Diagram("Grouped Workers", () => {
+    ArrayNode([ELB("lb1"), ELB("lb2")])._$([EC2("worker1"),
+                  EC2("worker2"),
+                  EC2("worker3"),
+                  EC2("worker4"),
+                  EC2("worker5")])//._$([RDS("events1"), RDS("events2")])
+}, {rankdir: 'TB'})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
 </body>
 </html>

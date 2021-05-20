@@ -262,12 +262,24 @@ var sysdiagram = sysdiagram || (function() {
 	}
 	
 	function connectGroup(nodes, node, direct) {
+		if (Array.isArray(node)) {	// natvie array
+			node = ArrayNode(node);
+		}
+		
 		if (node.type == 'edge') {
 			for (var i = 0; i < nodes.length; i++) {
 				var edge = node;
 				nodes[i].edgeattrs = edge.attrs();
 			}
 			node.srcNode = nodes;
+		} else if (node.type == 'array_group') {	// arraygroup
+			for (var i = 0; i < nodes.length; i++) {
+				var tgts = node.nodes;
+				for (var j = 0; j < tgts.length; j++) {
+					addNode(tgts[j]);
+					addEdge(nodes[i], tgts[j], direct, nodes[i].edgeattrs);
+				}
+			}
 		} else {
 			addNode(node);
 			for (var i = 0; i < nodes.length; i++) {
