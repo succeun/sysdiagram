@@ -543,7 +543,6 @@ var sysdiagram = sysdiagram || (function() {
 			var node = Node.apply(null, args);
 			return node;
 		};
-		namespace[key]._name_ = key;
 	}
 	
 	function render(selectorOrElement, script, graphvizOptions, cbFunc) {
