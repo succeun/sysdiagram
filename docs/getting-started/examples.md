@@ -287,5 +287,59 @@ Diagram("Broker Consumers", function() {
 })
 ```
 
+## Company Organization Chart (with HTML-like labels)
+
+```js
+ctx.attributes.subgraph.labeljust = 'c'
+
+var Man1 = (name, attrs) => Node(name, attrs, "images/man1.png")
+var Woman1 = (name, attrs) => Node(name, attrs, "images/woman1.png")
+
+var Man2 = (name, attrs) => Node(name, attrs, "images/man2.png");
+var Woman2 = (name, attrs) => Node(name, attrs, "images/woman2.png");
+
+var Man3 = (name, attrs) => Node(name, attrs, "images/man3.png");
+var Woman3 = (name, attrs) => Node(name, attrs, "images/woman3.png");
+
+var Man4 = (name, attrs) => Node(name, attrs, "images/man4.png");
+var Woman4 = (name, attrs) => Node(name, attrs, "images/woman4.png");
+
+Diagram("Organization", function() {
+	Cluster("CEO", function() {
+		ctx.ceo = Woman4("Roxy")
+    }, {fontcolor: "orange"})
+  	
+	Cluster("< <i>Operation Team</i> >", function() {
+		ctx.team1 = Man1("Hugh")
+		ctx.team1.$_(Woman1("Belle"))
+		ctx.team1.$_(Man1("Bruno"))
+		ctx.team1.$_(Man3("Eric"))
+	}, {fontcolor: "#FF0000", tooltip: "Operation Team"})
+  
+	Cluster("< <i>Technical Team</i> >", function() {
+		ctx.team2 = Woman2("Judith")
+		ctx.team2.$_(Man2("Tom"))
+		ctx.team2.$_(Man1("Andrew"))
+	}, {fontcolor: "blue", tooltip: "Technical Team"})
+
+	Cluster("Commercial Team", function() {
+		ctx.team3 = Man3("Leonard")
+		ctx.team3.$_(Woman3("Calla"))
+		ctx.team3.$_(Man2("Mac"))
+		ctx.team3.$_(Woman1("Ruby"))
+	}, {fontcolor: "green"})
+
+	Cluster("Human Resources Team", function() {
+		ctx.team4 = Man4("Sam")
+		ctx.team4.$_(Woman4("Silly"))
+		ctx.team4.$_(Woman2("Maggie"))
+	})
+
+	ctx.ceo.$_([ctx.team1, ctx.team2, ctx.team3, ctx.team4])
+  
+}, {rankdir: "TB"})	
+```
+
+
 
 

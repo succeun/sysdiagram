@@ -16,9 +16,9 @@ Diagram("Simple Diagram", function() {
 })	
 ```
 
-## Options
+## Attributes
 
-It allows custom Graphviz dot attributes options.
+It allows custom Graphviz dot attributes.
 
 > `Diagram`, `Cluster`, `Node`, and `Edge` all are supported with last parameter. Here is a [Reference link of Graphviz Attributes](https://www.graphviz.org/doc/info/attrs.html).
 

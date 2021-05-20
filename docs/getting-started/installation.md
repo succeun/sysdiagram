@@ -35,6 +35,16 @@ Latest Version: [https://unpkg.com/browse/sysdiagram@0.1.0/](https://unpkg.com/b
 ```
 **Doing so will command the sysdiagram parser to look for the `<div>` tags with `class="sysdiagram"`. From these tags sysdiagram will try to read the diagram definitons and render them into svg charts.**
 
+```html
+<div class="sysdiagram">
+	var EC2 = diagrams.aws.compute.EC2
+
+	Diagram("Simple Diagram", function() {
+		EC2("web")
+	})
+</div>
+```
+
  **Examples can be found in** [Other examples](getting-started/examples)
 
 

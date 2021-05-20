@@ -85,20 +85,22 @@ You can find all available nodes list in [Here](nodes/onprem).
 ## Data Flow
 
 ### Connect Function
-You can represent data flow by connecting the nodes with these operator functions: `_$()`, `$_()`, `$_$()`  and `_()`.
+You can represent data flow by connecting the nodes with these functions: `_$()`, `$_()`, `$_$()`  and `_()`.
 
-* **_$()**: Connect nodes in left to right direction. (like **>>**)
-* **$_()**: Connect nodes in right to left direction. (like **<<**)
-* **$_$()**: Connect nodes in both direction. (like **<< >>**)
-* **_()**: Connect nodes in no direction. Undirected. (like **-**)
+The connect function below is shaped like an arrow.
 
-?> Unlike [Diagrams using Python](https://diagrams.mingrammer.com/), Sysdiagram is implemented as a function rather than an operator.
+* `_$()`: Connect nodes in left to right direction. (like `->`)
+* `$_()`: Connect nodes in right to left direction. (like `->`)
+* `$_$()`: Connect nodes in both direction. (like `<->`)
+* `_()`: Connect nodes in no direction. Undirected. (like `-`)
+
+?> [Diagrams using Python](https://diagrams.mingrammer.com/) used operator overloading, but **Sysdiagram** was implemented as a function due to JavaScript limitations.
 
 ```js
 var { EC2 } = diagrams.aws.compute
 var { RDS } = diagrams.aws.database
 var { ELB } = diagrams.aws.network
-var {S3 } = diagrams.aws.storage
+var { S3 } = diagrams.aws.storage
 
 Diagram("Web Services", () => {
     // ELB("lb") >> EC2("web") >> RDS("userdb") >> S3("store")

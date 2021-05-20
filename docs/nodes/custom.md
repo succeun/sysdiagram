@@ -1,20 +1,20 @@
 # Custom
 
-## Custom with local icons(images)
+## Custom with local icons
 
 For this example we use the following architecture:
 
 ```js
 Diagram("Custom with local icons\n Can be downloaded here: \nhttps://creativecommons.org/about/downloads/", () => {
-	ctx.cc_heart = Custom("Creative Commons", "./images/cc_heart.black.png")
-	ctx.cc_attribution = Custom("Credit must be given to the creator", "./images/cc_attribution.png")
+	ctx.cc_heart = Custom("Creative Commons", "./images/ccheart_black.png")
+	ctx.cc_attribution = Custom("Credit must be given to the creator", "./images/by.png")
 
-	ctx.cc_sa = Custom("Adaptations must be shared\n under the same terms", "./images/cc_sa.png")
-	ctx.cc_nd = Custom("No derivatives or adaptations\n of the work are permitted", "./images/cc_nd.png")
-	ctx.cc_zero = Custom("Public Domain Dedication", "./images/cc_zero.png")
+	ctx.cc_sa = Custom("Adaptations must be shared\n under the same terms", "./images/sa.png")
+	ctx.cc_nd = Custom("No derivatives or adaptations\n of the work are permitted", "./images/nd.png")
+	ctx.cc_zero = Custom("Public Domain Dedication", "./images/zero.png")
 
 	Cluster("Non Commercial", () => {
-		ctx.non_commercial = [Custom("Y", "./images/cc_nc-jp.png")._(Custom("E", "./images/cc_nc-eu.png"))._(Custom("S", "./images/cc_nc.png"))]
+		ctx.non_commercial = [Custom("Y", "./images/nc-jp.png")._(Custom("E", "./images/nc-eu.png"))._(Custom("S", "./images/nc.png"))]
 	})
 	
 	ctx.cc_heart._$(ctx.cc_attribution)
@@ -51,12 +51,13 @@ Diagram("Custom with remote icons", () => {
 }, {rankdir: "LR" })
 ```
 
-## Repeat Custom
+## Repeat Custom Nodes
 
 If custom icons are used repeatedly, they can be predefined and used.
 
 ```js
 ctx.attributes.digraph.splines = 'curved'	// Changed graphviz digraph splines
+ctx.attributes.subgraph.labeljust = 'c'		// Justification for cluster labels
 
 var WEB = (name, attrs) => Node(name, attrs, "images/web.png")
 var WAS = (name, attrs) => Node(name, attrs, "images/was.png")

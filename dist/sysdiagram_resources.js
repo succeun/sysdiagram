@@ -1,3 +1,5 @@
+'use strict';
+
 var sysdiagram_resources = sysdiagram_resources || (function() {
 
 	var sysdiagram_resources = {
@@ -2143,3 +2145,5 @@ var sysdiagram_resources = sysdiagram_resources || (function() {
 	
 	return sysdiagram_resources;
 })()
+
+//module.exports = sysdiagram_resources;

@@ -1,6 +1,10 @@
 //     sysdiagram.js 0.1.0
 //     https://succeun.github.io/sysdiagram
 //     Copyright (c) 2021 Jeong-Ho, Eun Licensed under the MIT license.
+'use strict';
+
+//import sysdiagram_resources from './sysdiagram_resources';
+
 var sysdiagram = sysdiagram || (function() {
 	
 	////////////////////////////////////////////////////////////////////////////////////
@@ -753,3 +757,5 @@ var sysdiagram = sysdiagram || (function() {
 		toImage: toImage
 	};
 })();
+
+//module.exports = sysdiagram;
