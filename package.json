@@ -4,7 +4,7 @@
 	"description": "Diagram as Code for prototyping cloud system architectures using Javascript Syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
-	"browser": "dist/sysdiagram.min.js"
+	"browser": "dist/sysdiagram.min.js",
 	"scripts": {
 		"minify": "minify ./dist/sysdiagram_resources.js ./dist/sysdiagram.js > ./dist/sysdiagram.min.js",
 		"dev": "docsify serve ./docs",
