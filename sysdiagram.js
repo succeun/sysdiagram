@@ -142,7 +142,7 @@ var sysdiagram = sysdiagram || (function() {
 	
 	// Storing variables in scripts
 	var context = { 
-		eval: function(expr) { 
+		eval: function(expr) {
 				return eval(expr); 
 		},
 		attributes: null,
@@ -247,7 +247,7 @@ var sysdiagram = sysdiagram || (function() {
 				var edge = node;
 				me.edgeattrs = edge.attrs();
 				edge.srcNode = me;
-			} else if (node.type == 'array_group') {	// arraygroup
+			} else if (node.type == 'array_node') {
 				var nodes = node.nodes;
 				for (var i = 0; i < nodes.length; i++) {
 					addNode(nodes[i]);
@@ -272,7 +272,7 @@ var sysdiagram = sysdiagram || (function() {
 				nodes[i].edgeattrs = edge.attrs();
 			}
 			node.srcNode = nodes;
-		} else if (node.type == 'array_group') {	// arraygroup
+		} else if (node.type == 'array_node') {
 			for (var i = 0; i < nodes.length; i++) {
 				var tgts = node.nodes;
 				for (var j = 0; j < tgts.length; j++) {
@@ -304,7 +304,7 @@ var sysdiagram = sysdiagram || (function() {
 		}
 		
 		var node = {
-			type: 'type',
+			type: 'node',
 			uuid: uuid(),
 			name: name,
 			link: function(node) {		// -
@@ -346,10 +346,10 @@ var sysdiagram = sysdiagram || (function() {
 		});
 		
 		var group = {
-			type: 'array_group',
+			type: 'array_node',
 			nodes: nodes,
 			uuid: uuid(),
-			name: '_array_group_',
+			name: '_array_node_',
 			link: function(node) {	// -
 				return connectGroup(nodes, node, 'none');
 			},
@@ -518,7 +518,7 @@ var sysdiagram = sysdiagram || (function() {
 					lines.push(`${tabs(depth + 1)}graph ${toAttrs(attrs)}`);
 					generateDotNode(lines, node, depth + 1);
 					lines.push(`${tab}}`);
-				} else {
+				} else if (node.type == 'node') {	// ignored array_node
 					lines.push(`${tab}"${key}" ${toAttrs(node.attrs())}`);
 				}
 			}
