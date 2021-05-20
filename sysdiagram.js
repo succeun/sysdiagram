@@ -424,6 +424,7 @@ var sysdiagram = sysdiagram || (function() {
 	function Diagram(name, callbackFunc, attrs) {
 		attrs = attrs || {};
 		attrs = mergeAttrs(ctx.attributes.digraph, attrs);
+		attrs.label = name;
 		
 		var diagram = {
 			type: 'diagram',
