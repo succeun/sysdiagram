@@ -1,85 +1,84 @@
-## Custom with local icons
+# Custom
+
+## Custom with local icons(images)
 
 For this example we use the following architecture:
 
+```js
+Diagram("Custom with local icons\n Can be downloaded here: \nhttps://creativecommons.org/about/downloads/", () => {
+	ctx.cc_heart = Custom("Creative Commons", "./images/cc_heart.black.png")
+	ctx.cc_attribution = Custom("Credit must be given to the creator", "./images/cc_attribution.png")
+
+	ctx.cc_sa = Custom("Adaptations must be shared\n under the same terms", "./images/cc_sa.png")
+	ctx.cc_nd = Custom("No derivatives or adaptations\n of the work are permitted", "./images/cc_nd.png")
+	ctx.cc_zero = Custom("Public Domain Dedication", "./images/cc_zero.png")
+
+	Cluster("Non Commercial", () => {
+		ctx.non_commercial = [Custom("Y", "./images/cc_nc-jp.png")._(Custom("E", "./images/cc_nc-eu.png"))._(Custom("S", "./images/cc_nc.png"))]
+	})
+	
+	ctx.cc_heart._$(ctx.cc_attribution)
+	ctx.cc_heart._$(ctx.non_commercial)
+	ctx.cc_heart._$(ctx.cc_sa)
+	ctx.cc_heart._$(ctx.cc_nd)
+	ctx.cc_heart._$(ctx.cc_zero)
+}, {rankdir: "LR" })
 ```
-.
-├── custom_local.py
-├── my_resources
-│   ├── cc_heart.black.png
-│   ├── cc_attribution.png
-│   ├──...
-```
-
-The content of custom_local.py file:
-
-```python
-from diagrams import Diagram, Cluster
-from diagrams.custom import Custom
-
-
-with Diagram("Custom with local icons\n Can be downloaded here: \nhttps://creativecommons.org/about/downloads/", show=False, filename="custom_local", direction="LR"):
-  cc_heart = Custom("Creative Commons", "./my_resources/cc_heart.black.png")
-  cc_attribution = Custom("Credit must be given to the creator", "./my_resources/cc_attribution.png")
-
-  cc_sa = Custom("Adaptations must be shared\n under the same terms", "./my_resources/cc_sa.png")
-  cc_nd = Custom("No derivatives or adaptations\n of the work are permitted", "./my_resources/cc_nd.png")
-  cc_zero = Custom("Public Domain Dedication", "./my_resources/cc_zero.png")
-
-  with Cluster("Non Commercial"):
-    non_commercial = [Custom("Y", "./my_resources/cc_nc-jp.png") - Custom("E", "./my_resources/cc_nc-eu.png") - Custom("S", "./my_resources/cc_nc.png")]
-
-  cc_heart >> cc_attribution
-  cc_heart >> non_commercial
-  cc_heart >> cc_sa
-  cc_heart >> cc_nd
-  cc_heart >> cc_zero
-```
-
-It will generate the following diagram:
-
-![custom local](/img/custom_local.png)
 
 
 ## Custom with remote icons
 
 If your icons are hosted and can be accessed when you generate the diagrams, you can
 
-```python
-from diagrams import Diagram, Cluster
-from diagrams.custom import Custom
-from urllib.request import urlretrieve
+```js
+Diagram("Custom with remote icons", () => {
 
-with Diagram("Custom with remote icons", show=False, filename="custom_remote", direction="LR"):
+	var diagrams_url = "https://github.com/mingrammer/diagrams/raw/master/assets/img/diagrams.png"
+	ctx.diagrams = Custom("Diagrams", diagrams_url)
 
-  # download the icon image file
-  diagrams_url = "https://github.com/mingrammer/diagrams/raw/master/assets/img/diagrams.png"
-  diagrams_icon = "diagrams.png"
-  urlretrieve(diagrams_url, diagrams_icon)
+	Cluster("Some Providers", () => {
 
-  diagrams = Custom("Diagrams", diagrams_icon)
+		var openstack_url = "https://github.com/mingrammer/diagrams/raw/master/resources/openstack/openstack.png"
+		ctx.openstack = Custom("OpenStack", openstack_url)
 
-  with Cluster("Some Providers"):
-
-    openstack_url = "https://github.com/mingrammer/diagrams/raw/master/resources/openstack/openstack.png"
-    openstack_icon = "openstack.png"
-    urlretrieve(openstack_url, openstack_icon)
-
-    openstack = Custom("OpenStack", openstack_icon)
-
-    elastic_url = "https://github.com/mingrammer/diagrams/raw/master/resources/elastic/saas/elastic.png"
-    elastic_icon = "elastic.png"
-    urlretrieve(elastic_url, elastic_icon)
-
-    elastic = Custom("Elastic", elastic_icon)
-
-  diagrams >> openstack
-  diagrams >> elastic
+		var elastic_url = "https://github.com/mingrammer/diagrams/raw/master/resources/elastic/saas/elastic.png"
+		ctx.elastic = Custom("Elastic", elastic_url)
+	})
+	
+  ctx.diagrams._$(ctx.openstack)
+  ctx.diagrams._$(ctx.elastic)
+  
+}, {rankdir: "LR" })
 ```
 
-It will generate the following diagram:
+## Repeat Custom
 
-![custom local](/img/custom_remote.png)
+If custom icons are used repeatedly, they can be predefined and used.
+
+```js
+ctx.attributes.digraph.splines = 'curved'	// Changed graphviz digraph splines
+
+var WEB = (name, attrs) => Node(name, attrs, "images/web.png")
+var WAS = (name, attrs) => Node(name, attrs, "images/was.png")
+var DB = (name, attrs) => Node(name, attrs, "images/database.png")
+
+Diagram("Repeat Custom", () => {
+	Cluster("Web Servers", () => {
+		ctx.webs = [WEB("web #1"), WEB("web #2")]
+	})
+	
+	Cluster("WAS Servers", () => {
+		ctx.wass = [WAS("WAS #1"), WAS("WAS #2")]
+	})
+	
+	Cluster("DB Servers", () => {
+		ctx.dbs = [DB("DB #1"), DB("DB #2")]
+	})
+	
+  ctx.webs._$(ctx.wass)._$(ctx.dbs)
+  
+}, {rankdir: "LR" })
+```
 
 
-Another example can be found [Here](https://diagrams.mingrammer.com/docs/getting-started/examples#rabbitmq-consumers-with-custom-nodes).
+Another example can be found [Here](getting-started/examples#rabbitmq-consumers-with-custom-nodes).

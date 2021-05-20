@@ -1,11 +1,12 @@
 - Getting started
 
-  - [Quick start](getting-started/quickstart.md)
+  - [About Sysdiagram](getting-started/about.md)
   - [Installation](getting-started/installation.md)
   - [Examples](getting-started/examples.md)
 
 - Guides
 
+  - [Context](guides/context.md)
   - [Diagrams](guides/diagram.md)
   - [Nodes](guides/node.md)
   - [Clusters](guides/cluster.md)

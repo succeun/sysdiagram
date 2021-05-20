@@ -1,3 +1,5 @@
+# Azure
+
 Node classes list of azure provider.
 
 ## azure.analytics

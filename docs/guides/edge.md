@@ -1,64 +1,66 @@
+# Edges
+
 Edge is representing an edge between Nodes.
 
 ## Basic
 
-Edge is an object representing a connection between Nodes with some additional properties.
+Edge is an object representing a connection between Nodes with some additional graphviz edge attributes.
 
-An edge object contains three attributes: **label**, **color** and **style** which mirror corresponding graphviz edge attributes.
+```js
+var { Spark } = diagrams.onprem.analytics
+var { Server } = diagrams.onprem.compute
+var { PostgreSQL } = diagrams.onprem.database
+var { Redis } = diagrams.onprem.inmemory
+var { Fluentd } = diagrams.onprem.aggregator
+var { Grafana, Prometheus } = diagrams.onprem.monitoring
+var { Nginx } = diagrams.onprem.network
+var { Kafka } = diagrams.onprem.queue
 
-```python
-from diagrams import Cluster, Diagram, Edge
-from diagrams.onprem.analytics import Spark
-from diagrams.onprem.compute import Server
-from diagrams.onprem.database import PostgreSQL
-from diagrams.onprem.inmemory import Redis
-from diagrams.onprem.aggregator import Fluentd
-from diagrams.onprem.monitoring import Grafana, Prometheus
-from diagrams.onprem.network import Nginx
-from diagrams.onprem.queue import Kafka
+Diagram(name="Advanced Web Service with On-Premise (colored)", () => {
+    ctx.ingress = Nginx("ingress")
 
-with Diagram(name="Advanced Web Service with On-Premise (colored)", show=False):
-    ingress = Nginx("ingress")
+    ctx.metrics = Prometheus("metric")
+    ctx.metrics._$(Edge({color: "firebrick", style: "dashed"}))._$(Grafana("monitoring"))
 
-    metrics = Prometheus("metric")
-    metrics << Edge(color="firebrick", style="dashed") << Grafana("monitoring")
+    Cluster("Service Cluster", () => {
+        ctx.grpcsvc = [
+				Server("grpc1"),
+				Server("grpc2"),
+				Server("grpc3")]
+	})
 
-    with Cluster("Service Cluster"):
-        grpcsvc = [
-            Server("grpc1"),
-            Server("grpc2"),
-            Server("grpc3")]
+    Cluster("Sessions HA", () => {
+        ctx.main = Redis("session")
+        ctx.main
+            ._(Edge({color: "brown", style: "dashed"}))
+            ._(Redis("replica"))
+            .$_(Edge({label: "collect"}))
+            .$_(ctx.metrics)
+        ctx.grpcsvc._$(Edge({color: "brown"}))._$(ctx.main)
+	})
 
-    with Cluster("Sessions HA"):
-        main = Redis("session")
-        main \
-            - Edge(color="brown", style="dashed") \
-            - Redis("replica") \
-            << Edge(label="collect") \
-            << metrics
-        grpcsvc >> Edge(color="brown") >> main
+    Cluster("Database HA", () => {
+        ctx.main = PostgreSQL("users")
+        ctx.main
+            ._(Edge({color: "brown", style: "dotted"}))
+            ._(PostgreSQL("replica"))
+            .$_(Edge(label="collect"))
+            .$_(ctx.metrics)
+        ctx.grpcsvc._$(Edge({color: "black"}))._$(ctx.main)
+	})
 
-    with Cluster("Database HA"):
-        main = PostgreSQL("users")
-        main \
-            - Edge(color="brown", style="dotted") \
-            - PostgreSQL("replica") \
-            << Edge(label="collect") \
-            << metrics
-        grpcsvc >> Edge(color="black") >> main
+    ctx.aggregator = Fluentd("logging")
+    ctx.aggregator
+        ._$(Edge({label: "parse"}))
+        ._$(Kafka("stream"))
+        ._$(Edge({color: "black", style: "bold"}))
+        ._$(Spark("analytics"))
 
-    aggregator = Fluentd("logging")
-    aggregator \
-        >> Edge(label="parse") \
-        >> Kafka("stream") \
-        >> Edge(color="black", style="bold") \
-        >> Spark("analytics")
-
-    ingress \
-        >> Edge(color="darkgreen") \
-        << grpcsvc \
-        >> Edge(color="darkorange") \
-        >> aggregator
+    ctx.ingress
+        ._$(Edge({color: "darkgreen"}))
+        ._$(ctx.grpcsvc)
+        ._$(Edge({color: "darkorange"}))
+        ._$(ctx.aggregator)
+})		
 ```
 
-![advanced web service with on-premise diagram colored](/img/advanced_web_service_with_on-premise_colored.png)

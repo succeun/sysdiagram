@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>sysdiagram - Diagram as Code for prototyping cloud system architectures in Javascript.</title>
+  <title>sysdiagram - Diagram as Code for prototyping cloud system architectures using Javascript Syntax.</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -24,9 +24,13 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'Sysdiagram.js',
+      name: 'Sysdiagram',
       repo: 'https://github.com/succeun/sysdiagram',
 	  loadSidebar: true,
+	  auto2top: true,
+	  maxLevel: 4,
+      //subMaxLevel: 2,
+	  executeScript: true,
 	  plugins: [
 		function(hook, vm) {
 			hook.afterEach(function (html, next) {
@@ -92,5 +96,8 @@
 
   <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/sysdiagram_resources.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/sysdiagram.js"></script>
+  
+  <!--script type="text/javascript" src="/sysdiagram_resources.js"></script>
+  <script type="text/javascript" src="/sysdiagram.js"></script-->
 </body>
 </html>

@@ -1,66 +1,71 @@
+# Clusters
+
 Cluster allows you group (or clustering) the nodes in an isolated group.
 
 ## Basic
 
-Cluster represents a local cluster context.
+Cluster represents a local cluster.
 
-You can create a cluster context with Cluster class. And you can also connect the nodes in a cluster to other nodes outside a cluster.
+You can create a cluster with Cluster function. And you can also connect the nodes in a cluster to other nodes outside a cluster.
 
-```python
-from diagrams import Cluster, Diagram
-from diagrams.aws.compute import ECS
-from diagrams.aws.database import RDS
-from diagrams.aws.network import Route53
+> To make a node variable, use `ctx` or `this` global variable.
 
-with Diagram("Simple Web Service with DB Cluster", show=False):
-    dns = Route53("dns")
-    web = ECS("service")
+```js
+var { ECS } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { Route53 } = diagrams.aws.network
 
-    with Cluster("DB Cluster"):
-        db_main = RDS("main")
-        db_main - [RDS("replica1"),
-                     RDS("replica2")]
+Diagram("Simple Web Service with DB Cluster", () => {
+    ctx.dns = Route53("dns")
+    ctx.web = ECS("service")
 
-    dns >> web >> db_main
+    Cluster("DB Cluster", () => {
+        ctx.db_master = RDS("master")
+        ctx.db_master._([RDS("slave1"),
+                         RDS("slave2")])
+	})
+	
+    ctx.dns._$(ctx.web)._$(ctx.db_master)
+})
 ```
-
-![simple web service with db cluster diagram](/img/simple_web_service_with_db_cluster_diagram.png)
 
 ## Nested Clusters
 
 Nested clustering is also possible.
 
-```python
-from diagrams import Cluster, Diagram
-from diagrams.aws.compute import ECS, EKS, Lambda
-from diagrams.aws.database import Redshift
-from diagrams.aws.integration import SQS
-from diagrams.aws.storage import S3
+```js
+var { ECS, EKS, Lambda } = diagrams.aws.compute
+var { Redshift } = diagrams.aws.database
+var { SQS } = diagrams.aws.integration
+var { S3 } = diagrams.aws.storage
 
-with Diagram("Event Processing", show=False):
-    source = EKS("k8s source")
+Diagram("Event Processing", () => {
+    ctx.source = EKS("k8s source")
 
-    with Cluster("Event Flows"):
-        with Cluster("Event Workers"):
-            workers = [ECS("worker1"),
-                       ECS("worker2"),
-                       ECS("worker3")]
+    Cluster("Event Flows", () => {
+        Cluster("Event Workers", () => {
+            ctx.workers = [ECS("worker1"),
+						   ECS("worker2"),
+						   ECS("worker3")]
+		})
 
-        queue = SQS("event queue")
+        ctx.queue = SQS("event queue")
 
-        with Cluster("Processing"):
-            handlers = [Lambda("proc1"),
-                        Lambda("proc2"),
-                        Lambda("proc3")]
+        Cluster("Processing", () => {
+            ctx.handlers = [Lambda("proc1"),
+							Lambda("proc2"),
+							Lambda("proc3")]
+		})
+	})
 
-    store = S3("events store")
-    dw = Redshift("analytics")
+    ctx.store = S3("events store")
+    ctx.dw = Redshift("analytics")
 
-    source >> workers >> queue >> handlers
-    handlers >> store
-    handlers >> dw
+    ctx.source._$(ctx.workers)._$(ctx.queue)._$(ctx.handlers)
+    ctx.handlers._$(ctx.store)
+    ctx.handlers._$(ctx.dw)
+})	
 ```
 
-![event processing diagram](/img/event_processing_diagram.png)
 
 > There is no depth limit of nesting. Feel free to create nested clusters as deep as you want.

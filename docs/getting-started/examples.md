@@ -11,10 +11,10 @@ var ELB = diagrams.aws.network.ELB
 
 Diagram("Grouped Workers", function() {
 	ELB("lb")._$([EC2("worker1"), 
-				EC2("worker2"),
-				EC2("worker3"),
-				EC2("worker4"),
-				EC2("worker5")])._$(RDS("events"))
+				  EC2("worker2"),
+				  EC2("worker3"),
+				  EC2("worker4"),
+				  EC2("worker5")])._$(RDS("events"))
 })
 ```
 
@@ -34,8 +34,8 @@ Diagram("Clustered Web Services", function() {
 	
 	Cluster("Services", function() {
 		ctx.svc_group = [ECS("web1"),
-						ECS("web2"),
-						ECS("web3")]
+						 ECS("web2"),
+						 ECS("web3")]
 	})
 	
 	Cluster("DB Cluster", function() {
@@ -104,8 +104,8 @@ Diagram("Message Collecting", () => {
 	
 	Cluster("Source of Data", () => {
 		ArrayNode([IotCore("core1"),
-				IotCore("core2"),
-				IotCore("core3")])._$(ctx.pubsub)
+				   IotCore("core2"),
+				   IotCore("core3")])._$(ctx.pubsub)
 	})
 
     Cluster("Targets", () => {
@@ -115,7 +115,7 @@ Diagram("Message Collecting", () => {
 		
         Cluster("Data Lake", () => {
             ctx.flow._$([BigQuery("bq"),
-                     GCS("storage")])
+                         GCS("storage")])
 		})
 
         Cluster("Event Driven", () => {
@@ -145,8 +145,8 @@ var { Ingress, Service } = diagrams.k8s.network
 Diagram("Exposed Pod with 3 Replicas", () => {
 	ctx.net = Ingress("domain.com")._$(Service("svc"))
     ctx.net._$([Pod("pod1"),
-            Pod("pod2"),
-            Pod("pod3")]).$_(ReplicaSet("rs")).$_(Deployment("dp")).$_(HPA("hpa"))
+                Pod("pod2"),
+                Pod("pod3")]).$_(ReplicaSet("rs")).$_(Deployment("dp")).$_(HPA("hpa"))
 })
 ```
 
@@ -196,10 +196,9 @@ Diagram("Advanced Web Service with On-Premise", function() {
 	ctx.metrics.$_(Grafana("monitoring"))
 
 	Cluster("Service Cluster", () => {
-		ctx.grpcsvc = [
-			Server("grpc1"), 
-			Server("grpc2"), 
-			Server("grpc3")]
+		ctx.grpcsvc = [Server("grpc1"), 
+			           Server("grpc2"), 
+			           Server("grpc3")]
 	})
 
 	Cluster("Sessions HA", () => {
@@ -242,10 +241,9 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 	ctx.metrics.$_(Edge({color: "firebrick", style: "dashed"})).$_(Grafana("monitoring"))
 
 	Cluster("Service Cluster", () => {
-		ctx.grpcsvc = [
-			Server("grpc1"), 
-			Server("grpc2"), 
-			Server("grpc3")]
+		ctx.grpcsvc = [ Server("grpc1"), 
+			            Server("grpc2"), 
+			            Server("grpc3")]
 	})
 
 	Cluster("Sessions HA", () => {
@@ -278,10 +276,9 @@ var rabbitmq_icon = "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png"
 
 Diagram("Broker Consumers", function() {
 	Cluster("Consumers", function() {
-        ctx.consumers = [
-            Pod("worker"),
-            Pod("worker"),
-            Pod("worker")]
+        ctx.consumers = [Pod("worker"),
+                         Pod("worker"),
+                         Pod("worker")]
 	})
 
     ctx.queue = Custom("Message queue", rabbitmq_icon)

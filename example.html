@@ -615,7 +615,7 @@ Diagram("Organization", function() {
 		<div class="graphContainer"></div>
 	</div>
 	
-	<h2>Grouped Workers by Grouped Lbs<button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Grouped Workers by Grouped Lbs <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 ctx.attributes.digraph.splines = 'curved'
@@ -631,6 +631,35 @@ Diagram("Grouped Workers", () => {
                   EC2("worker4"),
                   EC2("worker5")])//._$([RDS("events1"), RDS("events2")])
 }, {rankdir: 'TB'})
+		</code>
+		<div class="graphContainer"></div>
+	</div>
+	
+	<h2>Repeat Custom <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<div class="group">
+		<code>
+ctx.attributes.digraph.splines = 'curved'    // Changed graphviz digraph splines
+
+var WEB = (name, attrs) => Node(name, attrs, "images/web.png")
+var WAS = (name, attrs) => Node(name, attrs, "images/was.png")
+var DB = (name, attrs) => Node(name, attrs, "images/database.png")
+
+Diagram("Repeat Custom", () => {
+    Cluster("Web Servers", () => {
+        ctx.webs = [WEB("web #1"), WEB("web #2")]
+    })
+    
+    Cluster("WAS Servers", () => {
+        ctx.wass = [WAS("WAS #1"), WAS("WAS #2")]
+    })
+    
+    Cluster("DB Servers", () => {
+        ctx.dbs = [DB("DB #1"), DB("DB #2")]
+    })
+    
+  ctx.webs._$(ctx.wass)._$(ctx.dbs)
+  
+}, {rankdir: "LR" })
 		</code>
 		<div class="graphContainer"></div>
 	</div>

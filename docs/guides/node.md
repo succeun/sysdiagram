@@ -1,3 +1,5 @@
+# Nodes
+
 Node is a second object representing a node or system component.
 
 ## Basic
@@ -6,121 +8,193 @@ Node is an abstract concept that represents a single system component object.
 
 A node object consists of three parts: **provider**, **resource type** and **name**. You may already have seen each part in the previous example.
 
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
+```js
+var EC2 = diagrams.aws.compute.EC2
 
-with Diagram("Simple Diagram"):
+Diagram("Simple Diagram", () => {
     EC2("web")
+})	
 ```
 
 In above example, the `EC2` is a node of `compute` resource type which provided by `aws` provider.
 
-You can use other node objects in a similar manner like:
+### Import Syntax
 
-```python
-# aws resources
-from diagrams.aws.compute import ECS, Lambda
-from diagrams.aws.database import RDS, ElastiCache
-from diagrams.aws.network import ELB, Route53, VPC
-...
+Using Javascript syntax, you can do as follows.
 
-# azure resources
-from diagrams.azure.compute import FunctionApps
-from diagrams.azure.storage import BlobStorage
-...
+```javascript
+var EC2 = diagrams.aws.compute.EC2	// Assign variable 
 
-# alibaba cloud resources
-from diagrams.alibabacloud.compute import ECS
-from diagrams.alibabacloud.storage import ObjectTableStore
-...
+var { EC2 } = diagrams.aws.compute	// like single import/export
 
-# gcp resources
-from diagrams.gcp.compute import AppEngine, GKE
-from diagrams.gcp.ml import AutoML 
-...
+var {EC2, Lambda, Compute, Batch } = diagrams.aws.compute	// like multi import/export
 
-# k8s resources
-from diagrams.k8s.compute import Pod, StatefulSet
-from diagrams.k8s.network import Service
-from diagrams.k8s.storage import PV, PVC, StorageClass
-...
-
-# oracle resources
-from diagrams.oci.compute import VirtualMachine, Container
-from diagrams.oci.network import Firewall
-from diagrams.oci.storage import FileStorage, StorageGateway
 ```
 
-You can find all available nodes list in [Here](https://diagrams.mingrammer.com/docs/nodes/aws).
+
+You can use other node objects in a similar manner like:
+
+```js
+ctx.attributes.graphviz.engine = 'osage'	// changed graphviz engine('dot'(default) -> 'osage')
+
+// aws resources
+var { ECS, Lambda } = diagrams.aws.compute
+var { RDS, ElastiCache } = diagrams.aws.database
+var {ELB, Route53, VPC } = diagrams.aws.network
+// ...
+
+// azure resources
+var FunctionApps = diagrams.azure.compute.FunctionApps
+var BlobStorage = diagrams.azure.storage.BlobStorage
+// ...
+
+// alibaba cloud resources
+var aliECS = diagrams.alibabacloud.compute.ECS
+var ObjectTableStore = diagrams.alibabacloud.storage.ObjectTableStore
+// ...
+
+// gcp resources
+var { AppEngine, GKE} = diagrams.gcp.compute
+var AutoML = diagrams.gcp.ml.AutoML 
+// ...
+
+// k8s resources
+var { Pod, StatefulSet } = diagrams.k8s.compute
+var Service = diagrams.k8s.network.Service
+var { PV, PVC, StorageClass } = diagrams.k8s.storage
+// ...
+
+// oracle resources
+var { VirtualMachine, Container } = diagrams.oci.compute
+var { Firewall } = diagrams.oci.network
+var { FileStorage, StorageGateway } = diagrams.oci.storage
+// ...
+
+Diagram('Node Object Samples', () => {
+	ECS(), Lambda(), RDS(), ElastiCache(), ELB(), Route53(), VPC()
+	FunctionApps(), BlobStorage()
+	aliECS(), ObjectTableStore()
+	AppEngine(), GKE(), AutoML()
+	Pod(), StatefulSet(), Service(), PV(), PVC(), StorageClass()
+	VirtualMachine(), Container(), Firewall(), FileStorage(), StorageGateway()
+})
+```
+
+You can find all available nodes list in [Here](nodes/onprem).
 
 ## Data Flow
 
-You can represent data flow by connecting the nodes with these operators: `>>`, `<<` and `-`.
+### Connect Function
+You can represent data flow by connecting the nodes with these operator functions: `_$()`, `$_()`, `$_$()`  and `_()`.
 
-* **>>**: Connect nodes in left to right direction. 
-* **<<**: Connect nodes in right to left direction.
-* **-**: Connect nodes in no direction. Undirected.
+* **_$()**: Connect nodes in left to right direction. (like **>>**)
+* **$_()**: Connect nodes in right to left direction. (like **<<**)
+* **$_$()**: Connect nodes in both direction. (like **<< >>**)
+* **_()**: Connect nodes in no direction. Undirected. (like **-**)
 
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-from diagrams.aws.database import RDS
-from diagrams.aws.network import ELB
-from diagrams.aws.storage import S3
+?> Unlike [Diagrams using Python](https://diagrams.mingrammer.com/), Sysdiagram is implemented as a function rather than an operator.
 
-with Diagram("Web Services", show=False):
-    ELB("lb") >> EC2("web") >> RDS("userdb") >> S3("store")
-    ELB("lb") >> EC2("web") >> RDS("userdb") << EC2("stat")
-    (ELB("lb") >> EC2("web")) - EC2("web") >> RDS("userdb")
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+var {S3 } = diagrams.aws.storage
+
+Diagram("Web Services", () => {
+    // ELB("lb") >> EC2("web") >> RDS("userdb") >> S3("store")
+	ELB("lb")._$(EC2("web"))._$(RDS("userdb"))._$(S3("store"))
+	
+    // ELB("lb") >> EC2("web") >> RDS("userdb") << EC2("stat")
+	ELB("lb")._$(EC2("web"))._$(RDS("userdb")).$_(EC2("stat"))
+	
+    // (ELB("lb") >> EC2("web")) - EC2("web") >> RDS("userdb")
+	ELB("lb")._$(EC2("web"))._(EC2("web"))._$(RDS("userdb"))
+	
+	ELB("lb").$_$(EC2("web"))._(EC2("web")).$_$(RDS("userdb"))
+})	
 ```
 
-> Be careful when using the `-` and any shift operators together, which could cause unexpected results due to operator precedence. 
+!> The order of rendered diagrams is the reverse of the declaration order.
 
-![web services diagram](/img/web_services_diagram.png)
+You can change the data flow direction with Graphviz Attributes(`rankdir`). Default is **LR**.
 
-> The order of rendered diagrams is the reverse of the declaration order.
+> (`TB`, `BT`, `LR` and `RL`) are allowed. (`T`: Top, `B`: Bottom, `L`: Left, `R`: Right)
 
-You can change the data flow direction with `direction` parameter. Default is **LR**.
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
 
-> (TB, BT, LR and RL) are allowed.
-
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-from diagrams.aws.database import RDS
-from diagrams.aws.network import ELB
-
-with Diagram("Workers", show=False, direction="TB"):
+Diagram("Workers", () => {
     lb = ELB("lb")
     db = RDS("events")
-    lb >> EC2("worker1") >> db
-    lb >> EC2("worker2") >> db
-    lb >> EC2("worker3") >> db
-    lb >> EC2("worker4") >> db
-    lb >> EC2("worker5") >> db
+    lb._$(EC2("worker1"))._$(db)
+    lb._$(EC2("worker2"))._$(db)
+    lb._$(EC2("worker3"))._$(db)
+    lb._$(EC2("worker4"))._$(db)
+    lb._$(EC2("worker5"))._$(db)
+}, {rankdir: 'TB'})
 ```
-
-![workers diagram](/img/workers_diagram.png)
 
 ## Group Data Flow
 
 Above worker example has too many redundant flows. In this case, you can group nodes into a list so that all nodes are connected to other nodes at once.
 
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-from diagrams.aws.database import RDS
-from diagrams.aws.network import ELB
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
 
-with Diagram("Grouped Workers", show=False, direction="TB"):
-    ELB("lb") >> [EC2("worker1"),
+Diagram("Grouped Workers", () => {
+    ELB("lb")._$([EC2("worker1"),
                   EC2("worker2"),
                   EC2("worker3"),
                   EC2("worker4"),
-                  EC2("worker5")] >> RDS("events")
+                  EC2("worker5")])._$(RDS("events"))
+}, {rankdir: 'LR'})
 ```
 
-![grouped workers diagram](/img/grouped_workers_diagram.png)
+### ArrayNode
 
-> You can't connect two **lists** directly because shift/arithmetic operations between lists are not allowed in Python.
+ArrayNode is a second object representing a node array.
+
+However, because there is no connection function in Array object of Javascript, you must use ArrayNode.
+
+#### When automatically generated and processed
+- When assigned to a variable of Context(`ctx`)
+- When assigned as a parameter of the node's connection function (`_$()`, `$_()`, `$_$()`  and `_()`)
+
+If you want to connect with other array creation, you have to wrap it with ArrayNode.
+
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+
+Diagram("Grouped Workers", () => {
+    ctx.workers = [EC2("worker1"),
+                   EC2("worker2")]
+	
+	ArrayNode([ELB("lb1"), 
+			   ELB("lb2")])
+	._$(ctx.workers)
+	._$([ELB("userdb1"), 
+		 ELB("userdb2")])
+})
+```
+
+?> Sysdiagrams is supported that can connect two **arays**.<br>
+
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+
+Diagram("Grouped Workers", () => {
+    ArrayNode([ELB("lb1"), ELB("lb2")])._$([EC2("worker1"),
+                  EC2("worker2"),
+                  EC2("worker3"),
+                  EC2("worker4"),
+                  EC2("worker5")])._$([RDS("events1"), RDS("events2")])
+})
+```
