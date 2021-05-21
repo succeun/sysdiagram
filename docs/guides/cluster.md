@@ -8,8 +8,6 @@ Cluster represents a local cluster.
 
 You can create a cluster with Cluster function. And you can also connect the nodes in a cluster to other nodes outside a cluster.
 
-> To make a node variable, use `ctx` or `this` global variable.
-
 ```js
 var { ECS } = diagrams.aws.compute
 var { RDS } = diagrams.aws.database

@@ -1,6 +1,5 @@
 - Getting started
 
-  - [About Sysdiagram](getting-started/about.md)
   - [Installation](getting-started/installation.md)
   - [Examples](getting-started/examples.md)
 
@@ -11,6 +10,7 @@
   - [Nodes](guides/node.md)
   - [Clusters](guides/cluster.md)
   - [Edges](guides/edge.md)
+  - [Configuration](guides/configuration.md)
 
 - Nodes
 

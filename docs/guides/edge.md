@@ -44,7 +44,7 @@ Diagram(name="Advanced Web Service with On-Premise (colored)", () => {
         ctx.main
             ._(Edge({color: "brown", style: "dotted"}))
             ._(PostgreSQL("replica"))
-            .$_(Edge(label="collect"))
+            .$_(Edge({label: "collect"}))
             .$_(ctx.metrics)
         ctx.grpcsvc._$(Edge({color: "black"}))._$(ctx.main)
 	})

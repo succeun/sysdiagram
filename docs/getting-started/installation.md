@@ -5,7 +5,7 @@
 ## CDN
 
 ```
-https://unpkg.com/sysdiagram@<version>/dist/
+https://unpkg.com/sysdiagram@<version>/dist/sysdiagram.min.js
 ```
 
 To select a version:
@@ -14,9 +14,9 @@ Replace `<version>` with the desired version number.
 
 Latest Version: [https://unpkg.com/browse/sysdiagram@0.1.0/](https://unpkg.com/browse/sysdiagram@0.1.0/)
 
-## [Sysdiagram API](./Setup.md):
+## Installing
 
-**It can insert a `script` tag with an absolute address and a `sysdiagram` call into the HTML like so:**
+It can insert a `script` tag with an absolute address and a `sysdiagram` call into the HTML like so:
 
 ```html
 <!-- canvg for converting image (Optional) -->
@@ -33,7 +33,10 @@ Latest Version: [https://unpkg.com/browse/sysdiagram@0.1.0/](https://unpkg.com/b
   
 <script>sysdiagram.initialize({startOnLoad:true});</script>
 ```
-**Doing so will command the sysdiagram parser to look for the `<div>` tags with `class="sysdiagram"`. From these tags sysdiagram will try to read the diagram definitons and render them into svg charts.**
+
+Doing so will command the sysdiagram parser to look for the `<div>` tags with `class="sysdiagram"`. 
+
+From these tags sysdiagram will try to read the diagram definitons and render them into svg charts.
 
 ```html
 <div class="sysdiagram">
@@ -52,6 +55,8 @@ Latest Version: [https://unpkg.com/browse/sysdiagram@0.1.0/](https://unpkg.com/b
 
 Many thanks to the [d3](http://d3js.org/) and [d3-graphviz](https://github.com/magjac/d3-graphviz) projects for providing the graphical layout and drawing libraries!
 
-Thanks also to the [Diagrams using Python](https://diagrams.mingrammer.com/) project for usage of the python syntax. Thanks to [mingrammer - MinJae Kwon](https://github.com/mingrammer) for inspiration and starting point for rendering.
+Thanks also to the [Diagrams using Python](https://diagrams.mingrammer.com/) project for usage of the python syntax. 
+
+Thanks to [mingrammer(MinJae Kwon)](https://github.com/mingrammer) for inspiration and starting point for rendering.
 
 

@@ -1,6 +1,6 @@
 # Nodes
 
-Node is a second object representing a node or system component.
+Node is a object representing a node or system component.
 
 ## Basic
 
@@ -128,13 +128,13 @@ var { RDS } = diagrams.aws.database
 var { ELB } = diagrams.aws.network
 
 Diagram("Workers", () => {
-    lb = ELB("lb")
-    db = RDS("events")
-    lb._$(EC2("worker1"))._$(db)
-    lb._$(EC2("worker2"))._$(db)
-    lb._$(EC2("worker3"))._$(db)
-    lb._$(EC2("worker4"))._$(db)
-    lb._$(EC2("worker5"))._$(db)
+    ctx.lb = ELB("lb")
+    ctx.db = RDS("events")
+    ctx.lb._$(EC2("worker1"))._$(ctx.db)
+    ctx.lb._$(EC2("worker2"))._$(ctx.db)
+    ctx.lb._$(EC2("worker3"))._$(ctx.db)
+    ctx.lb._$(EC2("worker4"))._$(ctx.db)
+    ctx.lb._$(EC2("worker5"))._$(ctx.db)
 }, {rankdir: 'TB'})
 ```
 

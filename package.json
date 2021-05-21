@@ -1,7 +1,7 @@
 {
 	"name": "sysdiagram",
 	"version": "0.1.0",
-	"description": "Diagram as Code for prototyping cloud system architectures using Javascript Syntax.",
+	"description": "Diagram the system architecture using JavaScript syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
 	"scripts": {
@@ -22,7 +22,8 @@
 		"graph layout",
 		"diagrams",
 		"diagram",
-		"Viz.js"
+		"Viz.js",
+		"cloud"
 	],
 	"author": "Jeong-Ho, Eun",
 	"license": "MIT",

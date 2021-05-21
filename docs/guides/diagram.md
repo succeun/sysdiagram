@@ -1,12 +1,13 @@
 # Diagrams (리소스 임포트 하는 방법, context 개념 추가)
 
-Diagram is a primary object representing a diagram.
+Diagram is a object representing a diagram.
 
 ## Basic
 
 Diagram represents a global diagram graph.
 
-You can create a diagram with Diagram function. The first parameter of Diagram function will be used name.
+You can create a diagram with Diagram function. 
+The first parameter of Diagram function will be used name, the second parameter of the diagram will be the callback function.
 
 ```js
 var EC2 = diagrams.aws.compute.EC2

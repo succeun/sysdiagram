@@ -1,89 +1,81 @@
-# Diagram
+# Context
 
-Diagram is a primary object representing a diagram.
+Context(`ctx`) provides the execution context for the script to run.
 
 ## Basic
 
-Diagram represents a global diagram context.
+Context Object represents a global diagram context.
 
-You can create a diagram context with Diagram class. The first parameter of Diagram constructor will be used for output filename.
+It is used to use variables, change attributes, and receive events.
 
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
+### Use variables
 
-with Diagram("Simple Diagram"):
-    EC2("web")
+If you connect multiple nodes repeatedly, declare them as variables.
+
+> To make a node variable, use `ctx` or `this` global variable.
+
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+
+Diagram("Simple Diagram", () => {
+	ctx.lb = ELB("lb")
+    ctx.web1 = EC2("web1")
+	ctx.web2 = EC2("web2")
+	ctx.db = RDS("userdb")
+	
+	ctx.lb._$(ctx.web1)._$(ctx.db)
+	ctx.lb._$(ctx.web2)._$(ctx.db)
+})	
 ```
 
-And if you run the above script with below command,
+### Change attributes.
 
-```shell
-$ python diagram.py
+We will change the line connecting the node to a curve in Graphviz.
+
+```js
+ctx.attributes.digraph.splines = 'curved'
+
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+
+Diagram("Simple Diagram", () => {
+	ctx.lb = ELB("lb")
+    ctx.web1 = EC2("web1")
+	ctx.web2 = EC2("web2")
+	ctx.db = RDS("userdb")
+	
+	ctx.lb._$(ctx.web1)._$(ctx.db)
+	ctx.lb._$(ctx.web2)._$(ctx.db)
+})	
 ```
 
-It will generate an image file with single `EC2` node drawn as `simple_diagram.png` on your working directory, and open that created image file immediately.
+### receive events
 
-## Jupyter Notebooks
+Receive a rendering complete event.
 
-Diagrams can be also rendered directly inside the notebook as like this:
+After rendering is complete, the element surrounding the `svg` is returned to the console window.
 
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
+```js
+ctx.attributes.digraph.splines = 'curved'
 
-with Diagram("Simple Diagram") as diag:
-    EC2("web")
-diag
-```
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
 
-## Options
+Diagram("Simple Diagram", () => {
+	ctx.lb = ELB("lb")
+    ctx.web1 = EC2("web1")
+	ctx.web2 = EC2("web2")
+	ctx.db = RDS("userdb")
+	
+	ctx.lb._$(ctx.web1)._$(ctx.db)
+	ctx.lb._$(ctx.web2)._$(ctx.db)
+})
 
-You can specify the output file format with `outformat` parameter. Default is **png**.
-
-> (png, jpg, svg, and pdf) are allowed.
-
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-
-with Diagram("Simple Diagram", outformat="jpg"):
-    EC2("web")
-```
-
-You can specify the output filename with `filename` parameter. The extension shouldn't be included, it's determined by the `outformat` parameter.
-
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-
-with Diagram("Simple Diagram", filename="my_diagram"):
-    EC2("web")
-```
-
-You can also disable the automatic file opening by setting the `show` parameter as **false**. Default is **true**.
-
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-
-with Diagram("Simple Diagram", show=False):
-    EC2("web")
-```
-
-It allows custom Graphviz dot attributes options.
-
-> `graph_attr`, `node_attr` and `edge_attr` are supported. Here is a [reference link](https://www.graphviz.org/doc/info/attrs.html).
-
-```python
-from diagrams import Diagram
-from diagrams.aws.compute import EC2
-
-graph_attr = {
-	"fontsize": "45",
-	"bgcolor": "transparent"
+ctx.onCompleted = function(element, graphviz) {
+	console.log(element); 
 }
-
-with Diagram("Simple Diagram", show=False, graph_attr=graph_attr):
-    EC2("web")
 ```
