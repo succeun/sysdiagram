@@ -17,15 +17,15 @@
 	</style>
 	
 	<!-- sysdiagram -->
-	<script src="https://d3js.org/d3.v5.min.js"></script>
-	<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-	<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+	<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
+	<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
+	<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 
-	<script type="text/javascript" src="../../dist/sysdiagram_resources.js"></script>
-	<script type="text/javascript" src="../../dist/sysdiagram.js"></script>
+	<script src="../lib/sysdiagram.js"></script>
+	<script src="../lib/sysdiagram_resources.js"></script>
 	
 	<script>
-		sysdiagram.initialize({startOnLoad: true});
+		sysdiagram.initialize({ startOnLoad: true, graphviz: {zoom: false} });
 	</script>
 </head>
 <body>

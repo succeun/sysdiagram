@@ -4,11 +4,12 @@
 	"description": "Diagram as Code for prototyping cloud system architectures using Javascript Syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
-	"browser": "dist/sysdiagram.min.js",
 	"scripts": {
-		"minify": "minify ./dist/sysdiagram_resources.js ./dist/sysdiagram.js > ./dist/sysdiagram.min.js",
-		"dev": "docsify serve ./docs",
-		"build": "npm run minify"
+		"minify": "minify ./lib/sysdiagram.js ./lib/sysdiagram_resources.js > ./dist/sysdiagram.min.js",
+		"concat": "concat -o ./dist/sysdiagram.js ./lib/sysdiagram.js ./lib/sysdiagram_resources.js",
+		"docs": "docsify serve ./docs",
+		"dev": "http-server -p 4000",
+		"build": "npm run concat && npm run minify"
 	},
 	"repository": {
 		"type": "git",
@@ -17,9 +18,11 @@
 	"keywords": [
 		"d3",
 		"graphviz",
+		"DOT",
+		"graph layout",
 		"diagrams",
 		"diagram",
-		"prototype"
+		"Viz.js"
 	],
 	"author": "Jeong-Ho, Eun",
 	"license": "MIT",
@@ -29,6 +32,8 @@
 	"homepage": "https://succeun.github.io/sysdiagram",
 	"dependencies": {
 		"docsify": "^4.4.3",
-		"minify": "^4.1.1"
+		"minify": "^4.1.1",
+		"concat": "^1.0.3",
+		"http-server": "^0.12.3"
 	}
 }

@@ -102,18 +102,19 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/dracula.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lesser-dark.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lucario.min.css">
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
 	
 	<!-- sysdiagram -->
-	<script src="https://d3js.org/d3.v5.min.js"></script>
-	<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-	<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+	<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
+	<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
+	<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 	
-	<script type="text/javascript" src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
+	<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
-	<script type="text/javascript" src="../../dist/sysdiagram_resources.js"></script>
-	<script type="text/javascript" src="../../dist/sysdiagram.js"></script>
+	<script src="../lib/sysdiagram.js"></script>
+	<script src="../lib/sysdiagram_resources.js"></script>
 	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
@@ -184,26 +185,32 @@
 				var elt = d3.select(element);
 				var nodes = elt.selectAll(".node");
 				var edges = elt.selectAll(".edge");
+				var clusters = elt.selectAll(".cluster");
 				
-				nodes.on("click", function() {
-					var event = d3.event;
+				nodes.on("click", function(event, element) {
 					event.preventDefault();
 					event.stopPropagation();
-					console.log("node:", event);
+					console.log("node:", element, element.sysdiagram_data);
 				});
-				nodes.on("mouseover", function(){
+				
+				nodes.on("mouseover", function(event, element){
 					this.old_stroke = d3.select(this).style("stroke");
 					d3.select(this).style("stroke", "crimson");
 				})
-				.on("mouseout", function(){
+				.on("mouseout", function(event, element){
 					d3.select(this).style("stroke", this.old_stroke);
 				});
 				
-				edges.on("click", function() {
-					var event = d3.event;
+				edges.on("click", function(event, element) {
 					event.preventDefault();
 					event.stopPropagation();
-					console.log("edge:", event);
+					console.log("edge:", element, element.sysdiagram_data);
+				});
+				
+				clusters.on("click", function(event, element) {
+					event.preventDefault();
+					event.stopPropagation();
+					console.log("cluster:", element, element.sysdiagram_data);
 				});
 			});
 			var dot = result.dot;	// generated dot script
@@ -564,58 +571,58 @@ Diagram("Grouped Workers", function() {
 		<code>
 ctx.attributes.subgraph.labeljust = 'c'
 
-var Man1 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/88_man-office-worker.513fcaf81c.png")
-var Woman1 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/184_woman-office-worker.aba5c81a53.png")
+var Man1 = (name, attrs) => Node(name, attrs, "../docs/images/man1.png")
+var Woman1 = (name, attrs) => Node(name, attrs, "../docs/images/woman1.png")
 
-var Man2 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/40_man-office-worker-medium-skin-tone.c786d46670.png");
-var Woman2 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/136_woman-office-worker-medium-skin-tone.5c2ed59d9e.png");
+var Man2 = (name, attrs) => Node(name, attrs, "../docs/images/man2.png");
+var Woman2 = (name, attrs) => Node(name, attrs, "../docs/images/woman2.png");
 
-var Man3 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/8_man-office-worker-light-skin-tone.ecedebb915.png");
-var Woman3 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/104_woman-office-worker-light-skin-tone.0b9478b0dc.png");
+var Man3 = (name, attrs) => Node(name, attrs, "../docs/images/man3.png");
+var Woman3 = (name, attrs) => Node(name, attrs, "../docs/images/woman3.png");
 
-var Man4 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/56_man-office-worker-medium-dark-skin-tone.dbc929b244.png");
-var Woman4 = (name, attrs) => Node(name, attrs, "https://symbols.getvecta.com/stencil_176/152_woman-office-worker-medium-dark-skin-tone.e47159e659.png");
+var Man4 = (name, attrs) => Node(name, attrs, "../docs/images/man4.png");
+var Woman4 = (name, attrs) => Node(name, attrs, "../docs/images/woman4.png");
 
 Diagram("Organization", function() {
-  	Cluster("CEO", function() {
-      	ctx.ceo = Woman4("Roxy")
+    Cluster("CEO", function() {
+        ctx.ceo = Woman4("Roxy")
     }, {fontcolor: "orange"})
-  	
-  	Cluster("< &lt;b&gt;Operation Team&lt;/b&gt; >", function() {
-      	ctx.team1 = Man1("Hugh")
+      
+    Cluster("< <i>Operation Team</i> >", function() {
+        ctx.team1 = Man1("Hugh")
         ctx.team1.$_(Woman1("Belle"))
         ctx.team1.$_(Man1("Bruno"))
         ctx.team1.$_(Man3("Eric"))
     }, {fontcolor: "#FF0000", tooltip: "Operation Team"})
   
-  	Cluster("< &lt;b&gt;Technical Team&lt;/b&gt; >", function() {
-     	ctx.team2 = Woman2("Judith")
-  		ctx.team2.$_(Man2("Tom"))
-		ctx.team2.$_(Man1("Andrew"))
+    Cluster("< <i>Technical Team</i> >", function() {
+        ctx.team2 = Woman2("Judith")
+        ctx.team2.$_(Man2("Tom"))
+        ctx.team2.$_(Man1("Andrew"))
     }, {fontcolor: "blue", tooltip: "Technical Team"})
-  
-  	Cluster("Commercial Team", function() {
-      	ctx.team3 = Man3("Leonard")
-		ctx.team3.$_(Woman3("Calla"))
-  		ctx.team3.$_(Man2("Mac"))
-		ctx.team3.$_(Woman1("Ruby"))
+
+    Cluster("Commercial Team", function() {
+        ctx.team3 = Man3("Leonard")
+        ctx.team3.$_(Woman3("Calla"))
+        ctx.team3.$_(Man2("Mac"))
+        ctx.team3.$_(Woman1("Ruby"))
     }, {fontcolor: "green"})
-  
-  	Cluster("Human Resources Team", function() {
-      	ctx.team4 = Man4("Sam")
-		ctx.team4.$_(Woman4("Silly"))
-  		ctx.team4.$_(Woman2("Maggie"))
+
+    Cluster("Human Resources Team", function() {
+        ctx.team4 = Man4("Sam")
+        ctx.team4.$_(Woman4("Silly"))
+        ctx.team4.$_(Woman2("Maggie"))
     })
+
+    ctx.ceo.$_([ctx.team1, ctx.team2, ctx.team3, ctx.team4])
   
-  	ctx.ceo.$_([ctx.team1, ctx.team2, ctx.team3, ctx.team4])
-  
-}, {rankdir: "TB"})	
+}, {rankdir: "TB"})  
 		
 		</code>
 		<div class="graphContainer"></div>
 	</div>
 	
-	<h2>Grouped Workers by Grouped Lbs <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Connection between Group Nodes and Group Nodes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
 	<div class="group">
 		<code>
 ctx.attributes.digraph.splines = 'curved'
@@ -640,9 +647,9 @@ Diagram("Grouped Workers", () => {
 		<code>
 ctx.attributes.digraph.splines = 'curved'    // Changed graphviz digraph splines
 
-var WEB = (name, attrs) => Node(name, attrs, "images/web.png")
-var WAS = (name, attrs) => Node(name, attrs, "images/was.png")
-var DB = (name, attrs) => Node(name, attrs, "images/database.png")
+var WEB = (name, attrs) => Node(name, attrs, "../docs/images/web.png")
+var WAS = (name, attrs) => Node(name, attrs, "../docs/images/was.png")
+var DB = (name, attrs) => Node(name, attrs, "../docs/images/database.png")
 
 Diagram("Repeat Custom", () => {
     Cluster("Web Servers", () => {
