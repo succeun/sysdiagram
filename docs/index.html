@@ -21,6 +21,21 @@
 	footer {
 	  text-align: center;
 	}
+	
+	.resource-image {
+		height: 40px;
+		vertical-align: middle;
+		float: right;
+		top: 5px;
+		position: relative;
+		background-color: #f9f9f9;
+		border-radius: 8px;
+	}
+	
+	.resource li {
+		width: 650px;
+		line-height: 50px;
+	}
   </style>
   
 </head>
@@ -30,6 +45,7 @@
     window.$docsify = {
       name: 'Sysdiagram',
       repo: 'https://github.com/succeun/sysdiagram',
+	  //logo: 'images/logo.png',
 	  loadSidebar: true,
 	  auto2top: true,
 	  themeColor: '#3F51B5',
@@ -87,10 +103,41 @@
           });
         }
 	  ],
+	  ga: 'G-ZY16EZMCRY',
     }
+	
+	function listResources(resourceName, baseUrl) {
+		var main = document.querySelector('#main');
+		var lines = [];
+		var diagrams = sysdiagram.loadResources();
+		var resources = diagrams[resourceName];
+		
+		for (var x in resources) {
+			var id = resourceName + x;	// ex: onpremaggregator
+			var path = resourceName + "." + x;	// ex: onprem.aggregator
+			lines.push('<h2 id="'+id+'"><a href="#/nodes/'+resourceName+'?id='+id+'" data-id="'+id+'" class="anchor"><span>'+path+'</span></a></h2>');
+			lines.push('<ul>');
+			for (var y in resources[x]) {
+				var p = 'diagrams.'+path+'.'+y;
+				var image = resources[x][y].imageURL;
+				lines.push('<li><strong>'+p+'</strong> <img class="resource-image" src="'+image+'" loading="lazy"></li>');
+			}
+			lines.push('</ul>');
+		}
+		
+		var fragment = document.createDocumentFragment();
+		var div = document.createElement('div');
+		fragment.appendChild(div);
+		div.innerHTML = lines.join("\n");
+		div.className = "resource";
+		
+		main.insertBefore(fragment.querySelector('div'), main.querySelector('hr'));
+	}
   </script>
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/ga.min.js"></script>
   
   <!-- sysdiagram -->
   <script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
@@ -99,7 +146,10 @@
 
   <script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
-  <script src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/dist/sysdiagram_resources.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/dist/sysdiagram.js"></script>
+  <!--script src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/dist/sysdiagram_resources.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/dist/sysdiagram.js"></script-->
+  
+  <script src="../dist/sysdiagram.js"></script>
+  
 </body>
 </html>

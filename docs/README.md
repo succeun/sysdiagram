@@ -7,9 +7,8 @@ Sysdiagram was developed inspired by [Diagrams using Python](https://diagrams.mi
 It is a Javascript based diagramming tool that renders text like Markdown definitions to create and modify diagrams dynamically. 
 
 
-?> Diagrams currently supports six major providers: `AWS`, `Azure`, `GCP`, `Kubernetes`, `Alibaba Cloud` and `Oracle Cloud`. 
-It now also supports `On-Premise` nodes as well as `Programming Languages` and `Frameworks`.
-
+?> Sysdiagram currently supports six major providers: [`AWS`](nodes/aws), [`Azure`](nodes/azure), [`GCP`](nodes/gcp), [`Kubernetes`](nodes/k8s), [`Alibaba Cloud`](nodes/alibabacloud) and [`Oracle Cloud`](nodes/oci). <br>
+It now also supports [`On-Premise`](nodes/onprem) nodes as well as [`Programming Languages`](nodes/programming?id=programminglanguage) and [`Frameworks`](nodes/programming?id=programmingframework).
 # Diagram
 
 ```js
@@ -22,3 +21,12 @@ Diagram("Web Service", function() {
 })
 ```
 
+
+
+## Credits
+
+Many thanks to the [d3](http://d3js.org/) and [d3-graphviz](https://github.com/magjac/d3-graphviz) projects for providing the graphical layout and drawing libraries!
+
+Thanks also to the [Diagrams using Python](https://diagrams.mingrammer.com/) project for usage of the python syntax. 
+
+Thanks to [mingrammer(MinJae Kwon)](https://github.com/mingrammer) for inspiration and starting point for developing.

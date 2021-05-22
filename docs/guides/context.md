@@ -4,7 +4,7 @@ Context(`ctx`) provides the execution context for the script to run.
 
 ## Basic
 
-Context Object represents a global diagram context.
+Context object represents a global diagram context.
 
 It is used to use variables, change attributes, and receive events.
 
@@ -52,7 +52,7 @@ Diagram("Simple Diagram", () => {
 })	
 ```
 
-### receive events
+### Receive events
 
 Receive a rendering complete event.
 

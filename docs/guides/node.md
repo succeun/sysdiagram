@@ -94,7 +94,7 @@ The connect function below is shaped like an arrow.
 * `$_$()`: Connect nodes in both direction. (like `<->`)
 * `_()`: Connect nodes in no direction. Undirected. (like `-`)
 
-?> [Diagrams using Python](https://diagrams.mingrammer.com/) used operator overloading, but **Sysdiagram** was implemented as a function due to JavaScript limitations.
+?> [Diagrams using Python](https://diagrams.mingrammer.com/) used operator overloading, but **Sysdiagram** was implemented as a function due to JavaScript syntax limitations.
 
 ```js
 var { EC2 } = diagrams.aws.compute
@@ -103,13 +103,16 @@ var { ELB } = diagrams.aws.network
 var { S3 } = diagrams.aws.storage
 
 Diagram("Web Services", () => {
-    // ELB("lb") >> EC2("web") >> RDS("userdb") >> S3("store")
+    // Diagrams using Python: 
+	// ELB("lb") >> EC2("web") >> RDS("userdb") >> S3("store")
 	ELB("lb")._$(EC2("web"))._$(RDS("userdb"))._$(S3("store"))
 	
-    // ELB("lb") >> EC2("web") >> RDS("userdb") << EC2("stat")
+    // Diagrams using Python : 
+	// ELB("lb") >> EC2("web") >> RDS("userdb") << EC2("stat")
 	ELB("lb")._$(EC2("web"))._$(RDS("userdb")).$_(EC2("stat"))
 	
-    // (ELB("lb") >> EC2("web")) - EC2("web") >> RDS("userdb")
+    // Diagrams using Python: 
+	// (ELB("lb") >> EC2("web")) - EC2("web") >> RDS("userdb")
 	ELB("lb")._$(EC2("web"))._(EC2("web"))._$(RDS("userdb"))
 	
 	ELB("lb").$_$(EC2("web"))._(EC2("web")).$_$(RDS("userdb"))
@@ -140,7 +143,7 @@ Diagram("Workers", () => {
 
 ## Group Data Flow
 
-Above worker example has too many redundant flows. In this case, you can group nodes into a list so that all nodes are connected to other nodes at once.
+Above worker example has too many redundant flows. In this case, you can group nodes into a list so that all nodes are connected to other nodes at once with `Array`.
 
 ```js
 var { EC2 } = diagrams.aws.compute
@@ -158,15 +161,15 @@ Diagram("Grouped Workers", () => {
 
 ### ArrayNode
 
-ArrayNode is a second object representing a node array.
+ArrayNode is a object representing a node array.
 
-However, because there is no connection function in Array object of Javascript, you must use ArrayNode.
+However, because there is no connection function in native `Array` object of Javascript, you must use `ArrayNode`.
 
 #### When automatically generated and processed
 - When assigned to a variable of Context(`ctx`)
 - When assigned as a parameter of the node's connection function (`_$()`, `$_()`, `$_$()`  and `_()`)
 
-If you want to connect with other array creation, you have to wrap it with ArrayNode.
+If you want to connect with other `Array` creation, you have to wrap it with `ArrayNode` without assigning.
 
 ```js
 var { EC2 } = diagrams.aws.compute
@@ -185,7 +188,7 @@ Diagram("Grouped Workers", () => {
 })
 ```
 
-?> Sysdiagrams is supported that can connect two **arays**.<br>
+?> Sysdiagrams is supported that can connect two **Arrays**.
 
 ```js
 var { EC2 } = diagrams.aws.compute
@@ -193,10 +196,14 @@ var { RDS } = diagrams.aws.database
 var { ELB } = diagrams.aws.network
 
 Diagram("Grouped Workers", () => {
-    ArrayNode([ELB("lb1"), ELB("lb2")])._$([EC2("worker1"),
-                  EC2("worker2"),
-                  EC2("worker3"),
-                  EC2("worker4"),
-                  EC2("worker5")])._$([RDS("events1"), RDS("events2")])
+    ArrayNode([ELB("lb1"), 
+			   ELB("lb2")])
+	._$([EC2("worker1"),
+		 EC2("worker2"),
+		 EC2("worker3"),
+		 EC2("worker4"),
+		 EC2("worker5")])
+	._$([RDS("events1"), 
+		 RDS("events2")])
 })
 ```

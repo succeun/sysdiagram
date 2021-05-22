@@ -2,39 +2,25 @@
 
 Node classes list of firebase provider.
 
-## firebase.base
+<script>listResources("firebase");</script>
 
-- **diagrams.firebase.base.Firebase**
+```js
+ctx.attributes.graphviz.engine = 'fdp'
 
-## firebase.develop
+var providerName = 'firebase'
 
-- **diagrams.firebase.develop.Authentication**
-- **diagrams.firebase.develop.Firestore**
-- **diagrams.firebase.develop.Functions**
-- **diagrams.firebase.develop.Hosting**
-- **diagrams.firebase.develop.MLKit**
-- **diagrams.firebase.develop.RealtimeDatabase**
-- **diagrams.firebase.develop.Storage**
-
-## firebase.extentions
-
-- **diagrams.firebase.extentions.Extensions**
-
-## firebase.grow
-
-- **diagrams.firebase.grow.ABTesting**
-- **diagrams.firebase.grow.AppIndexing**
-- **diagrams.firebase.grow.DynamicLinks**
-- **diagrams.firebase.grow.InAppMessaging**
-- **diagrams.firebase.grow.Invites**
-- **diagrams.firebase.grow.Messaging**, **FCM** (alias)
-- **diagrams.firebase.grow.Predictions**
-- **diagrams.firebase.grow.RemoteConfig**
-
-## firebase.quality
-
-- **diagrams.firebase.quality.AppDistribution**
-- **diagrams.firebase.quality.CrashReporting**
-- **diagrams.firebase.quality.Crashlytics**
-- **diagrams.firebase.quality.PerformanceMonitoring**
-- **diagrams.firebase.quality.TestLab**
+Diagram(providerName, () => {
+	Cluster(providerName, () => {
+		var provider = diagrams[providerName]
+		for (var resourceGroupName in provider) {
+			Cluster(providerName + '.' + resourceGroupName, () => {
+				var resources = provider[resourceGroupName]
+				for (var resourceName in resources) {
+					ctx[providerName + '_' + resourceGroupName + '_' + resourceName] = resources[resourceName](resourceName)
+				}
+			})
+			
+		}
+	})
+})
+```

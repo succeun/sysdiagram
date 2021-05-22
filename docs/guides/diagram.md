@@ -1,4 +1,4 @@
-# Diagrams (리소스 임포트 하는 방법, context 개념 추가)
+# Diagrams (리소스 임포트 하는 방법)
 
 Diagram is a object representing a diagram.
 

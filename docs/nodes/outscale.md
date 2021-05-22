@@ -2,26 +2,25 @@
 
 Node classes list of outscale provider.
 
-## outscale.compute
+<script>listResources("outscale");</script>
 
-- **diagrams.outscale.compute.Compute**
-- **diagrams.outscale.compute.DirectConnect**
+```js
+ctx.attributes.graphviz.engine = 'fdp'
 
-## outscale.network
+var providerName = 'outscale'
 
-- **diagrams.outscale.network.ClientVpn**
-- **diagrams.outscale.network.InternetService**
-- **diagrams.outscale.network.LoadBalancer**
-- **diagrams.outscale.network.NatService**
-- **diagrams.outscale.network.Net**
-- **diagrams.outscale.network.SiteToSiteVpng**
-
-## outscale.security
-
-- **diagrams.outscale.security.Firewall**
-- **diagrams.outscale.security.IdentityAndAccessManagement**
-
-## outscale.storage
-
-- **diagrams.outscale.storage.SimpleStorageService**
-- **diagrams.outscale.storage.Storage**
+Diagram(providerName, () => {
+	Cluster(providerName, () => {
+		var provider = diagrams[providerName]
+		for (var resourceGroupName in provider) {
+			Cluster(providerName + '.' + resourceGroupName, () => {
+				var resources = provider[resourceGroupName]
+				for (var resourceName in resources) {
+					ctx[providerName + '_' + resourceGroupName + '_' + resourceName] = resources[resourceName](resourceName)
+				}
+			})
+			
+		}
+	})
+})
+```

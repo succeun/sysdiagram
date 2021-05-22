@@ -2,55 +2,25 @@
 
 Node classes list of saas provider.
 
-## saas.alerting
+<script>listResources("saas");</script>
 
-- **diagrams.saas.alerting.Newrelic**
-- **diagrams.saas.alerting.Opsgenie**
-- **diagrams.saas.alerting.Pushover**
+```js
+ctx.attributes.graphviz.engine = 'fdp'
 
-## saas.analytics
+var providerName = 'saas'
 
-- **diagrams.saas.analytics.Snowflake**
-- **diagrams.saas.analytics.Stitch**
-
-## saas.cdn
-
-- **diagrams.saas.cdn.Akamai**
-- **diagrams.saas.cdn.Cloudflare**
-
-## saas.chat
-
-- **diagrams.saas.chat.Discord**
-- **diagrams.saas.chat.Mattermost**
-- **diagrams.saas.chat.RocketChat**
-- **diagrams.saas.chat.Slack**
-- **diagrams.saas.chat.Teams**
-- **diagrams.saas.chat.Telegram**
-
-## saas.filesharing
-
-- **diagrams.saas.filesharing.Nextcloud**
-
-## saas.identity
-
-- **diagrams.saas.identity.Auth0**
-- **diagrams.saas.identity.Okta**
-
-## saas.logging
-
-- **diagrams.saas.logging.Datadog**, **DataDog** (alias)
-- **diagrams.saas.logging.Newrelic**, **NewRelic** (alias)
-- **diagrams.saas.logging.Papertrail**
-
-## saas.media
-
-- **diagrams.saas.media.Cloudinary**
-
-## saas.recommendation
-
-- **diagrams.saas.recommendation.Recombee**
-
-## saas.social
-
-- **diagrams.saas.social.Facebook**
-- **diagrams.saas.social.Twitter**
+Diagram(providerName, () => {
+	Cluster(providerName, () => {
+		var provider = diagrams[providerName]
+		for (var resourceGroupName in provider) {
+			Cluster(providerName + '.' + resourceGroupName, () => {
+				var resources = provider[resourceGroupName]
+				for (var resourceName in resources) {
+					ctx[providerName + '_' + resourceGroupName + '_' + resourceName] = resources[resourceName](resourceName)
+				}
+			})
+			
+		}
+	})
+})
+```

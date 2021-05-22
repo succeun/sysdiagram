@@ -28,8 +28,7 @@ It can insert a `script` tag with an absolute address and a `sysdiagram` call in
 <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
 
 <!-- sysdiagram -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/sysdiagram_resources.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/sysdiagram.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/sysdiagram.min.js"></script>
   
 <script>sysdiagram.initialize({startOnLoad:true});</script>
 ```
@@ -50,13 +49,5 @@ From these tags sysdiagram will try to read the diagram definitons and render th
 
  **Examples can be found in** [Other examples](getting-started/examples)
 
-
-## Credits
-
-Many thanks to the [d3](http://d3js.org/) and [d3-graphviz](https://github.com/magjac/d3-graphviz) projects for providing the graphical layout and drawing libraries!
-
-Thanks also to the [Diagrams using Python](https://diagrams.mingrammer.com/) project for usage of the python syntax. 
-
-Thanks to [mingrammer(MinJae Kwon)](https://github.com/mingrammer) for inspiration and starting point for rendering.
 
 

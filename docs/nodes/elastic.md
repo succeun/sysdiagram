@@ -2,46 +2,25 @@
 
 Node classes list of elastic provider.
 
-## elastic.elasticsearch
+<script>listResources("elastic");</script>
 
-- **diagrams.elastic.elasticsearch.Alerting**
-- **diagrams.elastic.elasticsearch.Beats**
-- **diagrams.elastic.elasticsearch.Elasticsearch**
-- **diagrams.elastic.elasticsearch.Kibana**
-- **diagrams.elastic.elasticsearch.Logstash**, **LogStash** (alias)
-- **diagrams.elastic.elasticsearch.MachineLearning**
-- **diagrams.elastic.elasticsearch.Maps**
-- **diagrams.elastic.elasticsearch.Monitoring**
-- **diagrams.elastic.elasticsearch.SecuritySettings**
-- **diagrams.elastic.elasticsearch.Sql**
+```js
+ctx.attributes.graphviz.engine = 'fdp'
 
-## elastic.enterprisesearch
+var providerName = 'elastic'
 
-- **diagrams.elastic.enterprisesearch.AppSearch**
-- **diagrams.elastic.enterprisesearch.EnterpriseSearch**
-- **diagrams.elastic.enterprisesearch.SiteSearch**
-- **diagrams.elastic.enterprisesearch.WorkplaceSearch**
-
-## elastic.observability
-
-- **diagrams.elastic.observability.APM**
-- **diagrams.elastic.observability.Logs**
-- **diagrams.elastic.observability.Metrics**
-- **diagrams.elastic.observability.Observability**
-- **diagrams.elastic.observability.Uptime**
-
-## elastic.orchestration
-
-- **diagrams.elastic.orchestration.ECE**
-- **diagrams.elastic.orchestration.ECK**
-
-## elastic.saas
-
-- **diagrams.elastic.saas.Cloud**
-- **diagrams.elastic.saas.Elastic**
-
-## elastic.security
-
-- **diagrams.elastic.security.Endpoint**
-- **diagrams.elastic.security.Security**
-- **diagrams.elastic.security.SIEM**
+Diagram(providerName, () => {
+	Cluster(providerName, () => {
+		var provider = diagrams[providerName]
+		for (var resourceGroupName in provider) {
+			Cluster(providerName + '.' + resourceGroupName, () => {
+				var resources = provider[resourceGroupName]
+				for (var resourceName in resources) {
+					ctx[providerName + '_' + resourceGroupName + '_' + resourceName] = resources[resourceName](resourceName)
+				}
+			})
+			
+		}
+	})
+})
+```
