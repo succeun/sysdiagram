@@ -4,6 +4,8 @@
 
 For this example we use the following architecture:
 
+이미지 뿐만 아니라 svg 파일도 가능하다
+
 ```js
 Diagram("Custom with local icons\n Can be downloaded here: \nhttps://creativecommons.org/about/downloads/", () => {
 	ctx.cc_heart = Custom("Creative Commons", "./images/ccheart_black.png")

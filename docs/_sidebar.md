@@ -31,5 +31,4 @@
   - [Program](nodes/program.md)
   - [Custom](nodes/custom.md)
 
-- [Changelog](changelog.md)
 
