@@ -52,6 +52,9 @@ The setting information is divided into the following areas.
 		shape: "none",
 	},
 	edge: {							// https://graphviz.org/doc/info/attrs.html
+		fontname: "Sans-Serif",
+		fontsize: "13",
+		fontcolor: "#2D3436",
 		color: "#7B8894",
 	},
 	subgraph: {						// https://graphviz.org/doc/info/attrs.html

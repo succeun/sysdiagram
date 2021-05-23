@@ -207,3 +207,27 @@ Diagram("Grouped Workers", () => {
 		 RDS("events2")])
 })
 ```
+
+## Support with HTML-like labels
+
+Diagram, Cluster, Node, and Edge all are supported with first name parameter. Here is a [Reference link of Graphviz HTML-Like Labels](https://graphviz.org/doc/info/shapes.html#html).
+
+!> **HTML string** should be wrapped in `< `, ` >`, such as `< ... >`. Also, there must be space..
+
+```js
+var { EC2 } = diagrams.aws.compute
+var { RDS } = diagrams.aws.database
+var { ELB } = diagrams.aws.network
+
+Diagram("< <i>Simple Diagram</i> >", () => {
+	Cluster("< <u>Simple Cluster</u> >", () => {
+		ctx.lb = ELB("< <b>lb</b> >")
+		ctx.web1 = EC2('< <i><u>web1</u></i> >')
+		ctx.web2 = EC2("< <i><u>web2</u></i> >")
+		ctx.db = RDS("< <i>userdb</i> >")
+		
+		ctx.lb._$(ctx.web1)._$(ctx.db)
+		ctx.lb._$(ctx.web2)._$(ctx.db)
+	})
+}) 
+```

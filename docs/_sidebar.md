@@ -28,6 +28,7 @@
   - [Generic](nodes/generic.md)
   - [Programming](nodes/programming.md)
   - [Saas](nodes/saas.md)
+  - [Program](nodes/program.md)
   - [Custom](nodes/custom.md)
 
 - [Changelog](changelog.md)
