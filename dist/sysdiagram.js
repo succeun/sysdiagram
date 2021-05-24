@@ -2,7 +2,15 @@
 //     https://succeun.github.io/sysdiagram
 //     Copyright (c) 2021 Jeong-Ho, Eun Licensed under the MIT license.
 
-var sysdiagram = sysdiagram || (function() {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) { // AMD
+    define([], factory);
+  } else if (typeof module === 'object' && module.exports) { // CommonJS
+    module.exports = factory();
+  } else { // window
+    root.sysdiagram = root.sysdiagram || factory(root); 
+  }
+}(this, function(window) {
 	'use strict';
 	
 	////////////////////////////////////////////////////////////////////////////////////
@@ -798,9 +806,21 @@ var sysdiagram = sysdiagram || (function() {
 		render: render,
 		toImage: toImage
 	};
-})();
+}));
 
-var sysdiagram_resources = sysdiagram_resources || (function() {
+//     sysdiagram.js 0.1.0
+//     https://succeun.github.io/sysdiagram
+//     Copyright (c) 2021 Jeong-Ho, Eun Licensed under the MIT license.
+
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) { // AMD
+    define([], factory);
+  } else if (typeof module === 'object' && module.exports) { // CommonJS
+    module.exports = factory();
+  } else { // window
+    root.sysdiagram_resources = root.sysdiagram_resources || factory(root); 
+  }
+}(this, function(window) {
 	'use strict';
 	
 	var sysdiagram_resources = {
@@ -3086,4 +3106,4 @@ var sysdiagram_resources = sysdiagram_resources || (function() {
 	merge(sysdiagram_resources, additional);
 	
 	return sysdiagram_resources;
-})()
+}));

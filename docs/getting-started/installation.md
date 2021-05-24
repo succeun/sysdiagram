@@ -12,7 +12,7 @@ To select a version:
 
 Replace `<version>` with the desired version number.
 
-Latest Version: [https://unpkg.com/browse/sysdiagram@0.1.0/](https://unpkg.com/browse/sysdiagram@0.1.0/)
+Latest Version: [https://unpkg.com/sysdiagram/dist/sysdiagram.min.js](https://unpkg.com/sysdiagram/dist/sysdiagram.min.js)
 
 ## Installing
 
@@ -20,15 +20,15 @@ It can insert a `script` tag with an absolute address and a `sysdiagram` call in
 
 ```html
 <!-- canvg for converting image (Optional) -->
-<script type="text/javascript" src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script>
+<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
 <!-- d3 & d3-graphviz (Mandatory) -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-<script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
+<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
+<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 
 <!-- sysdiagram -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/succeun/sysdiagram@master/sysdiagram.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
   
 <script>sysdiagram.initialize({startOnLoad:true});</script>
 ```
