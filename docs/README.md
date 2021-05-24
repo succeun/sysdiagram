@@ -11,9 +11,9 @@ It is a Javascript based diagramming tool that renders text like Markdown defini
 It now also supports [`On-Premise`](nodes/onprem) nodes as well as [`Programming Languages`](nodes/programming?id=programminglanguage), [`Frameworks`](nodes/programming?id=programmingframework) and [`Programs`](nodes/program).
 
 
-# Diagram
+# Example
 
-## Simple Example
+## Simple Diagram
 
 ```javascript
 var EC2 = diagrams.aws.compute.EC2
@@ -26,7 +26,7 @@ Diagram("Web Service", function() {
 ```
 ![Web Service](images/simple_diagram.png)
 
-## Complex Example
+## Complex Diagram
 
 ```javascript
 var { BigQuery, Dataflow, PubSub } = diagrams.gcp.analytics
