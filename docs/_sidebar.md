@@ -2,6 +2,7 @@
 
   - [Installation](getting-started/installation.md)
   - [Examples](getting-started/examples.md)
+  - [Advanced Examples](getting-started/advanced_examples.md)
 
 - Guides
 

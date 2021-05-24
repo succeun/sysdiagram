@@ -1,12 +1,18 @@
 {
 	"name": "sysdiagram",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Diagram the system architecture using JavaScript syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
+	"files": [
+		"dist",
+		"lib",
+		"docs",
+		"examples"
+	],
 	"scripts": {
-		"minify": "minify ./lib/sysdiagram.js ./lib/sysdiagram_resources.js > ./dist/sysdiagram.min.js",
-		"concat": "concat -o ./dist/sysdiagram.js ./lib/sysdiagram.js ./lib/sysdiagram_resources.js",
+		"minify": "minify ./lib/sysdiagram.js > ./dist/sysdiagram.min.js",
+		"concat": "concat -o ./dist/sysdiagram.js ./lib/sysdiagram.js",
 		"docs": "docsify serve ./docs",
 		"dev": "http-server -p 4000",
 		"build": "npm run concat && npm run minify"

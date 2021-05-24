@@ -20,14 +20,14 @@ It can insert a `script` tag with an absolute address and a `sysdiagram` call in
 
 ```html
 <!-- canvg for converting image (Optional) -->
-<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
+<script src="https://unpkg.com/canvg@^3.0.7/lib/umd.js"></script> 
 
 <!-- d3 & d3-graphviz (Mandatory) -->
-<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
-<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
-<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
+<script src="https://unpkg.com/d3@^6.7.0/dist/d3.min.js"></script>
+<script src="https://unpkg.com/@hpcc-js/wasm@^1.5.2/dist/index.min.js"></script>
+<script src="https://unpkg.com/d3-graphviz@^4.0.0/build/d3-graphviz.js"></script>
 
-<!-- sysdiagram -->
+<!-- sysdiagram (latest) -->
 <script type="text/javascript" src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
   
 <script>sysdiagram.initialize({startOnLoad:true});</script>

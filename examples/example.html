@@ -99,7 +99,6 @@
 	<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
 	<script src="../lib/sysdiagram.js"></script>
-	<script src="../lib/sysdiagram_resources.js"></script>
 	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
@@ -733,6 +732,10 @@ Diagram("Repeat Custom", () => {
 		<div class="codeContainer">
 			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
 			<code>
+ctx.attributes.edge.fontcolor = "#0079d4"
+ctx.attributes.edge.fontsize = "40px"
+ctx.attributes.edge.style = "dashed"
+
 var { MicrosoftEdge } = diagrams.program.browser
 var { CDNProfiles} = diagrams.azure.network
 var { KubernetesServices, FunctionApps } = diagrams.azure.compute
@@ -751,20 +754,21 @@ Diagram("Build cloud native applications", () => {
 	ctx.CosDB = CosmosDb("Azure Cosmos DB")
 	
 	Cluster("", () => {
-		ctx.DBPost = DatabaseForPostgresqlServers("Azure Database for PostgreSQL")
-		ctx.AKS.$_$(CacheForRedis("Azure Cache for Redis"))
+		ctx.Postgre = DatabaseForPostgresqlServers("Azure Database for PostgreSQL")
+		ctx.AKS.edge("②")._$(ctx.Postgre)
+		ctx.AKS.edge("③").$_$(CacheForRedis("Azure Cache for Redis"))
 	})
 	
-	ctx.browser._$(CDNProfiles("Content Delivery Network"))
+	ctx.browser.edge("①")._$(CDNProfiles("Content Delivery Network"))
 	ctx.browser._$(ctx.AKS)
-	ctx.AKS._$(ctx.CosDB)
-	ctx.AKS._$(ctx.Insight)
-	ctx.Insight.$_(ctx.AF)
-	ctx.AF._$(NotificationHubs("Notification Hubs"))
-	ctx.DBPost._$(ctx.AF)
-	ctx.DBPost._$(ctx.ASA)
-	ctx.ASA._$(PowerBI("Power BI"))
-	ctx.CosDB._$(ctx.ASA)
+	ctx.AKS.edge("⑧")._$(ctx.CosDB)
+	ctx.AKS.edge("⑦")._$(ctx.Insight)
+	ctx.Insight.edge("⑦").$_(ctx.AF)
+	ctx.AF.edge("⑤")._$(NotificationHubs("Notification Hubs"))
+	ctx.Postgre.edge("④")._$(ctx.AF)
+	ctx.Postgre.edge("⑥")._$(ctx.ASA)
+	ctx.ASA.edge("⑩")._$(PowerBI("Power BI"))
+	ctx.CosDB.edge("⑨")._$(ctx.ASA)
   
 }, {rankdir: "LR", pad: "0.5", nodesep: "1", ranksep: "2", splines: "curved" })
 			</code>

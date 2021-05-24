@@ -64,3 +64,26 @@ Diagram(name="Advanced Web Service with On-Premise (colored)", () => {
 })		
 ```
 
+## Using
+
+Below all appear the same.
+
+```javascript
+	// Edge Node
+	ELB("lb")._$(Edge({color: "firebrick", style: "dashed"}))_$(EC2("web"))
+	ELB("lb")._$(Edge({label: "connect", color: "firebrick", style: "dashed"}))_$(EC2("web"))
+	ELB("lb")._$(Edge("connect", {color: "firebrick", style: "dashed"}))_$(EC2("web"))
+	
+	// Abbreviated : ~.edge(), ~.e()
+	ELB("lb").edge({label: "connect", color: "firebrick", style: "dashed"})._$(EC2("web"))
+	ELB("lb").edge("connect", {color: "firebrick", style: "dashed"})._$(EC2("web"))
+	ELB("lb").e("connect", {color: "firebrick", style: "dashed"})._$(EC2("web"))
+	
+	// Use of attributes
+	ctx.attributes.edge.color = "firebrick"
+	ctx.attributes.edge.style = "dashed"
+	...
+	ELB("lb").edge("connect")._$(EC2("web"))
+	ELB("lb").e("connect")._$(EC2("web"))
+```
+
