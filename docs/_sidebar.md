@@ -22,6 +22,7 @@
   - [K8S](nodes/k8s.md)
   - [AlibabaCloud](nodes/alibabacloud.md)
   - [OCI](nodes/oci.md)
+  - [IBMCloud](nodes/ibmcloud.md) 
   - [OpenStack](nodes/openstack.md)
   - [Firebase](nodes/firebase.md)
   - [Outscale](nodes/outscale.md)

@@ -1,13 +1,13 @@
-# AlibabaCloud
+# IBMCloud
 
-Node classes list of alibabacloud provider.
+Node classes list of IBMCloud provider.
 
-<script>listResources("alibabacloud");</script>
+<script>listResources("ibm");</script>
 
 ```js
 ctx.attributes.graphviz.engine = 'fdp'
 
-var providerName = 'alibabacloud'
+var providerName = 'ibm'
 
 Diagram(providerName, () => {
 	Cluster(providerName, () => {
