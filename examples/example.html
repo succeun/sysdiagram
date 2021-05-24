@@ -778,5 +778,38 @@ Diagram("Build cloud native applications", () => {
 			<div class="diagram"></div>
 		</div>
 	</div>
+	
+	<h2>Cluster Connect</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+ctx.attributes.verbose = true			
+ctx.attributes.digraph.compound = true
+
+var APIGateway = diagrams.aws.network.APIGateway
+var Aurora = diagrams.aws.database.Aurora
+var Pod = diagrams.k8s.compute.Pod
+
+Diagram("Broker Consumers", function() {
+	Cluster("Consumers Wrapper", function() {
+		Cluster("Consumers", function() {
+			ctx.consumers = [
+				Pod("worker"),
+				Pod("worker"),
+				Pod("worker")]
+		})
+	})
+    ctx.gateway = APIGateway("Gateway")
+
+    ctx.gateway.e({lhead: true})._$(ctx.consumers).e({ltail: true})._$(Aurora("Database"))
+})
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
+	</div>
 </body>
 </html>
