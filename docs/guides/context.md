@@ -6,7 +6,7 @@ Context(`ctx`) provides the execution context for the script to run.
 
 Context object represents a global diagram context.
 
-It is used to use variables, change attributes, and receive events.
+It is used to **use variables**, **change attributes**, and **receive events**.
 
 ### Use variables
 
@@ -51,6 +51,8 @@ Diagram("Simple Diagram", () => {
 	ctx.lb._$(ctx.web2)._$(ctx.db)
 })	
 ```
+
+!> Attributes to be changed can be checked in [Configuration](guides/configuration).
 
 ### Receive events
 

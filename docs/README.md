@@ -8,10 +8,14 @@ It is a Javascript based diagramming tool that renders text like Markdown defini
 
 
 ?> Sysdiagram currently supports six major providers: [`AWS`](nodes/aws), [`Azure`](nodes/azure), [`GCP`](nodes/gcp), [`Kubernetes`](nodes/k8s), [`Alibaba Cloud`](nodes/alibabacloud) and [`Oracle Cloud`](nodes/oci). <br>
-It now also supports [`On-Premise`](nodes/onprem) nodes as well as [`Programming Languages`](nodes/programming?id=programminglanguage) and [`Frameworks`](nodes/programming?id=programmingframework).
+It now also supports [`On-Premise`](nodes/onprem) nodes as well as [`Programming Languages`](nodes/programming?id=programminglanguage), [`Frameworks`](nodes/programming?id=programmingframework) and [`Programs`](nodes/program).
+
+
 # Diagram
 
-```js
+## Simple Example
+
+```javascript
 var EC2 = diagrams.aws.compute.EC2
 var RDS = diagrams.aws.database.RDS
 var ELB = diagrams.aws.network.ELB
@@ -20,7 +24,51 @@ Diagram("Web Service", function() {
     ELB("lb")._$(EC2("web"))._$(RDS("userdb"))
 })
 ```
+![Web Service](images/simple_diagram.png)
 
+## Complex Example
+
+```javascript
+var { BigQuery, Dataflow, PubSub } = diagrams.gcp.analytics
+var {AppEngine, Functions } = diagrams.gcp.compute
+var BigTable = diagrams.gcp.database.BigTable
+var IotCore = diagrams.gcp.iot.IotCore
+var GCS = diagrams.gcp.storage.GCS
+
+Diagram("Message Collecting", () => {
+    ctx.pubsub = PubSub("pubsub")
+    
+    Cluster("Source of Data", () => {
+        ArrayNode([IotCore("core1"),
+                   IotCore("core2"),
+                   IotCore("core3")])._$(ctx.pubsub)
+    })
+
+    Cluster("Targets", () => {
+        Cluster("Data Flow", () => {
+            ctx.flow = Dataflow("data flow")
+        })
+        
+        Cluster("Data Lake", () => {
+            ctx.flow._$([BigQuery("bq"),
+                         GCS("storage")])
+        })
+
+        Cluster("Event Driven", () => {
+            Cluster("Processing", () => {
+                ctx.flow._$(AppEngine("engine"))._$(BigTable("bigtable"))
+            })
+
+            Cluster("Serverless", () => {
+                ctx.flow._$(Functions("func"))._$(AppEngine("appengine"))
+            })
+        })
+    })
+    ctx.pubsub._$(ctx.flow)
+})
+```
+
+![Message Collecting](images/complex_diagram.png)
 
 
 ## Credits

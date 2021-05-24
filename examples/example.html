@@ -25,12 +25,27 @@
 			font-size: 16px;
 		}
 		
+		.codeContainer {
+			position: relative;
+		}
+		
 		.graphContainer {
 			text-align: center; 
 			border: 1px solid #444;
 			width: calc(100% - 700px);
 			height: 400px;
 			margin-left: 50px;
+			position: relative;
+		}
+		
+		.badge {
+			opacity: 0.8;
+			transition: opacity linear 0.5s;
+			border-radius: 0 0 0 7px;
+			position: absolute;
+			right: 0;
+			top: 0;
+			z-index: 1000;
 		}
 		
 		button {
@@ -52,48 +67,18 @@
 			-ms-user-select: none;
 			user-select: none;
 			background-image: none;
-			border: 2px solid transparent;
+			border: 1px solid transparent;
 			border-radius: 4px;
-		}
-		button:focus,
-		button:active:focus {
-			outline: thin dotted;
-			outline: 5px auto -webkit-focus-ring-color;
-			outline-offset: -2px;
-		}
-		button:hover,
-		button:focus {
+			
 			color: #333;
+			background-color: #e6e6e6;
+			border-color: #adadad;
+		}
+		button:hover {
 			text-decoration: none;
-		}
-		button:active {
-			background-image: none;
-			outline: 0;
-			-webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-			box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-		}
-		
-		/* default
-		---------------------------- */
-		.btn-default {
-			color: #333;
-			background-color: #7e7;
+			color: #fff;
+			background-color: #3F51B5;
 			border-color: #ccc;
-		}
-		.btn-default:focus {
-			color: #333;
-			background-color: #e6e6e6;
-			border-color: #8c8c8c;
-		}
-		.btn-default:hover {
-			color: #333;
-			background-color: #e6e6e6;
-			border-color: #adadad;
-		}
-		.btn-default:active {
-			color: #333;
-			background-color: #e6e6e6;
-			border-color: #adadad;
 		}
 	</style>
 	
@@ -118,6 +103,12 @@
 	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
+			// code init
+			var codeEls = document.querySelectorAll("code");
+			for (var i = 0 ; i < codeEls.length; i++) {
+				run(i, true);
+			}
+			
 			var btnRun = document.querySelectorAll("button.run");
 			for (var i = 0 ; i < btnRun.length; i++) {
 				addButtonRunEvent(i);
@@ -126,11 +117,6 @@
 			var btnDownload = document.querySelectorAll("button.download");
 			for (var i = 0 ; i < btnDownload.length; i++) {
 				addButtonDownloadEvent(i);
-			}
-		
-			var codeEls = document.querySelectorAll("code");
-			for (var i = 0 ; i < codeEls.length; i++) {
-				run(i, true);
 			}
 		});
 		
@@ -144,7 +130,7 @@
 		function addButtonDownloadEvent(i) {
 			var btn = document.querySelectorAll("button.download")[i];
 			btn.addEventListener("click", function(evt) {
-				var graphEl = document.querySelectorAll(".graphContainer")[i];
+				var graphEl = document.querySelectorAll(".diagram")[i];
 				if (graphEl && graphEl.graphviz) {
 					graphEl.graphviz.toImage("example-" + i);
 				}
@@ -153,7 +139,7 @@
 		
 		function run(index, init) {
 			var codeEl = document.querySelectorAll("code")[index];
-			var graphEl = document.querySelectorAll(".graphContainer")[index];
+			var graphEl = document.querySelectorAll(".diagram")[index];
 			
 			var code = "";
 			if (init) {
@@ -221,9 +207,11 @@
 <body>
 	<h1>Sysdiagram Examples</h1>
 	
-	<h2>Grouped Workers on AWS <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Grouped Workers on AWS</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 ctx.attributes.digraph.splines = 'curved'
 
 var EC2 = diagrams.aws.compute.EC2
@@ -237,14 +225,20 @@ Diagram("Grouped Workers", function() {
 				EC2("worker4"),
 				EC2("worker5")])._$(RDS("events"))
 }, {rankdir: "TB"})
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Clustered Web Services <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Clustered Web Services</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var ECS = diagrams.aws.compute.ECS
 var { ElastiCache, RDS } = diagrams.aws.database
 var ELB = diagrams.aws.network.ELB
@@ -273,14 +267,20 @@ Diagram("Clustered Web Services", function() {
 	
 })
 //ctx.onCompleted = function(element, graphviz) { graphviz.toImage('test') }
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Event Processing on AWS <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Event Processing on AWS</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var { ECS, EKS, Lambda } = diagrams.aws.compute
 var Redshift = diagrams.aws.database.Redshift
 var SQS = diagrams.aws.integration.SQS
@@ -311,14 +311,20 @@ Diagram("Event Processing", function() {
     ctx.handlers._$(ctx.store)
     ctx.handlers._$(ctx.dw)
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Message Collecting System on GCP <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Message Collecting System on GCP</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var { BigQuery, Dataflow, PubSub } = diagrams.gcp.analytics
 var {AppEngine, Functions } = diagrams.gcp.compute
 var BigTable = diagrams.gcp.database.BigTable
@@ -362,14 +368,20 @@ Diagram("Message Collecting", () => {
 	})
     ctx.pubsub._$(ctx.flow)
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Exposed Pod with 3 Replicas on Kubernetes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Exposed Pod with 3 Replicas on Kubernetes</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var HPA = diagrams.k8s.clusterconfig.HPA
 var { Deployment, Pod, ReplicaSet }  = diagrams.k8s.compute
 var { Ingress, Service } = diagrams.k8s.network
@@ -380,14 +392,20 @@ Diagram("Exposed Pod with 3 Replicas", () => {
             Pod("pod2"),
             Pod("pod3")]).$_(ReplicaSet("rs")).$_(Deployment("dp")).$_(HPA("hpa"))
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Stateful Architecture on Kubernetes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Stateful Architecture on Kubernetes</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var { Pod, StatefulSet } = diagrams.k8s.compute
 var Service = diagrams.k8s.network.Service
 var { PV, PVC, StorageClass } = diagrams.k8s.storage
@@ -408,14 +426,20 @@ Diagram("Stateful Architecture", () => {
 
     ctx.apps.$_(PV("pv")).$_(StorageClass("sc"))
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Advanced Web Service with On-Premise <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Advanced Web Service with On-Premise</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var Spark = diagrams.onprem.analytics.Spark
 var Server = diagrams.onprem.compute.Server
 var PostgreSQL = diagrams.onprem.database.Postgresql
@@ -455,14 +479,20 @@ Diagram("Advanced Web Service with On-Premise", function() {
 
 	ctx.ingress._$(ctx.grpcsvc)._$(ctx.aggregator)
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>Advanced Web Service with On-Premise (with colors and labels) <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Advanced Web Service with On-Premise (with colors and labels)</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var Spark = diagrams.onprem.analytics.Spark
 var Server = diagrams.onprem.compute.Server
 var PostgreSQL = diagrams.onprem.database.Postgresql
@@ -502,24 +532,24 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 
 	ctx.ingress.$_$(Edge({color: "darkgreen"})).$_$(ctx.grpcsvc)._$(Edge({color: "darkorange"}))._$(ctx.aggregator)
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
 	
-	<h2>RabbitMQ Consumers with Custom Nodes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>RabbitMQ Consumers with Custom Nodes</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var Aurora = diagrams.aws.database.Aurora
 var Pod = diagrams.k8s.compute.Pod
 
-// 참고 https://vecta.io/symbols
-var rabbitmq_icon = "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png";
-
-var RabbitMQ = (name, attrs) => Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png")
-var RabbitMQ = function(name, attrs) {
-	return Node(name, attrs, "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png")
-}
+var rabbitmq_icon = "https://jpadilla.github.io/rabbitmqapp/assets/img/icon.png"
 
 Diagram("Broker Consumers", function() {
 	Cluster("Consumers", function() {
@@ -529,18 +559,23 @@ Diagram("Broker Consumers", function() {
             Pod("worker")]
 	})
 
-    ctx.queue = Custom("Message queue", rabbitmq_icon);
-	ctx.queue1 = RabbitMQ("Message queue1", rabbitmq_icon);
+    ctx.queue = Custom("Message queue", rabbitmq_icon)
 
     ctx.queue.$_$(ctx.consumers).$_$(Aurora("Database"))
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
-	<h2>Circled Workers on AWS <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Circled Workers on AWS</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 ctx.attributes.graphviz.engine = 'circo'
 ctx.attributes.digraph.splines = 'curved'
 		
@@ -562,13 +597,19 @@ Diagram("Grouped Workers", function() {
   	ctx.gateway._$(ctx.worker1)
 	ctx.worker4._$(ctx.userdb)
 })
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
-	<h2>Company organization chart (with HTML-like labels) <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Company organization chart (with HTML-like labels)</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 ctx.attributes.subgraph.labeljust = 'c'
 
 var Man1 = (name, attrs) => Node(name, attrs, "../docs/images/man1.png")
@@ -618,13 +659,19 @@ Diagram("Organization", function() {
   
 }, {rankdir: "TB"})  
 		
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
-	<h2>Connection between Group Nodes and Group Nodes <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Connection between Group Nodes and Group Nodes</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 ctx.attributes.digraph.splines = 'curved'
 		
 var { EC2 } = diagrams.aws.compute
@@ -638,13 +685,19 @@ Diagram("Grouped Workers", () => {
                   EC2("worker4"),
                   EC2("worker5")])//._$([RDS("events1"), RDS("events2")])
 }, {rankdir: 'TB'})
-		</code>
-		<div class="graphContainer"></div>
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
-	<h2>Repeat Custom <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Repeat Custom Nodes</h2>
 	<div class="group">
-		<code>
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 ctx.attributes.digraph.splines = 'curved'    // Changed graphviz digraph splines
 
 var WEB = (name, attrs) => Node(name, attrs, "../docs/images/web.png")
@@ -667,15 +720,19 @@ Diagram("Repeat Custom", () => {
   ctx.webs._$(ctx.wass)._$(ctx.dbs)
   
 }, {rankdir: "LR" })
-		</code>
-		<div class="graphContainer"></div>	
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 	
-	<h2>Build cloud native applications <button class="btn-default run">Run(Ctrl-Enter)</button> <button class="btn-default download">Image Download</button></h2>
+	<h2>Build Cloud Native Applications</h2>
 	<div class="group">
-		<code>
-
-
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
 var { MicrosoftEdge } = diagrams.program.browser
 var { CDNProfiles} = diagrams.azure.network
 var { KubernetesServices, FunctionApps } = diagrams.azure.compute
@@ -710,8 +767,12 @@ Diagram("Build cloud native applications", () => {
 	ctx.CosDB._$(ctx.ASA)
   
 }, {rankdir: "LR", pad: "0.5", nodesep: "1", ranksep: "2", splines: "curved" })
-		</code>
-		<div class="graphContainer"></div>	
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
 	</div>
 </body>
 </html>

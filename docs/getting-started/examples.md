@@ -340,6 +340,44 @@ Diagram("Organization", function() {
 }, {rankdir: "TB"})	
 ```
 
+## Build Cloud Native Applications
+
+```js
+var { MicrosoftEdge } = diagrams.program.browser
+var { CDNProfiles} = diagrams.azure.network
+var { KubernetesServices, FunctionApps } = diagrams.azure.compute
+var { CosmosDb, DatabaseForPostgresqlServers, CacheForRedis } = diagrams.azure.database
+var { ApplicationInsights } = diagrams.azure.devops
+var { NotificationHubs } = diagrams.azure.mobile
+var { AnalysisServices } = diagrams.azure.analytics 
+var { PowerBI } = diagrams.onprem.analytics
+
+Diagram("Build cloud native applications", () => {
+    ctx.browser = MicrosoftEdge("Browser")
+	ctx.AKS = KubernetesServices("Azure Kubernetes Service")
+	ctx.Insight = ApplicationInsights("Application Insights")
+	ctx.AF = FunctionApps("Azure Functions")
+	ctx.ASA = AnalysisServices("Azure Synapse Analytics")
+	ctx.CosDB = CosmosDb("Azure Cosmos DB")
+	
+	Cluster("", () => {
+		ctx.DBPost = DatabaseForPostgresqlServers("Azure Database for PostgreSQL")
+		ctx.AKS.$_$(CacheForRedis("Azure Cache for Redis"))
+	})
+	
+	ctx.browser._$(CDNProfiles("Content Delivery Network"))
+	ctx.browser._$(ctx.AKS)
+	ctx.AKS._$(ctx.CosDB)
+	ctx.AKS._$(ctx.Insight)
+	ctx.Insight.$_(ctx.AF)
+	ctx.AF._$(NotificationHubs("Notification Hubs"))
+	ctx.DBPost._$(ctx.AF)
+	ctx.DBPost._$(ctx.ASA)
+	ctx.ASA._$(PowerBI("Power BI"))
+	ctx.CosDB._$(ctx.ASA)
+  
+}, {rankdir: "LR", pad: "0.5", nodesep: "1", ranksep: "2", splines: "curved" })
+```
 
 
 
