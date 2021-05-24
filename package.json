@@ -1,6 +1,6 @@
 {
 	"name": "sysdiagram",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"description": "Diagram the system architecture using JavaScript syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
@@ -16,7 +16,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "github.com/succeun/sysdiagram"
+		"url": "https://github.com/succeun/sysdiagram"
 	},
 	"keywords": [
 		"d3",
