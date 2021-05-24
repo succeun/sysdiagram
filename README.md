@@ -1,4 +1,4 @@
-# About Sysdiagram
+# About
 
 **Diagram the system architecture using JavaScript syntax.**
 
@@ -7,8 +7,8 @@ Sysdiagram was developed inspired by [Diagrams using Python](https://diagrams.mi
 It is a Javascript based diagramming tool that renders text like Markdown definitions to create and modify diagrams dynamically. 
 
 
-?> Sysdiagram currently supports six major providers: [`AWS`](nodes/aws), [`Azure`](nodes/azure), [`GCP`](nodes/gcp), [`Kubernetes`](nodes/k8s), [`Alibaba Cloud`](nodes/alibabacloud) and [`Oracle Cloud`](nodes/oci). <br>
-It now also supports [`On-Premise`](nodes/onprem) nodes as well as [`Programming Languages`](nodes/programming?id=programminglanguage), [`Frameworks`](nodes/programming?id=programmingframework) and [`Programs`](nodes/program).
+?> Sysdiagram currently supports six major providers: [`AWS`](nodes/aws), [`Azure`](https://succeun.github.io/sysdiagram/#/nodes/aws), [`GCP`](https://succeun.github.io/sysdiagram/#/nodes/gcp), [`Kubernetes`](https://succeun.github.io/sysdiagram/#/nodes/k8s), [`Alibaba Cloud`](https://succeun.github.io/sysdiagram/#/nodes/alibabacloud) and [`Oracle Cloud`](https://succeun.github.io/sysdiagram/#/nodes/oci). <br>
+It now also supports [`On-Premise`](https://succeun.github.io/sysdiagram/#/nodes/onprem) nodes as well as [`Programming Languages`](https://succeun.github.io/sysdiagram/#/nodes/programming?id=programminglanguage), [`Frameworks`](https://succeun.github.io/sysdiagram/#/nodes/programming?id=programmingframework) and [`Programs`](https://succeun.github.io/sysdiagram/#/nodes/program).
 
 # Installation
 
