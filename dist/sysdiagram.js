@@ -1,5 +1,5 @@
 //! sysdiagram.js
-//! version : 0.1.12
+//! version : 0.1.15
 //! authors : Jeong-Ho, Eun
 //! license : MIT
 //! https://succeun.github.io/sysdiagram
@@ -24,7 +24,8 @@
 			splines: "ortho",			// none(""), line(false), polyline, curved, ortho, spline(true)
 			//labelloc: "b",			// t(top), b(bottom, default), c(center)
 			
-			rankdir: "LR",
+			rankdir: "LR",				// TB(default), LR, BT, RL
+			compound: true,				// If true, allow edges between clusters.
 		},
 		node: {							// https://graphviz.org/doc/info/attrs.html
 			shape: "box",
@@ -200,7 +201,7 @@
 	// Diagram, Cluster, Node, Edge, ArrayNode
 	
 	function convEdge(edgeattrs, src, tgt) {
-		// cluster connect, ltail (logical tail)
+		// cluster connect, ltail (logical tail: source point)
 		if (edgeattrs && edgeattrs.ltail && src) {
 			if (src.cluster_uuid) {
 				edgeattrs.ltail = src.cluster_uuid;
@@ -208,7 +209,7 @@
 				console.warn(`'${src.name}[${src.uuid}]' is not cluster member.`);
 			}
 		}
-		// cluster connect, lhead (logical head)
+		// cluster connect, lhead (logical head: target point)
 		if (edgeattrs && edgeattrs.lhead && tgt) {
 			if (tgt.cluster_uuid) {
 				edgeattrs.lhead = tgt.cluster_uuid;
@@ -231,6 +232,8 @@
 		
 		if (Array.isArray(me)) {
 			connectGroup(me, node, direct);
+		} else if (me.type == 'array_node') {
+			connectGroup(me.nodes, node, direct);
 		} else {
 			if (node.type == 'edge') {	// ignored direct
 				var edge = node;
@@ -252,6 +255,7 @@
 		return node;
 	}
 	
+	// nodes must be native array.
 	function connectGroup(nodes, node, direct) {
 		if (Array.isArray(node)) {	// natvie array
 			node = ArrayNode(node);

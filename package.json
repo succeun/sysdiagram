@@ -1,6 +1,6 @@
 {
 	"name": "sysdiagram",
-	"version": "0.1.13",
+	"version": "0.1.15",
 	"description": "Diagram the system architecture using JavaScript syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
