@@ -117,7 +117,7 @@ Diagram("Message Collecting", () => {
 
 ![Message Collecting](https://succeun.github.io/sysdiagram/images/complex_diagram.png)
 
-**Examples can be found in** [examples](https://succeun.github.io/sysdiagram/getting-started/examples), [Advanced examples](https://succeun.github.io/sysdiagram/getting-started/advanced_examples)
+**Examples can be found in** [examples](https://succeun.github.io/sysdiagram/#/getting-started/examples), [Advanced examples](https://succeun.github.io/sysdiagram/#/getting-started/advanced_examples)
 
 ## Credits
 

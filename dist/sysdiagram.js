@@ -1,5 +1,5 @@
 //! sysdiagram.js
-//! version : 0.1.5
+//! version : 0.1.6
 //! authors : Jeong-Ho, Eun
 //! license : MIT
 //! https://succeun.github.io/sysdiagram
