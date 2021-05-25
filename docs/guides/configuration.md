@@ -95,6 +95,8 @@ The setting information is divided into the following areas.
 	selector: ".sysdiagram",
 	startOnLoad: true,
 	verbose: false,					// log output to console
+	width: null,					// When you set the width, content's width is set after rendering.
+	height: null,					// When you set the height, content's height is set after rendering.
 }
 ```
 

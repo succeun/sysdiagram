@@ -1,5 +1,5 @@
 //! sysdiagram.js
-//! version : 0.1.18
+//! version : 0.1.21
 //! authors : Jeong-Ho, Eun
 //! license : MIT
 //! https://succeun.github.io/sysdiagram
@@ -88,6 +88,8 @@
 		selector: ".sysdiagram",
 		startOnLoad: true,
 		verbose: false,					// log output to console
+		width: null,					// When you set the width, content's width is set after rendering.
+		height: null,					// When you set the height, content's height is set after rendering.
 	};
 	
 	////////////////////////////////////////////////////////////////////////////////////
@@ -682,6 +684,12 @@
 
 		graphviz.renderDot(dot, function() {
 			element.setAttribute("data-sysdiagram-processed", "true");
+			if (ctx.attributes.width) {
+				element.style.width = ctx.attributes.width;
+			}
+			if (ctx.attributes.height) {
+				element.style.height = ctx.attributes.height;
+			}
 			
 			if (graphviz.sysdiagram_ctx.onCompleted) {
 				graphviz.sysdiagram_ctx.onCompleted(element, this);
