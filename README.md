@@ -57,8 +57,41 @@ From these tags sysdiagram will try to read the diagram definitons and render th
 </div>
 ```
 
+# basic.html
 
-# Example
+Below is the most basic and simple example html.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- canvg for converting image (Optional) -->
+	<script src="https://unpkg.com/canvg@^3.0.7/lib/umd.js"></script> 
+
+	<!-- d3 & d3-graphviz (Mandatory) -->
+	<script src="https://unpkg.com/d3@^6.7.0/dist/d3.min.js"></script>
+	<script src="https://unpkg.com/@hpcc-js/wasm@^1.5.2/dist/index.min.js"></script>
+	<script src="https://unpkg.com/d3-graphviz@^4.0.0/build/d3-graphviz.js"></script>
+
+	<!-- sysdiagram (latest) -->
+	<script src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
+	  
+	<script>sysdiagram.initialize({startOnLoad:true});</script>
+<head>
+<body>
+	<div class="sysdiagram">
+var EC2 = diagrams.aws.compute.EC2
+
+Diagram("Simple Diagram", function() {
+	EC2("web")
+})
+	</div>
+</body>
+</html>
+```
+
+
+# Example Diagram
 
 ## Simple Diagram
 
