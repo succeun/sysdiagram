@@ -2,6 +2,10 @@
 
 **Diagram the system architecture using JavaScript syntax.**
 
+[![npm version](https://img.shields.io/npm/v/sysdiagram.svg?style=flat)](https://www.npmjs.com/package/sysdiagram)
+[![unpkg](http://img.badgesize.io/https://unpkg.com/sysdiagram/dist/sysdiagram.js?compression=gzip&label=unpkg&style=flat&cache=false)](https://unpkg.com/sysdiagram/dist/sysdiagram.js)
+[![unpkg min](https://img.badgesize.io/https:/unpkg.com/sysdiagram/dist/sysdiagram.min.js?label=unpkg%20min&compression=gzip&cache=false&style=flat)](https://unpkg.com/sysdiagram/dist/sysdiagram.min.js)
+
 Sysdiagram was developed inspired by [Diagrams using Python](https://diagrams.mingrammer.com/), thanks to [mingrammer(MinJae Kwon)](https://github.com/mingrammer).
 
 It is a Javascript based diagramming tool that renders text like Markdown definitions to create and modify diagrams dynamically. 
