@@ -31,7 +31,8 @@ The setting information is divided into the following areas.
 		splines: "ortho",			// none(""), line(false), polyline, curved, ortho, spline(true)
 		//labelloc: "b",			// t(top), b(bottom, default), c(center)
 		
-		rankdir: "LR",
+		rankdir: "LR",				// TB(default), LR, BT, RL
+		compound: true,				// If true, allow edges between clusters.
 	},
 	node: {							// https://graphviz.org/doc/info/attrs.html
 		shape: "box",
@@ -50,6 +51,7 @@ The setting information is divided into the following areas.
 		fontsize: "13",
 		fontcolor: "#2D3436",
 		shape: "none",
+		target: "_blank",
 	},
 	edge: {							// https://graphviz.org/doc/info/attrs.html
 		fontname: "Sans-Serif",
@@ -68,6 +70,7 @@ The setting information is divided into the following areas.
 		
 		bgcolor: null,
 		rankdir: "LR",
+		peripheries: 1,				// border
 	},
 	subgraphBgcolors: [
 		"#E5F5FD", "#EBF3E7", "#ECE8F6", "#FDF7E3", "#FDEAE3", "#E1FCFA", "#FCE1F9"
@@ -91,6 +94,7 @@ The setting information is divided into the following areas.
 	},
 	selector: ".sysdiagram",
 	startOnLoad: true,
+	verbose: false,					// log output to console
 }
 ```
 

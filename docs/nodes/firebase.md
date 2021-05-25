@@ -1,6 +1,6 @@
 # Firebase
 
-Node classes list of firebase provider.
+Node classes list of [Firebase](https://github.com/mingrammer/diagrams/tree/master/resources/firebase) provider.
 
 <script>listResources("firebase");</script>
 

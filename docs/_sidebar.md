@@ -31,6 +31,7 @@
   - [Programming](nodes/programming.md)
   - [Saas](nodes/saas.md)
   - [Program](nodes/program.md)
+  - [SuperTinyIcons](nodes/supertinyicons.md)
   - [Custom](nodes/custom.md)
 
 

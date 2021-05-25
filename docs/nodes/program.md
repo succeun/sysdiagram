@@ -1,6 +1,6 @@
 # Program
 
-Node classes list of program provider.
+Node classes list of Program provider.
 
 <script>listResources("program");</script>
 

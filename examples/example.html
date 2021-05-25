@@ -173,8 +173,8 @@
 				var clusters = elt.selectAll(".cluster");
 				
 				nodes.on("click", function(event, element) {
-					event.preventDefault();
-					event.stopPropagation();
+					//event.preventDefault();
+					//event.stopPropagation();
 					console.log("node:", element, element.sysdiagram_data);
 				});
 				
@@ -187,14 +187,14 @@
 				});
 				
 				edges.on("click", function(event, element) {
-					event.preventDefault();
-					event.stopPropagation();
+					//event.preventDefault();
+					//event.stopPropagation();
 					console.log("edge:", element, element.sysdiagram_data);
 				});
 				
 				clusters.on("click", function(event, element) {
-					event.preventDefault();
-					event.stopPropagation();
+					//event.preventDefault();
+					//event.stopPropagation();
 					console.log("cluster:", element, element.sysdiagram_data);
 				});
 			});
@@ -784,8 +784,7 @@ Diagram("Build cloud native applications", () => {
 		<div class="codeContainer">
 			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
 			<code>
-ctx.attributes.verbose = true			
-ctx.attributes.digraph.compound = true
+ctx.attributes.verbose = true
 
 var APIGateway = diagrams.aws.network.APIGateway
 var Aurora = diagrams.aws.database.Aurora
@@ -804,6 +803,115 @@ Diagram("Broker Consumers", function() {
 
     ctx.gateway.e({lhead: true})._$(ctx.consumers).e({ltail: true})._$(Aurora("Database"))
 })
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
+	</div>
+	
+	<h2>Social media (including URL)</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+ctx.attributes.graphviz.engine = 'fdp'
+
+var {Flickr, Facebook, Tumblr, Twitter, LinkedIn, Instagram, Reddit} = diagrams.supertinyicons.socialmedia
+var {Pinterest, VK, Mastodon, Imgur, Slack, Devto, Goodreads, TikTok} = diagrams.supertinyicons.socialmedia
+
+Diagram("Social Media", function() {
+	Flickr({URL: "https://www.flickr.com"})
+	Facebook({URL: "https://www.facebook.com"})
+	Tumblr({URL: "https://www.tumblr.com"})
+	Twitter({URL: "https://www.twitter.com"})
+	LinkedIn({URL: "https://www.linkedin.com"})
+	Instagram({URL: "https://www.instagram.com"})
+	Reddit({URL: "https://www.raddit.com"})
+	Pinterest({URL: "https://www.pinterest.com"})
+	VK({URL: "https://vk.com"})
+	Mastodon({URL: "https://joinmastodon.org"})
+	Imgur({URL: "https://imgur.com"})
+	Slack({URL: "https://www.slack.com"})
+	Devto({URL: "https://https://dev.to"})
+	Goodreads({URL: "https://www.goodreads.com"})
+	TikTok({URL: "https://www.tiktok.com"})
+})
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
+	</div>
+	
+	<h2>AWS Case Study</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+var { Lambda, EC2 } = diagrams.aws.compute
+var { CloudFront, ELB, VpnGateway, VpnConnection  } = diagrams.aws.network
+var { SimpleStorageServiceS3 } = diagrams.aws.storage
+var { Elasticache, Aurora } = diagrams.aws.database
+var { GenericDatabase, InternetAlt1 } = diagrams.aws.general
+
+Diagram("Social Media", function() {
+	ctx.CF = CloudFront("Amazon\nCloudFront", {height: 2.5})
+	Lambda("AWS\nLamda@Edge", {height: 2.5}).e({constraint: true}).$_$(ctx.CF)
+	Cluster("  🏪 AWS Clound", () => {
+		ctx.S3 = SimpleStorageServiceS3("Amazon S3")
+		ctx.lambda = Lambda("Amazon\nLambda", {height: 2.5})
+		ctx.CF._$(ctx.S3)
+		ctx.S3._$(ctx.lambda)
+		
+		Cluster("  🟩 VPC", () => {
+			ctx.ELB = ELB("ELB")
+			ctx.CF.e({constraint: true})._$(ctx.ELB)
+			DummyCluster(()=> {
+				Cluster("  🟩 Web subsets", ()=> {
+					ctx.FSG = EC2("Front Server Group")
+					ctx.ELB.e({constraint: false})._$(ctx.FSG)
+				})
+				
+				Cluster("  🟩 API subsets", ()=> {
+					ctx.ASG = EC2("API Server Group")
+					ctx.ELB._$(ctx.ASG)
+					ctx.ASG.e({constraint: false})._$(ctx.FSG)
+				})
+			})
+			
+			DummyCluster(()=> {
+				ctx.MDB = EC2("mongoDB on EC2")
+				ctx.Redis = Elasticache("Redis")
+				ctx.Aurora = Elasticache("Amazon Aurora")
+			})
+			
+			ctx.lambda.$_$(ctx.MDB)
+			
+			ctx.ASG._$(ctx.MDB)
+			ctx.ASG._$(ctx.Redis)
+			ctx.ASG._$(ctx.Aurora)
+			
+			ctx.Gateway = VpnGateway("VPN Gateway")
+			ctx.MDB._$(ctx.Gateway)
+			ctx.Redis._$(ctx.Gateway)
+			ctx.Aurora._$(ctx.Gateway)
+		})
+	})
+		
+	ctx.Connection = VpnConnection("VPN Connection")
+	ctx.Gateway._$(ctx.Connection)
+	
+	Cluster("  🏥 On Premise\nIDC", () => {
+		ctx.DBMS = GenericDatabase("DBMS")
+		ctx.DMT = InternetAlt1("Data Mgiration Tools")
+	})
+	ctx.Connection._$(ctx.DBMS)
+	ctx.Connection._$(ctx.DMT)
+	ctx.DBMS.e({constraint: false}).$_$(ctx.DMT)
+})	
 			</code>
 		</div>
 		<div class="graphContainer">

@@ -1,10 +1,13 @@
 # Custom
 
+
+This is used when you want to dynamically create a node using a local or remote image, not a resource already defined by a provider.
+
+!> Not only `gif`, `jpg`, and `png` files, but also `svg` files can be used.
+
 ## Custom with local icons
 
 For this example we use the following architecture:
-
-이미지 뿐만 아니라 svg 파일도 가능하다
 
 ```js
 Diagram("Custom with local icons\n Can be downloaded here: \nhttps://creativecommons.org/about/downloads/", () => {

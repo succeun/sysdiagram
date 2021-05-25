@@ -1,5 +1,5 @@
 //! sysdiagram.js
-//! version : 0.1.17
+//! version : 0.1.18
 //! authors : Jeong-Ho, Eun
 //! license : MIT
 //! https://succeun.github.io/sysdiagram
@@ -44,6 +44,7 @@
 			fontsize: "13",
 			fontcolor: "#2D3436",
 			shape: "none",
+			target: "_blank",
 		},
 		edge: {							// https://graphviz.org/doc/info/attrs.html
 			fontname: "Sans-Serif",
@@ -62,6 +63,7 @@
 			
 			bgcolor: null,
 			rankdir: "LR",
+			peripheries: 1,				// border
 		},
 		subgraphBgcolors: [
 			"#E5F5FD", "#EBF3E7", "#ECE8F6", "#FDF7E3", "#FDEAE3", "#E1FCFA", "#FCE1F9"
@@ -71,7 +73,7 @@
 			height: "100%", 
 			fit: true, 
 			engine: "dot",				// circo, dot (default), fdp, neato, osage, patchwork, twopi
-			zoom: true,				// drag & zoom enable/disable
+			zoom: true,					// drag & zoom enable/disable
 		},
 		iconSize: {
 			width: "256px",
@@ -85,7 +87,7 @@
 		},
 		selector: ".sysdiagram",
 		startOnLoad: true,
-		verbose: false,
+		verbose: false,					// log output to console
 	};
 	
 	////////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +202,40 @@
 	///////////////////////////////////////////////////////////////////////////////////
 	// Diagram, Cluster, Node, Edge, ArrayNode
 	
+	function getArguments(args, defaultAttrs) {
+		var name = null;
+		var callbackFunc = null;
+		var attrs = null;
+		for (var i = 0; i < args.length; i++) {
+			var arg = args[i];
+			if (typeof arg === "function") {
+				callbackFunc = arg;
+			} else if (typeof arg === "string") {
+				name = arg;
+			} else if (isObject(arg)) {
+				attrs = arg;
+			}
+		}
+		
+		name = name == null ? "" : name;
+		callbackFunc = callbackFunc || function() {};
+		attrs = attrs || {};
+		if (defaultAttrs) {
+			attrs = mergeAttrs(defaultAttrs, attrs);
+		}
+		
+		attrs.label = name;
+		if (!attrs.tooltip) {
+			attrs.tooltip = name;
+		}
+		
+		return {
+			name: name,
+			callbackFunc: callbackFunc,
+			attrs: attrs
+		};
+	}
+	
 	function convEdge(edgeattrs, src, tgt) {
 		// cluster connect, ltail (logical tail: source point)
 		if (edgeattrs && edgeattrs.ltail && src) {
@@ -287,12 +323,15 @@
 	}
 
 	function Node(name, attrs, icon) {
+		attrs = isObject(name) ? name : attrs;	// If the first argument is a attributes other than a name
 		attrs = attrs || {};
 		attrs = mergeAttrs(ctx.attributes.node, attrs);
 		
-		attrs.label = name;
-		if (!attrs.tooltip) {
-			attrs.tooltip = name;
+		if (typeof name == "string") {
+			attrs.label = name;
+			if (!attrs.tooltip) {
+				attrs.tooltip = name;
+			}
 		}
 		
 		if (icon) {
@@ -382,17 +421,10 @@
 	}
 	
 	
-	function Edge(label, attrs) {
-		attrs = isObject(label) ? label : attrs;	// If the first argument is a attributes other than a label
-		attrs = attrs || {};
-		attrs = mergeAttrs(ctx.attributes.edge, attrs);
-		
-		if (typeof label == "string") {
-			attrs.label = label;
-			if (!attrs.tooltip) {
-				attrs.tooltip = label;
-			}
-		}
+	function Edge(name, attrs) {
+		var args = getArguments(arguments, ctx.attributes.edge);
+		name = args.name;
+		attrs = args.attrs;
 		
 		var edge = {
 			type: 'edge',
@@ -425,13 +457,10 @@
 	}
 
 	function Cluster(name, callbackFunc, attrs) {
-		attrs = attrs || {};
-		attrs = mergeAttrs(ctx.attributes.subgraph, attrs);
-		attrs.label = name;
-		
-		if (!attrs.tooltip) {
-			attrs.tooltip = name;
-		}
+		var args = getArguments(arguments, ctx.attributes.subgraph);
+		name = args.name;
+		attrs = args.attrs;
+		callbackFunc = args.callbackFunc;
 		
 		var cluster = {
 			type: 'cluster',
@@ -449,9 +478,10 @@
 	}
 
 	function Diagram(name, callbackFunc, attrs) {
-		attrs = attrs || {};
-		attrs = mergeAttrs(ctx.attributes.digraph, attrs);
-		attrs.label = name;
+		var args = getArguments(arguments, ctx.attributes.digraph);
+		name = args.name;
+		attrs = args.attrs;
+		callbackFunc = args.callbackFunc;
 		
 		var diagram = {
 			type: 'diagram',
@@ -470,6 +500,20 @@
 	var Custom = function(name, icon, attrs){
 		return Node(name || "Custom", attrs, icon);
 	};
+	
+	var Dummy = function(name, icon, attrs){
+		attrs = attrs || {};
+		attrs.bgcolor = "#00000000";	// transparent or #00000000
+		attrs.peripheries = 0;			// Border 0
+		return Node("", attrs, icon);
+	};
+	
+	var DummyCluster = function(callbackFunc, attrs) {
+		attrs = attrs || {};
+		attrs.bgcolor = "#00000000";	// transparent or #00000000
+		attrs.peripheries = 0;			// Border 0
+		return Cluster("", callbackFunc, attrs);
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Public function
@@ -561,9 +605,10 @@
 			image = dir ? dir + image : image;
 		}
 		namespace[key] = function() {
+			var obj = getArguments(arguments);
 			var args = [];
-			args[0] = arguments[0] || key;
-			args[1] = arguments[1];
+			args[0] = obj.name || key;
+			args[1] = obj.attrs;
 			args[2] = image;
 			var node = Node.apply(null, args);
 			return node;
@@ -3364,6 +3409,329 @@
 					Whiteboard: "https://cdn.jsdelivr.net/gh/sandroasp/Microsoft-Integration-and-Azure-Stencils-Pack-for-Visio/Office%20365/SVG/Whiteboard.svg",
 					Word: "https://cdn.jsdelivr.net/gh/sandroasp/Microsoft-Integration-and-Azure-Stencils-Pack-for-Visio/Office%20365/SVG/Word.svg",
 					Yammer: "https://cdn.jsdelivr.net/gh/sandroasp/Microsoft-Integration-and-Azure-Stencils-Pack-for-Visio/Office%20365/SVG/Yammer.svg",
+				}
+			},
+			// https://github.com/edent/SuperTinyIcons
+			supertinyicons: {
+				socialmedia: {
+					Flickr: "https://edent.github.io/SuperTinyIcons/images/svg/flickr.svg",
+					Facebook: "https://edent.github.io/SuperTinyIcons/images/svg/facebook.svg",
+					Tumblr: "https://edent.github.io/SuperTinyIcons/images/svg/tumblr.svg",
+					Twitter: "https://edent.github.io/SuperTinyIcons/images/svg/twitter.svg",
+					LinkedIn: "https://edent.github.io/SuperTinyIcons/images/svg/linkedin.svg",
+					Instagram: "https://edent.github.io/SuperTinyIcons/images/svg/instagram.svg",
+					Reddit: "https://edent.github.io/SuperTinyIcons/images/svg/reddit.svg",
+					Pinterest: "https://edent.github.io/SuperTinyIcons/images/svg/pinterest.svg",
+					VK: "https://edent.github.io/SuperTinyIcons/images/svg/vk.svg",
+					Mastodon: "https://edent.github.io/SuperTinyIcons/images/svg/mastodon.svg",
+					Imgur: "https://edent.github.io/SuperTinyIcons/images/svg/imgur.svg",
+					Slack: "https://edent.github.io/SuperTinyIcons/images/svg/slack.svg",
+					Devto: "https://edent.github.io/SuperTinyIcons/images/svg/dev_to.svg",
+					Goodreads: "https://edent.github.io/SuperTinyIcons/images/svg/goodreads.svg",
+					TikTok: "https://edent.github.io/SuperTinyIcons/images/svg/tiktok.svg",
+					Friendica: "https://edent.github.io/SuperTinyIcons/images/svg/friendica.svg",
+				},
+				media: {
+					SoundCloud: "https://edent.github.io/SuperTinyIcons/images/svg/soundcloud.svg",
+					Vimeo: "https://edent.github.io/SuperTinyIcons/images/svg/vimeo.svg",
+					Spotify: "https://edent.github.io/SuperTinyIcons/images/svg/spotify.svg",
+					YouTube: "https://edent.github.io/SuperTinyIcons/images/svg/youtube.svg",
+					AppleMusic: "https://edent.github.io/SuperTinyIcons/images/svg/apple_music.svg",
+					Bandcamp: "https://edent.github.io/SuperTinyIcons/images/svg/bandcamp.svg",
+					Deezer: "https://edent.github.io/SuperTinyIcons/images/svg/deezer.svg",
+					IHeartRadio: "https://edent.github.io/SuperTinyIcons/images/svg/iheartradio.svg",
+					Kodi: "https://edent.github.io/SuperTinyIcons/images/svg/kodi.svg",
+					Foobar2000: "https://edent.github.io/SuperTinyIcons/images/svg/foobar2000.svg",
+				},
+				google: {
+					Google: "https://edent.github.io/SuperTinyIcons/images/svg/google.svg",
+					GooglePlay: "https://edent.github.io/SuperTinyIcons/images/svg/google_play.svg",
+					Gmail: "https://edent.github.io/SuperTinyIcons/images/svg/gmail.svg",
+					GoogleCalendar: "https://edent.github.io/SuperTinyIcons/images/svg/google_calendar.svg",
+					GoogleCollaborativeContentTools: "https://edent.github.io/SuperTinyIcons/images/svg/google_collaborative_content_tools.svg",
+					GoogleDocsEditors: "https://edent.github.io/SuperTinyIcons/images/svg/google_docs_editors.svg",
+					GoogleDrive: "https://edent.github.io/SuperTinyIcons/images/svg/google_drive.svg",
+					GoogleMeet: "https://edent.github.io/SuperTinyIcons/images/svg/google_meet.svg",
+					GoogleMaps: "https://edent.github.io/SuperTinyIcons/images/svg/google_maps.svg",
+					GoogleScholar: "https://edent.github.io/SuperTinyIcons/images/svg/google_scholar.svg",
+					GoogleDrive: "https://edent.github.io/SuperTinyIcons/images/svg/google_drive.svg",
+					GoogleMapsOld: "https://edent.github.io/SuperTinyIcons/images/svg/google_maps_old.svg",
+					GoogleMailOld: "https://edent.github.io/SuperTinyIcons/images/svg/gmail_old.svg",
+					GoogleDriveOld: "https://edent.github.io/SuperTinyIcons/images/svg/google_drive_old.svg",
+					GooglePlus: "https://edent.github.io/SuperTinyIcons/images/svg/google_plus.svg",
+				},
+				communications: {
+					WhatsApp: "https://edent.github.io/SuperTinyIcons/images/svg/whatsapp.svg",
+					Telegram: "https://edent.github.io/SuperTinyIcons/images/svg/telegram.svg",
+					Skype: "https://edent.github.io/SuperTinyIcons/images/svg/skype.svg",
+					Snapchat: "https://edent.github.io/SuperTinyIcons/images/svg/snapchat.svg",
+					WeChat: "https://edent.github.io/SuperTinyIcons/images/svg/wechat.svg",
+					Signal: "https://edent.github.io/SuperTinyIcons/images/svg/signal.svg",
+					Phone: "https://edent.github.io/SuperTinyIcons/images/svg/phone.svg",
+					LINE: "https://edent.github.io/SuperTinyIcons/images/svg/line.svg",
+					Viber: "https://edent.github.io/SuperTinyIcons/images/svg/viber.svg",
+					Mailchimp: "https://edent.github.io/SuperTinyIcons/images/svg/mailchimp.svg",
+					Threema: "https://edent.github.io/SuperTinyIcons/images/svg/threema.svg",
+					Mattermost: "https://edent.github.io/SuperTinyIcons/images/svg/mattermost.svg",
+					Protonmail: "https://edent.github.io/SuperTinyIcons/images/svg/protonmail.svg",
+					XMPP: "https://edent.github.io/SuperTinyIcons/images/svg/xmpp.svg",
+					Tutanota: "https://edent.github.io/SuperTinyIcons/images/svg/tutanota.svg",
+					Messenger: "https://edent.github.io/SuperTinyIcons/images/svg/messenger.svg",
+					Discord: "https://edent.github.io/SuperTinyIcons/images/svg/discord.svg",
+					Zoom: "https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg",
+					Wire: "https://edent.github.io/SuperTinyIcons/images/svg/wire.svg",
+					Teamspeak: "https://edent.github.io/SuperTinyIcons/images/svg/teamspeak.svg",
+					Element: "https://edent.github.io/SuperTinyIcons/images/svg/element.svg",
+				},
+				websites: {
+					HackerNews: "https://edent.github.io/SuperTinyIcons/images/svg/hackernews.svg",
+					StackOverflow: "https://edent.github.io/SuperTinyIcons/images/svg/stackoverflow.svg",
+					StackExchange: "https://edent.github.io/SuperTinyIcons/images/svg/stackexchange.svg",
+					WordPress: "https://edent.github.io/SuperTinyIcons/images/svg/wordpress.svg",
+					GitHub: "https://edent.github.io/SuperTinyIcons/images/svg/github.svg",
+					Wikipedia: "https://edent.github.io/SuperTinyIcons/images/svg/wikipedia.svg",
+					GitLab: "https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg",
+					Meetup: "https://edent.github.io/SuperTinyIcons/images/svg/meetup.svg",
+					EBay: "https://edent.github.io/SuperTinyIcons/images/svg/ebay.svg",
+					Kickstarter: "https://edent.github.io/SuperTinyIcons/images/svg/kickstarter.svg",
+					Yahoo: "https://edent.github.io/SuperTinyIcons/images/svg/yahoo.svg",
+					Evernote: "https://edent.github.io/SuperTinyIcons/images/svg/evernote.svg",
+					Yammer: "https://edent.github.io/SuperTinyIcons/images/svg/yammer.svg",
+					Blogger: "https://edent.github.io/SuperTinyIcons/images/svg/blogger.svg",
+					Cloudflare: "https://edent.github.io/SuperTinyIcons/images/svg/cloudflare.svg",
+					Amazon: "https://edent.github.io/SuperTinyIcons/images/svg/amazon.svg",
+					Strava: "https://edent.github.io/SuperTinyIcons/images/svg/strava.svg",
+					Dribbble: "https://edent.github.io/SuperTinyIcons/images/svg/dribbble.svg",
+					CodePen: "https://edent.github.io/SuperTinyIcons/images/svg/codepen.svg",
+					DigitalOcean: "https://edent.github.io/SuperTinyIcons/images/svg/digitalocean.svg",
+					Medium: "https://edent.github.io/SuperTinyIcons/images/svg/medium.svg",
+					Airbnb: "https://edent.github.io/SuperTinyIcons/images/svg/airbnb.svg",
+					Delicious: "https://edent.github.io/SuperTinyIcons/images/svg/delicious.svg",
+					Disqus: "https://edent.github.io/SuperTinyIcons/images/svg/disqus.svg",
+					Ghost: "https://edent.github.io/SuperTinyIcons/images/svg/ghost.svg",
+					Sketch: "https://edent.github.io/SuperTinyIcons/images/svg/sketch.svg",
+					Trello: "https://edent.github.io/SuperTinyIcons/images/svg/trello.svg",
+					QQ: "https://edent.github.io/SuperTinyIcons/images/svg/qq.svg",
+					Badoo: "https://edent.github.io/SuperTinyIcons/images/svg/badoo.svg",
+					Yelp: "https://edent.github.io/SuperTinyIcons/images/svg/yelp.svg",
+					Workato: "https://edent.github.io/SuperTinyIcons/images/svg/workato.svg",
+					Untappd: "https://edent.github.io/SuperTinyIcons/images/svg/untappd.svg",
+					Vivino: "https://edent.github.io/SuperTinyIcons/images/svg/vivino.svg",
+					Apereo: "https://edent.github.io/SuperTinyIcons/images/svg/apereo.svg",
+					Twilio: "https://edent.github.io/SuperTinyIcons/images/svg/twilio.svg",
+					Plex: "https://edent.github.io/SuperTinyIcons/images/svg/plex.svg",
+					XING: "https://edent.github.io/SuperTinyIcons/images/svg/xing.svg",
+					Pinboard: "https://edent.github.io/SuperTinyIcons/images/svg/pinboard.svg",
+					InternetArchive: "https://edent.github.io/SuperTinyIcons/images/svg/internet_archive.svg",
+					Access: "https://edent.github.io/SuperTinyIcons/images/svg/access.svg",
+					baidu: "https://edent.github.io/SuperTinyIcons/images/svg/baidu.svg",
+					Twitch: "https://edent.github.io/SuperTinyIcons/images/svg/twitch.svg",
+					OKru: "https://edent.github.io/SuperTinyIcons/images/svg/ok.svg",
+					Pocket: "https://edent.github.io/SuperTinyIcons/images/svg/pocket.svg",
+					StumbleUpon: "https://edent.github.io/SuperTinyIcons/images/svg/stumbleupon.svg",
+					Opencast: "https://edent.github.io/SuperTinyIcons/images/svg/opencast.svg",
+					Buffer: "https://edent.github.io/SuperTinyIcons/images/svg/buffer.svg",
+					Upwork: "https://edent.github.io/SuperTinyIcons/images/svg/upwork.svg",
+					DuckDuckGo: "https://edent.github.io/SuperTinyIcons/images/svg/duckduckgo.svg",
+					Bing: "https://edent.github.io/SuperTinyIcons/images/svg/bing.svg",
+					IMDb: "https://edent.github.io/SuperTinyIcons/images/svg/imdb.svg",
+					Heroku: "https://edent.github.io/SuperTinyIcons/images/svg/heroku.svg",
+					ResearchGate: "https://edent.github.io/SuperTinyIcons/images/svg/researchgate.svg",
+					OpenCores: "https://edent.github.io/SuperTinyIcons/images/svg/opencores.svg",
+					OpenBenches: "https://edent.github.io/SuperTinyIcons/images/svg/openbenches.svg",
+					TripAdvisor: "https://edent.github.io/SuperTinyIcons/images/svg/tripadvisor.svg",
+					Sentry: "https://edent.github.io/SuperTinyIcons/images/svg/sentry.svg",
+					Behance: "https://edent.github.io/SuperTinyIcons/images/svg/behance.svg",
+					Taigaio: "https://edent.github.io/SuperTinyIcons/images/svg/taiga.svg",
+					Coilcom: "https://edent.github.io/SuperTinyIcons/images/svg/coil.svg",
+					Glitch: "https://edent.github.io/SuperTinyIcons/images/svg/glitch.svg",
+					AngelList: "https://edent.github.io/SuperTinyIcons/images/svg/angellist.svg",
+					Jellyfin: "https://edent.github.io/SuperTinyIcons/images/svg/jellyfin.svg",
+					Gandi: "https://edent.github.io/SuperTinyIcons/images/svg/gandi.svg",
+					Kaggle: "https://edent.github.io/SuperTinyIcons/images/svg/kaggle.svg",
+					Humblebundle: "https://edent.github.io/SuperTinyIcons/images/svg/humblebundle.svg",
+					FfreeCodeCamp: "https://edent.github.io/SuperTinyIcons/images/svg/freecodecamp.svg",
+					Codeberg: "https://edent.github.io/SuperTinyIcons/images/svg/codeberg.svg",
+					BitBucket: "https://edent.github.io/SuperTinyIcons/images/svg/bitbucket.svg",
+					Etsy: "https://edent.github.io/SuperTinyIcons/images/svg/etsy.svg",
+					Intercom: "https://edent.github.io/SuperTinyIcons/images/svg/intercom.svg",
+					Intercom: "https://edent.github.io/SuperTinyIcons/images/svg/overleaf.svg",
+					Malt: "https://edent.github.io/SuperTinyIcons/images/svg/malt.svg",
+				},
+				internet: {
+					RSS: "https://edent.github.io/SuperTinyIcons/images/svg/rss.svg",
+					Mail: "https://edent.github.io/SuperTinyIcons/images/svg/mail.svg",
+					Email: "https://edent.github.io/SuperTinyIcons/images/svg/email.svg",
+					HTML5: "https://edent.github.io/SuperTinyIcons/images/svg/html5.svg",
+					WiFi: "https://edent.github.io/SuperTinyIcons/images/svg/wifi.svg",
+					W3C: "https://edent.github.io/SuperTinyIcons/images/svg/w3c.svg",
+					TheUnicodeConsortium: "https://edent.github.io/SuperTinyIcons/images/svg/unicode.svg",
+					Markdown: "https://edent.github.io/SuperTinyIcons/images/svg/markdown.svg",
+					HAML: "https://edent.github.io/SuperTinyIcons/images/svg/haml.svg",
+					Microformats: "https://edent.github.io/SuperTinyIcons/images/svg/microformats.svg",
+					CSS3: "https://edent.github.io/SuperTinyIcons/images/svg/css3.svg",
+				},
+				browsers: {
+					Chrome: "https://edent.github.io/SuperTinyIcons/images/svg/chrome.svg",
+					Firefox: "https://edent.github.io/SuperTinyIcons/images/svg/firefox.svg",
+					SamsungInternet: "https://edent.github.io/SuperTinyIcons/images/svg/samsung_internet.svg",
+					Edge: "https://edent.github.io/SuperTinyIcons/images/svg/edge.svg",
+					Opera: "https://edent.github.io/SuperTinyIcons/images/svg/opera.svg",
+					Safari: "https://edent.github.io/SuperTinyIcons/images/svg/safari.svg",
+					Chromium: "https://edent.github.io/SuperTinyIcons/images/svg/chromium.svg",
+				},
+				podcasts: {
+					ITunes: "https://edent.github.io/SuperTinyIcons/images/svg/itunes_podcasts.svg",
+					Google: "https://edent.github.io/SuperTinyIcons/images/svg/google_podcasts.svg",
+					PocketCasts: "https://edent.github.io/SuperTinyIcons/images/svg/pocketcasts.svg",
+					Stitcher: "https://edent.github.io/SuperTinyIcons/images/svg/stitcher.svg",
+					TuneIn: "https://edent.github.io/SuperTinyIcons/images/svg/tunein.svg",
+					Acast: "https://edent.github.io/SuperTinyIcons/images/svg/acast.svg",
+					Overcast: "https://edent.github.io/SuperTinyIcons/images/svg/overcast.svg",
+				},
+				logos: {
+					Apple: "https://edent.github.io/SuperTinyIcons/images/svg/apple.svg",
+					NPM: "https://edent.github.io/SuperTinyIcons/images/svg/npm.svg",
+					Docker: "https://edent.github.io/SuperTinyIcons/images/svg/docker.svg",
+					IBM: "https://edent.github.io/SuperTinyIcons/images/svg/ibm.svg",
+					OpenSource: "https://edent.github.io/SuperTinyIcons/images/svg/opensource.svg",
+					Intel: "https://edent.github.io/SuperTinyIcons/images/svg/intel.svg",
+					VLC: "https://edent.github.io/SuperTinyIcons/images/svg/vlc.svg",
+					Vegetarian: "https://edent.github.io/SuperTinyIcons/images/svg/vegetarian.svg",
+					Espressif: "https://edent.github.io/SuperTinyIcons/images/svg/espressif.svg",
+					NHS: "https://edent.github.io/SuperTinyIcons/images/svg/nhs.svg",
+					Orcid: "https://edent.github.io/SuperTinyIcons/images/svg/orcid.svg",
+					HP: "https://edent.github.io/SuperTinyIcons/images/svg/hp.svg",
+					RedHat: "https://edent.github.io/SuperTinyIcons/images/svg/redhat.svg",
+					CentOS: "https://edent.github.io/SuperTinyIcons/images/svg/centos.svg",
+					Git: "https://edent.github.io/SuperTinyIcons/images/svg/git.svg",
+					Microsoft: "https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg",
+					Grafana: "https://edent.github.io/SuperTinyIcons/images/svg/grafana.svg",
+					Ubiquiti: "https://edent.github.io/SuperTinyIcons/images/svg/ubiquiti.svg",
+					Adobe: "https://edent.github.io/SuperTinyIcons/images/svg/adobe.svg",
+					Homekit: "https://edent.github.io/SuperTinyIcons/images/svg/homekit.svg",
+					Pixelfed: "https://edent.github.io/SuperTinyIcons/images/svg/pixelfed.svg",
+					Samsung: "https://edent.github.io/SuperTinyIcons/images/svg/samsung.svg",
+					Samsung: "https://edent.github.io/SuperTinyIcons/images/svg/samsung_s.svg",
+					Samsung: "https://edent.github.io/SuperTinyIcons/images/svg/samsung_swoop.svg",
+					Uphold: "https://edent.github.io/SuperTinyIcons/images/svg/uphold.svg",
+					CoinPot: "https://edent.github.io/SuperTinyIcons/images/svg/coinpot.svg",
+					ThisAmericanLife: "https://edent.github.io/SuperTinyIcons/images/svg/thisamericanlife.svg",
+					WHATWG: "https://edent.github.io/SuperTinyIcons/images/svg/whatwg.svg",
+				},
+				security: {
+					Tox: "https://edent.github.io/SuperTinyIcons/images/svg/tox.svg",
+					Lock: "https://edent.github.io/SuperTinyIcons/images/svg/lock.svg",
+					LastPass: "https://edent.github.io/SuperTinyIcons/images/svg/lastpass.svg",
+					Symantec: "https://edent.github.io/SuperTinyIcons/images/svg/symantec.svg",
+					Yubico: "https://edent.github.io/SuperTinyIcons/images/svg/yubico.svg",
+					Keybase: "https://edent.github.io/SuperTinyIcons/images/svg/keybase.svg",
+					Authy: "https://edent.github.io/SuperTinyIcons/images/svg/authy.svg",
+					HackerOne: "https://edent.github.io/SuperTinyIcons/images/svg/hackerone.svg",
+					Bitwarden: "https://edent.github.io/SuperTinyIcons/images/svg/bitwarden.svg",
+					Auth0: "https://edent.github.io/SuperTinyIcons/images/svg/auth0.svg",
+					AndOTP: "https://edent.github.io/SuperTinyIcons/images/svg/andotp.svg",
+					OpenBugBounty: "https://edent.github.io/SuperTinyIcons/images/svg/openbugbounty.svg",
+					OpenVPN: "https://edent.github.io/SuperTinyIcons/images/svg/openvpn.svg",
+					KeePassDX: "https://edent.github.io/SuperTinyIcons/images/svg/keepassdx.svg",
+					WireGuard: "https://edent.github.io/SuperTinyIcons/images/svg/wireguard.svg",
+				},
+				payments: {
+					PayPal: "https://edent.github.io/SuperTinyIcons/images/svg/paypal.svg",
+					Bitcoin: "https://edent.github.io/SuperTinyIcons/images/svg/bitcoin.svg",
+					Ethereum: "https://edent.github.io/SuperTinyIcons/images/svg/ethereum.svg",
+					Liberapay: "https://edent.github.io/SuperTinyIcons/images/svg/liberapay.svg",
+					KoFi: "https://edent.github.io/SuperTinyIcons/images/svg/ko-fi.svg",
+					Flattr: "https://edent.github.io/SuperTinyIcons/images/svg/flattr.svg",
+					Patreon: "https://edent.github.io/SuperTinyIcons/images/svg/patreon.svg",
+					Venmo: "https://edent.github.io/SuperTinyIcons/images/svg/venmo.svg",
+					SquareCashApp: "https://edent.github.io/SuperTinyIcons/images/svg/square_cash.svg",
+					OpenCollective: "https://edent.github.io/SuperTinyIcons/images/svg/opencollective.svg",
+					GateHub: "https://edent.github.io/SuperTinyIcons/images/svg/gatehub.svg",
+				},
+				programming: {
+					Python: "https://edent.github.io/SuperTinyIcons/images/svg/python.svg",
+					Julia: "https://edent.github.io/SuperTinyIcons/images/svg/julia.svg",
+					PHP: "https://edent.github.io/SuperTinyIcons/images/svg/php.svg",
+					Laravel: "https://edent.github.io/SuperTinyIcons/images/svg/laravel.svg",
+					Drupal: "https://edent.github.io/SuperTinyIcons/images/svg/drupal.svg",
+					React: "https://edent.github.io/SuperTinyIcons/images/svg/react.svg",
+					Angular: "https://edent.github.io/SuperTinyIcons/images/svg/angular.svg",
+					Sass: "https://edent.github.io/SuperTinyIcons/images/svg/sass.svg",
+					JSON: "https://edent.github.io/SuperTinyIcons/images/svg/json.svg",
+					Yarn: "https://edent.github.io/SuperTinyIcons/images/svg/yarn.svg",
+					Go: "https://edent.github.io/SuperTinyIcons/images/svg/go.svg",
+					Java: "https://edent.github.io/SuperTinyIcons/images/svg/java.svg",
+					Rust: "https://edent.github.io/SuperTinyIcons/images/svg/rust.svg",
+					Clojure: "https://edent.github.io/SuperTinyIcons/images/svg/clojure.svg",
+					CoffeeScript: "https://edent.github.io/SuperTinyIcons/images/svg/coffeescript.svg",
+					JavaScript: "https://edent.github.io/SuperTinyIcons/images/svg/javascript.svg",
+					Flutter: "https://edent.github.io/SuperTinyIcons/images/svg/flutter.svg",
+					Backbone: "https://edent.github.io/SuperTinyIcons/images/svg/backbone.svg",
+					Vue: "https://edent.github.io/SuperTinyIcons/images/svg/vue.svg",
+					Gradle: "https://edent.github.io/SuperTinyIcons/images/svg/gradle.svg",
+					AmberFramework: "https://edent.github.io/SuperTinyIcons/images/svg/amberframework.svg",
+					Gitea: "https://edent.github.io/SuperTinyIcons/images/svg/gitea.svg",
+					Droneio: "https://edent.github.io/SuperTinyIcons/images/svg/drone.svg",
+					RubyGems: "https://edent.github.io/SuperTinyIcons/images/svg/rubygems.svg",
+					LuckyFramework: "https://edent.github.io/SuperTinyIcons/images/svg/luckyframework.svg",
+					Wekan: "https://edent.github.io/SuperTinyIcons/images/svg/wekan.svg",
+					KemalFramework: "https://edent.github.io/SuperTinyIcons/images/svg/kemal.svg",
+					RubyOnRails: "https://edent.github.io/SuperTinyIcons/images/svg/rubyonrails.svg",
+					Kotlin: "https://edent.github.io/SuperTinyIcons/images/svg/kotlin.svg",
+					Crystal: "https://edent.github.io/SuperTinyIcons/images/svg/crystal.svg",
+					SemaphoreCI: "https://edent.github.io/SuperTinyIcons/images/svg/semaphoreci.svg",
+					DjangoProject: "https://edent.github.io/SuperTinyIcons/images/svg/djangoproject.svg",
+					Ruby: "https://edent.github.io/SuperTinyIcons/images/svg/ruby.svg",
+					SVG: "https://edent.github.io/SuperTinyIcons/images/svg/svg.svg",
+					SVG: "https://edent.github.io/SuperTinyIcons/images/svg/preact.svg",
+					Svelte: "https://edent.github.io/SuperTinyIcons/images/svg/svelte.svg",
+					CPlusPlus: "https://edent.github.io/SuperTinyIcons/images/svg/cplusplus.svg",
+					Elastic: "https://edent.github.io/SuperTinyIcons/images/svg/elastic.svg",
+				},
+				os: {
+					Android: "https://edent.github.io/SuperTinyIcons/images/svg/android.svg",
+					ArchLinux: "https://edent.github.io/SuperTinyIcons/images/svg/arch_linux.svg",
+					Linux: "https://edent.github.io/SuperTinyIcons/images/svg/linux.svg",
+					Ubuntu: "https://edent.github.io/SuperTinyIcons/images/svg/ubuntu.svg",
+					Windows: "https://edent.github.io/SuperTinyIcons/images/svg/windows.svg",
+					ElementaryOS: "https://edent.github.io/SuperTinyIcons/images/svg/elementaryos.svg",
+					Debian: "https://edent.github.io/SuperTinyIcons/images/svg/debian.svg",
+					LinuxMint: "https://edent.github.io/SuperTinyIcons/images/svg/linux_mint.svg",
+					MacOS: "https://edent.github.io/SuperTinyIcons/images/svg/macos.svg",
+					FreeBSD: "https://edent.github.io/SuperTinyIcons/images/svg/freebsd.svg",
+				},
+				gaming: {
+					Steam: "https://edent.github.io/SuperTinyIcons/images/svg/steam.svg",
+					GOGcom: "https://edent.github.io/SuperTinyIcons/images/svg/gogcom.svg",
+					Ubisoft: "https://edent.github.io/SuperTinyIcons/images/svg/ubisoft.svg",
+					Uplay: "https://edent.github.io/SuperTinyIcons/images/svg/uplay.svg",
+					ElectronicArts: "https://edent.github.io/SuperTinyIcons/images/svg/ea.svg",
+					Minecraft: "https://edent.github.io/SuperTinyIcons/images/svg/minecraft.svg",
+					Itchio: "https://edent.github.io/SuperTinyIcons/images/svg/itch_io.svg",
+				},
+				misc: {
+					Calendar: "https://edent.github.io/SuperTinyIcons/images/svg/calendar.svg",
+					SlideShare: "https://edent.github.io/SuperTinyIcons/images/svg/slideshare.svg",
+					Dropbox: "https://edent.github.io/SuperTinyIcons/images/svg/dropbox.svg",
+					PDF: "https://edent.github.io/SuperTinyIcons/images/svg/pdf.svg",
+					Digidentity: "https://edent.github.io/SuperTinyIcons/images/svg/digidentity.svg",
+					Bluetooth: "https://edent.github.io/SuperTinyIcons/images/svg/bluetooth.svg",
+					EPub: "https://edent.github.io/SuperTinyIcons/images/svg/epub.svg",
+					NextCloud: "https://edent.github.io/SuperTinyIcons/images/svg/nextcloud.svg",
+					RaspberryPi: "https://edent.github.io/SuperTinyIcons/images/svg/raspberry_pi.svg",
+					Printer: "https://edent.github.io/SuperTinyIcons/images/svg/print.svg",
+					Uber: "https://edent.github.io/SuperTinyIcons/images/svg/uber.svg",
+					AmazonS3: "https://edent.github.io/SuperTinyIcons/images/svg/amazon_s3.svg",
+					Ansible: "https://edent.github.io/SuperTinyIcons/images/svg/ansible.svg",
+					Gojek: "https://edent.github.io/SuperTinyIcons/images/svg/gojek.svg",
+					AmazonAlexa: "https://edent.github.io/SuperTinyIcons/images/svg/amazon_alexa.svg",
+					Finder: "https://edent.github.io/SuperTinyIcons/images/svg/finder.svg",
+					Roundcube: "https://edent.github.io/SuperTinyIcons/images/svg/roundcube.svg",
+					Fritz: "https://edent.github.io/SuperTinyIcons/images/svg/fritz.svg",
+					JacobinMagazine: "https://edent.github.io/SuperTinyIcons/images/svg/jacobin.svg",
+					Keskonfai: "https://edent.github.io/SuperTinyIcons/images/svg/keskonfai.svg",
+					SublimeText: "https://edent.github.io/SuperTinyIcons/images/svg/sublimetext.svg",
 				}
 			}
 		}

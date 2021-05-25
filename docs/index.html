@@ -116,31 +116,33 @@
     }
 	
 	function listResources(resourceName, baseUrl) {
-		var main = document.querySelector('#main');
-		var lines = [];
-		var diagrams = sysdiagram.loadResources();
-		var resources = diagrams[resourceName];
-		
-		for (var x in resources) {
-			var id = resourceName + x;	// ex: onpremaggregator
-			var path = resourceName + "." + x;	// ex: onprem.aggregator
-			lines.push('<h2 id="'+id+'"><a href="#/nodes/'+resourceName+'?id='+id+'" data-id="'+id+'" class="anchor"><span>'+path+'</span></a></h2>');
-			lines.push('<ul>');
-			for (var y in resources[x]) {
-				var p = 'diagrams.'+path+'.'+y;
-				var image = resources[x][y].imageURL;
-				lines.push('<li><strong>'+p+'</strong> <img class="resource-image" src="'+image+'" loading="lazy"></li>');
+		setTimeout(function() {
+			var main = document.querySelector('#main');
+			var lines = [];
+			var diagrams = sysdiagram.loadResources();
+			var resources = diagrams[resourceName];
+			
+			for (var x in resources) {
+				var id = resourceName + x;	// ex: onpremaggregator
+				var path = resourceName + "." + x;	// ex: onprem.aggregator
+				lines.push('<h2 id="'+id+'"><a href="#/nodes/'+resourceName+'?id='+id+'" data-id="'+id+'" class="anchor"><span>'+path+'</span></a></h2>');
+				lines.push('<ul>');
+				for (var y in resources[x]) {
+					var p = 'diagrams.'+path+'.'+y;
+					var image = resources[x][y].imageURL;
+					lines.push('<li><strong>'+p+'</strong> <img class="resource-image" src="'+image+'" loading="lazy"></li>');
+				}
+				lines.push('</ul>');
 			}
-			lines.push('</ul>');
-		}
-		
-		var fragment = document.createDocumentFragment();
-		var div = document.createElement('div');
-		fragment.appendChild(div);
-		div.innerHTML = lines.join("\n");
-		div.className = "resource";
-		
-		main.insertBefore(fragment.querySelector('div'), main.querySelector('hr'));
+			
+			var fragment = document.createDocumentFragment();
+			var div = document.createElement('div');
+			fragment.appendChild(div);
+			div.innerHTML = lines.join("\n");
+			div.className = "resource";
+			
+			main.insertBefore(fragment.querySelector('div'), main.querySelector('hr'));
+		}, 500);
 	}
   </script>
   <!-- Docsify v4 -->

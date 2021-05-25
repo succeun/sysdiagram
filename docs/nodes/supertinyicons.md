@@ -1,13 +1,13 @@
-# Generic
+# Super Tiny Icons
 
-Node classes list of [Generic](https://github.com/mingrammer/diagrams/tree/master/resources/generic) provider.
+Node classes list of [Super Tiny Icons](https://github.com/edent/SuperTinyIcons) provider.
 
-<script>listResources("generic");</script>
+<script>listResources("supertinyicons");</script>
 
 ```js
 ctx.attributes.graphviz.engine = 'fdp'
 
-var providerName = 'generic'
+var providerName = 'supertinyicons'
 
 Diagram(providerName, () => {
 	Cluster(providerName, () => {
@@ -24,4 +24,3 @@ Diagram(providerName, () => {
 	})
 })
 ```
-

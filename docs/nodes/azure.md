@@ -1,6 +1,6 @@
 # Azure
 
-Node classes list of azure provider.
+Node classes list of [Azure](https://github.com/mingrammer/diagrams/tree/master/resources/azure) provider.
 
 <script>listResources("azure");</script>
 

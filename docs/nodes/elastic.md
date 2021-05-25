@@ -1,6 +1,6 @@
 # Elastic
 
-Node classes list of elastic provider.
+Node classes list of [Elastic](https://github.com/mingrammer/diagrams/tree/master/resources/elastic) provider.
 
 <script>listResources("elastic");</script>
 

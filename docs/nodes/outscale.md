@@ -1,6 +1,6 @@
 # Outscale
 
-Node classes list of outscale provider.
+Node classes list of [Outscale](https://github.com/mingrammer/diagrams/tree/master/resources/outscale) provider.
 
 <script>listResources("outscale");</script>
 

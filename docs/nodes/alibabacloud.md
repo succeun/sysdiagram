@@ -1,6 +1,6 @@
 # AlibabaCloud
 
-Node classes list of alibabacloud provider.
+Node classes list of [AlibabaCloud](https://github.com/mingrammer/diagrams/tree/master/resources/alibabacloud) provider.
 
 <script>listResources("alibabacloud");</script>
 

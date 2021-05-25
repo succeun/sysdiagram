@@ -1,6 +1,6 @@
 # K8S
 
-Node classes list of k8s provider.
+Node classes list of [K8S](https://github.com/mingrammer/diagrams/tree/master/resources/k8s) provider.
 
 <script>listResources("k8s");</script>
 

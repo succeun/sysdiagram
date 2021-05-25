@@ -1,6 +1,6 @@
 {
 	"name": "sysdiagram",
-	"version": "0.1.17",
+	"version": "0.1.18",
 	"description": "Diagram the system architecture using JavaScript syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
@@ -8,11 +8,12 @@
 		"dist"
 	],
 	"scripts": {
+		"version": "node ./lib/version.js",
 		"minify": "minify ./lib/sysdiagram.js > ./dist/sysdiagram.min.js",
 		"concat": "concat -o ./dist/sysdiagram.js ./lib/sysdiagram.js",
 		"docs": "docsify serve ./docs",
 		"dev": "http-server -p 4000",
-		"build": "npm run concat && npm run minify"
+		"build": "npm run concat && npm run minify && npm run version"
 	},
 	"repository": {
 		"type": "git",
@@ -38,6 +39,7 @@
 		"docsify": "^4.4.3",
 		"minify": "^4.1.1",
 		"concat": "^1.0.3",
-		"http-server": "^0.12.3"
+		"http-server": "^0.12.3",
+		"replace-in-file": "^6.2.0"
 	}
 }

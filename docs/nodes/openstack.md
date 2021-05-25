@@ -1,6 +1,6 @@
 # OpenStack
 
-Node classes list of openstack provider.
+Node classes list of [OpenStack](https://github.com/mingrammer/diagrams/tree/master/resources/openstack) provider.
 
 <script>listResources("openstack");</script>
 

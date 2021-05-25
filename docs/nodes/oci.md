@@ -1,6 +1,6 @@
 # OCI
 
-Node classes list of oci provider.
+Node classes list of [OCI](https://github.com/mingrammer/diagrams/tree/master/resources/oci) provider.
 
 <script>listResources("oci");</script>
 

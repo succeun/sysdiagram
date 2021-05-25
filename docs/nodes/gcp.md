@@ -1,6 +1,6 @@
 # GCP
 
-Node classes list of gcp provider.
+Node classes list of [GCP](https://github.com/mingrammer/diagrams/tree/master/resources/gcp) provider.
 
 <script>listResources("gcp");</script>
 

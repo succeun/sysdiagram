@@ -1,6 +1,6 @@
 # AWS
 
-Node classes list of aws provider.
+Node classes list of [AWS](https://github.com/mingrammer/diagrams/tree/master/resources/aws) provider.
 
 <script>listResources("aws");</script>
 

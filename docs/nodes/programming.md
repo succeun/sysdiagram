@@ -1,6 +1,6 @@
 # Programming
 
-Node classes list of programming provider.
+Node classes list of [Programming](https://github.com/mingrammer/diagrams/tree/master/resources/programming) provider.
 
 <script>listResources("programming");</script>
 

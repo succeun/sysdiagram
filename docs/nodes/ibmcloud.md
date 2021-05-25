@@ -1,6 +1,6 @@
 # IBMCloud
 
-Node classes list of IBMCloud provider.
+Node classes list of [IBMCloud](https://github.com/mingrammer/diagrams/tree/master/resources/ibm) provider.
 
 <script>listResources("ibm");</script>
 
