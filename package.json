@@ -40,6 +40,10 @@
 		"minify": "^4.1.1",
 		"concat": "^1.0.3",
 		"http-server": "^0.12.3",
-		"replace-in-file": "^6.2.0"
+		"replace-in-file": "^6.2.0",
+		"d3": "^6.7.0",
+		"@hpcc-js/wasm": "^1.5.2",
+		"d3-graphviz": "^4.0.0",
+		"canvg": "^3.0.7"
 	}
 }
