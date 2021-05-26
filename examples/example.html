@@ -138,13 +138,29 @@
 			});
 		}
 		
+		function getTextCode(element) {
+			// If it is difficult to put it in a <div> like a table tag label, use <!-- --> to get the code if you put the code.
+			var code = element.textContent;
+			if (code.trim() == "") {
+				var node = element.firstChild;
+				while (node != null) {
+					if (node.nodeType == 8) {	// COMMENT_NODE
+						code = node.nodeValue;
+						break;
+					}
+					node = node.nextSibling;
+				}
+			}
+			return code;
+		}
+		
 		function run(index, init) {
 			var codeEl = document.querySelectorAll("code")[index];
 			var graphEl = document.querySelectorAll(".diagram")[index];
 			
 			var code = "";
 			if (init) {
-				code = codeEl.innerText;
+				code = getTextCode(codeEl);
 				codeEl.innerHTML = null;
 				codeEl.style.display = "block";
 				codeEl.editor = CodeMirror(codeEl, {
@@ -200,8 +216,10 @@
 					console.log("cluster:", element, element.sysdiagram_data);
 				});
 			});
-			var dot = result.dot;	// generated dot script
-			var graphviz = result.graphviz;
+			if (result){
+				var dot = result.dot;	// generated dot script
+				var graphviz = result.graphviz;
+			}
 		}
 	</script>
 </head>
@@ -213,6 +231,7 @@
 		<div class="codeContainer">
 			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
 			<code>
+<!--
 ctx.attributes.verbose = true
 ctx.attributes.digraph.splines = 'curved'
 
@@ -221,11 +240,12 @@ var RDS = diagrams.aws.database.RDS
 var ELB = diagrams.aws.network.ELB
 
 Diagram("Grouped Workers", function() {
-	Custom(`<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
-  <TR><TD PORT="f0">one</TD>
-  </TR><TR><TD BGCOLOR="gray" WIDTH="80px" ALIGN="CENTER">당사자<BR/>PART</TD></TR>
-</TABLE>>`)
+  	Cluster("고객", () => {
+		ctx.t1 = Table().td("one").td("당사자<br/>PART", {WIDTH: "80px", BGCOLOR: "gray"})
+		Table().td("title").td("row1", {WIDTH: "80px", BGCOLOR: "gray"})._$(ctx.t1)
+    })
 }, {rankdir: "TB"})
+-->
 			</code>
 		</div>
 		<div class="graphContainer">
