@@ -868,16 +868,16 @@ Diagram("Social Media", function() {
 		ctx.CF._$(ctx.S3)
 		ctx.S3._$(ctx.lambda)
 		
-		Cluster("  🟩 VPC", () => {
+		Cluster("  📗 VPC", () => {
 			ctx.ELB = ELB("ELB")
 			ctx.CF.e({constraint: true})._$(ctx.ELB)
 			DummyCluster(()=> {
-				Cluster("  🟩 Web subsets", ()=> {
+				Cluster("  📗 Web subsets", ()=> {
 					ctx.FSG = EC2("Front Server Group")
 					ctx.ELB.e({constraint: false})._$(ctx.FSG)
 				})
 				
-				Cluster("  🟩 API subsets", ()=> {
+				Cluster("  📗 API subsets", ()=> {
 					ctx.ASG = EC2("API Server Group")
 					ctx.ELB._$(ctx.ASG)
 					ctx.ASG.e({constraint: false})._$(ctx.FSG)
