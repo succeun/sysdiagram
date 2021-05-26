@@ -234,6 +234,9 @@
 <!--
 ctx.attributes.verbose = true
 ctx.attributes.digraph.splines = 'curved'
+ctx.attributes.digraph.pad="0.1"
+ctx.attributes.digraph.nodesep="0.5"
+ctx.attributes.digraph.ranksep="2"
 
 var EC2 = diagrams.aws.compute.EC2
 var RDS = diagrams.aws.database.RDS
@@ -242,9 +245,11 @@ var ELB = diagrams.aws.network.ELB
 Diagram("Grouped Workers", function() {
   	Cluster("고객", () => {
 		ctx.t1 = Table().td("one").td("당사자<br/>PART", {WIDTH: "80px", BGCOLOR: "gray"})
-		Table().td("title").td("row1", {WIDTH: "80px", BGCOLOR: "gray"})._$(ctx.t1)
+		Table().td("title").td("row1", {WIDTH: "80px", BGCOLOR: "gray"})
+		.e({sport: 1, eport: 1, label: "test"})
+		._$(ctx.t1)
     })
-}, {rankdir: "TB"})
+}, {rankdir: "LR"})
 -->
 			</code>
 		</div>
