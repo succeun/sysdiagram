@@ -144,7 +144,7 @@
 			
 			var code = "";
 			if (init) {
-				code = codeEl.textContent;
+				code = codeEl.innerText;
 				codeEl.innerHTML = null;
 				codeEl.style.display = "block";
 				codeEl.editor = CodeMirror(codeEl, {
@@ -207,6 +207,32 @@
 </head>
 <body>
 	<h1>Sysdiagram Examples</h1>
+	
+	<h2>Table ERD</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+ctx.attributes.verbose = true
+ctx.attributes.digraph.splines = 'curved'
+
+var EC2 = diagrams.aws.compute.EC2
+var RDS = diagrams.aws.database.RDS
+var ELB = diagrams.aws.network.ELB
+
+Diagram("Grouped Workers", function() {
+	Custom(`<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="f0">one</TD>
+  </TR><TR><TD BGCOLOR="gray" WIDTH="80px" ALIGN="CENTER">당사자<BR/>PART</TD></TR>
+</TABLE>>`)
+}, {rankdir: "TB"})
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="diagram"></div>
+		</div>
+	</div>
 	
 	<h2>Grouped Workers on AWS</h2>
 	<div class="group">
