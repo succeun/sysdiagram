@@ -45,7 +45,7 @@
 			position: absolute;
 			right: 0;
 			top: 0;
-			z-index: 1000;
+			z-index: 10;
 		}
 		
 		button {
@@ -80,6 +80,57 @@
 			background-color: #3F51B5;
 			border-color: #ccc;
 		}
+		
+		
+		div.sysdiagram_mask {
+			position: fixed;
+			height: 100%;
+			z-index: 10;
+			background-color: #555;
+			opacity: 0.9;
+			left: 0px;
+			top: 0px;
+			width: 0%;
+		}
+
+		div.sysdiagram_mask.show {
+			width: 100%;
+		}
+		
+		div.sysdiagram[data-sysdiagram-processed=true].fullscreen {
+		  z-index: 9999;
+		  position: fixed;
+		  margin: auto;
+		  width: 95%;
+		  height: 95%;
+		  left: 0;
+		  right: 0;
+		  top: 0;
+		  bottom: 0;
+		  cursor: pointer;
+		  border: 2px solid #ccc;
+		  box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
+					  0 2px 2px rgba(0,0,0,0.11), 
+					  0 4px 4px rgba(0,0,0,0.11), 
+					  0 8px 8px rgba(0,0,0,0.11), 
+					  0 16px 16px rgba(0,0,0,0.11), 
+					  0 32px 32px rgba(0,0,0,0.11);
+		  min-width: 95% !important;
+		  min-height: 95% !important;
+		  background-color: white;
+		}
+
+		div.sysdiagram[data-sysdiagram-processed=true].fullscreen svg {
+		  max-width: 100% !important;
+		  max-height: 100% !important;
+		  /*width: auto;*/
+		  height: auto;
+		  position: absolute;
+		  left: 50%;
+		  top: 50%;
+		  transform: translate(-50%, -50%);
+		  background-color: #fff;
+		}
 	</style>
 	
 	<!-- code mirror -->
@@ -104,10 +155,21 @@
 	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
+			// fullscreen mask
+			var mask = document.createElement("div");
+			mask.className = "sysdiagram_mask";
+			document.body.appendChild(mask);
+			
 			// code init
 			var codeEls = document.querySelectorAll("code");
 			for (var i = 0 ; i < codeEls.length; i++) {
 				run(i, true);
+				
+				var graphEl = document.querySelectorAll(".sysdiagram")[i];
+				graphEl.addEventListener("click", function(e) {
+					this.classList.toggle("fullscreen");
+					document.querySelector(".sysdiagram_mask").classList.toggle("show");
+				});
 			}
 			
 			var btnRun = document.querySelectorAll("button.run");
@@ -131,7 +193,7 @@
 		function addButtonDownloadEvent(i) {
 			var btn = document.querySelectorAll("button.download")[i];
 			btn.addEventListener("click", function(evt) {
-				var graphEl = document.querySelectorAll(".diagram")[i];
+				var graphEl = document.querySelectorAll(".sysdiagram")[i];
 				if (graphEl && graphEl.graphviz) {
 					graphEl.graphviz.toImage("example-" + i);
 				}
@@ -156,7 +218,7 @@
 		
 		function run(index, init) {
 			var codeEl = document.querySelectorAll("code")[index];
-			var graphEl = document.querySelectorAll(".diagram")[index];
+			var graphEl = document.querySelectorAll(".sysdiagram")[index];
 			
 			var code = "";
 			if (init) {
@@ -190,7 +252,47 @@
 				var edges = elt.selectAll(".edge");
 				var clusters = elt.selectAll(".cluster");
 				
-				nodes.on("click", function(event, element) {
+				nodes.on("mouseover", mouseOver(0.2))
+				.on("mouseout", mouseOut);
+				
+				function isConnected(a, b) {
+					return a.sysdiagram_data.connectedNodes[b.key] != null || a.key == b.key;
+				}
+
+				function mouseOver(opacity) {
+					return function(event, d) {
+						nodes.style("stroke-opacity", function(o) {
+							var thisOpacity = isConnected(d, o) ? 1 : opacity;
+							return thisOpacity;
+						});
+
+						nodes.style("fill-opacity", function(o) {
+							var thisOpacity = isConnected(d, o) ? 1 : opacity;
+							return thisOpacity;
+						});
+						
+						edges.style("stroke-opacity", function(o) {
+							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
+						});
+						
+						edges.style("fill-opacity", function(o){	// label color
+							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
+						});
+						
+						/*edges.style("stroke", function(o){	// label color
+							return o.key.indexOf(d.key) >= 0 ? "#0f0" : "";
+						});*/
+					};
+				}
+
+				function mouseOut(event, d) {
+					nodes.style("stroke-opacity", 1);
+					nodes.style("fill-opacity", 1);
+					edges.style("stroke-opacity", 1);
+					//edges.style("stroke", "");
+				}
+				
+				/*nodes.on("click", function(event, element) {
 					//event.preventDefault();
 					//event.stopPropagation();
 					console.log("node:", element, element.sysdiagram_data);
@@ -214,7 +316,7 @@
 					//event.preventDefault();
 					//event.stopPropagation();
 					console.log("cluster:", element, element.sysdiagram_data);
-				});
+				});*/
 			});
 			if (result){
 				var dot = result.dot;	// generated dot script
@@ -225,39 +327,6 @@
 </head>
 <body>
 	<h1>Sysdiagram Examples</h1>
-	
-	<h2>Table ERD</h2>
-	<div class="group">
-		<div class="codeContainer">
-			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
-			<code>
-<!--
-ctx.attributes.verbose = true
-ctx.attributes.digraph.splines = 'curved'
-ctx.attributes.digraph.pad="0.1"
-ctx.attributes.digraph.nodesep="0.5"
-ctx.attributes.digraph.ranksep="2"
-
-var EC2 = diagrams.aws.compute.EC2
-var RDS = diagrams.aws.database.RDS
-var ELB = diagrams.aws.network.ELB
-
-Diagram("Grouped Workers", function() {
-  	Cluster("고객", () => {
-		ctx.t1 = Table().td("one").td("당사자<br/>PART", {WIDTH: "80px", BGCOLOR: "gray"})
-		Table().td("title").td("row1", {WIDTH: "80px", BGCOLOR: "gray"})
-		.e({sport: 1, eport: 1, label: "test"})
-		._$(ctx.t1)
-    })
-}, {rankdir: "LR"})
--->
-			</code>
-		</div>
-		<div class="graphContainer">
-			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
-		</div>
-	</div>
 	
 	<h2>Grouped Workers on AWS</h2>
 	<div class="group">
@@ -281,7 +350,7 @@ Diagram("Grouped Workers", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -323,7 +392,7 @@ Diagram("Clustered Web Services", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -367,7 +436,7 @@ Diagram("Event Processing", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -424,7 +493,7 @@ Diagram("Message Collecting", () => {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -448,7 +517,7 @@ Diagram("Exposed Pod with 3 Replicas", () => {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -482,7 +551,7 @@ Diagram("Stateful Architecture", () => {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -535,7 +604,7 @@ Diagram("Advanced Web Service with On-Premise", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -588,7 +657,7 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -619,7 +688,7 @@ Diagram("Broker Consumers", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -653,7 +722,7 @@ Diagram("Grouped Workers", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -715,7 +784,7 @@ Diagram("Organization", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -741,7 +810,7 @@ Diagram("Grouped Workers", () => {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -776,7 +845,7 @@ Diagram("Repeat Custom", () => {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -828,7 +897,7 @@ Diagram("Build cloud native applications", () => {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -860,7 +929,7 @@ Diagram("Broker Consumers", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -895,7 +964,7 @@ Diagram("Social Media", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 	
@@ -969,7 +1038,7 @@ Diagram("Social Media", function() {
 		</div>
 		<div class="graphContainer">
 			<button class="btn-default download badge">Image Download</button>
-			<div class="diagram"></div>
+			<div class="sysdiagram"></div>
 		</div>
 	</div>
 </body>

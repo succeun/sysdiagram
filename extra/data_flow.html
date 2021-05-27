@@ -1,0 +1,474 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style>
+		body {
+			margin: 40px;
+		}
+		.group {
+			display: flex;
+			/*flex-direction: row;
+			justify-content: space-evenly;*/
+		}
+		
+		code {
+			display: none;
+		}
+		
+		.CodeMirror {
+			border: 1px solid #444;
+			width: 700px;
+			height: 700px !important;
+			margin-bottom: 30px;
+			font-family: Operator Mono SSm A,Operator Mono SSm B,Source Code Pro,Menlo,Consolas,Monaco,monospace !important;
+			font-size: 16px;
+		}
+		
+		.codeContainer {
+			position: relative;
+		}
+		
+		.graphContainer {
+			text-align: center; 
+			border: 1px solid #444;
+			width: calc(100% - 700px);
+			height: 700px;
+			margin-left: 50px;
+			position: relative;
+		}
+		
+		.badge {
+			opacity: 0.8;
+			transition: opacity linear 0.5s;
+			border-radius: 0 0 0 7px;
+			position: absolute;
+			right: 0;
+			top: 0;
+			z-index: 10;
+		}
+		
+		button {
+			font-family: Operator Mono SSm A,Operator Mono SSm B,Source Code Pro,Menlo,Consolas,Monaco,monospace !important;
+			font-size: 14px;
+			padding: 6px 12px;
+			margin-bottom: 0;
+
+			display: inline-block;
+			text-decoration: none;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: middle;
+			-ms-touch-action: manipulation;
+			touch-action: manipulation;
+			cursor: pointer;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			background-image: none;
+			border: 1px solid transparent;
+			border-radius: 4px;
+			
+			color: #333;
+			background-color: #e6e6e6;
+			border-color: #adadad;
+		}
+		button:hover {
+			text-decoration: none;
+			color: #fff;
+			background-color: #3F51B5;
+			border-color: #ccc;
+		}
+		
+		
+		div.sysdiagram_mask {
+			position: fixed;
+			height: 100%;
+			z-index: 10;
+			background-color: #555;
+			opacity: 0.9;
+			left: 0px;
+			top: 0px;
+			width: 0%;
+		}
+
+		div.sysdiagram_mask.show {
+			width: 100%;
+		}
+		
+		div.sysdiagram[data-sysdiagram-processed=true].fullscreen {
+		  z-index: 9999;
+		  position: fixed;
+		  margin: auto;
+		  width: 95%;
+		  height: 95%;
+		  left: 0;
+		  right: 0;
+		  top: 0;
+		  bottom: 0;
+		  cursor: pointer;
+		  border: 2px solid #ccc;
+		  box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
+					  0 2px 2px rgba(0,0,0,0.11), 
+					  0 4px 4px rgba(0,0,0,0.11), 
+					  0 8px 8px rgba(0,0,0,0.11), 
+					  0 16px 16px rgba(0,0,0,0.11), 
+					  0 32px 32px rgba(0,0,0,0.11);
+		  min-width: 95% !important;
+		  min-height: 95% !important;
+		  background-color: white;
+		}
+
+		div.sysdiagram[data-sysdiagram-processed=true].fullscreen svg {
+		  max-width: 100% !important;
+		  max-height: 100% !important;
+		  /*width: auto;*/
+		  height: auto;
+		  position: absolute;
+		  left: 50%;
+		  top: 50%;
+		  transform: translate(-50%, -50%);
+		  background-color: #fff;
+		}
+	</style>
+	
+	<!-- code mirror -->
+	<link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/dracula.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lesser-dark.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lucario.min.css">
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
+	
+	<!-- canvg for converting image (Optional) -->
+	<script src="../node_modules/canvg/lib/umd.js"></script> 
+
+	<!-- d3 & d3-graphviz (Mandatory) -->
+	<script src="../node_modules/d3/dist/d3.js"></script>
+	<script src="../node_modules/@hpcc-js/wasm/dist/index.min.js"></script>
+	<script src="../node_modules/d3-graphviz/build/d3-graphviz.js"></script>
+
+	<!-- sysdiagram (latest) -->
+	<script src="../lib/sysdiagram.js"></script>
+	
+	<script>
+		window.addEventListener('DOMContentLoaded', function(event) {
+			// fullscreen mask
+			var mask = document.createElement("div");
+			mask.className = "sysdiagram_mask";
+			document.body.appendChild(mask);
+		
+			// code init
+			var codeEls = document.querySelectorAll("code");
+			for (var i = 0 ; i < codeEls.length; i++) {
+				run(i, true);
+				
+				var graphEl = document.querySelectorAll(".sysdiagram")[i];
+				graphEl.addEventListener("click", function(e) {
+					this.classList.toggle("fullscreen");
+					document.querySelector(".sysdiagram_mask").classList.toggle("show");
+				});
+			}
+			
+			var btnRun = document.querySelectorAll("button.run");
+			for (var i = 0 ; i < btnRun.length; i++) {
+				addButtonRunEvent(i);
+			}
+			
+			var btnDownload = document.querySelectorAll("button.download");
+			for (var i = 0 ; i < btnDownload.length; i++) {
+				addButtonDownloadEvent(i);
+			}
+		});
+		
+		function addButtonRunEvent(i) {
+			var btn = document.querySelectorAll("button.run")[i];
+			btn.addEventListener("click", function(evt) {
+				run(i, false);
+			});
+		}
+		
+		function addButtonDownloadEvent(i) {
+			var btn = document.querySelectorAll("button.download")[i];
+			btn.addEventListener("click", function(evt) {
+				var graphEl = document.querySelectorAll(".sysdiagram")[i];
+				if (graphEl && graphEl.graphviz) {
+					graphEl.graphviz.toImage("example-" + i);
+				}
+			});
+		}
+		
+		function getTextCode(element) {
+			// If it is difficult to put it in a <div> like a table tag label, use <!-- --> to get the code if you put the code.
+			var code = element.textContent;
+			if (code.trim() == "") {
+				var node = element.firstChild;
+				while (node != null) {
+					if (node.nodeType == 8) {	// COMMENT_NODE
+						code = node.nodeValue;
+						break;
+					}
+					node = node.nextSibling;
+				}
+			}
+			return code;
+		}
+		
+		function run(index, init) {
+			var codeEl = document.querySelectorAll("code")[index];
+			var graphEl = document.querySelectorAll(".sysdiagram")[index];
+			
+			var code = "";
+			if (init) {
+				code = getTextCode(codeEl);
+				codeEl.innerHTML = null;
+				codeEl.style.display = "block";
+				codeEl.editor = CodeMirror(codeEl, {
+					value: code,
+					lineNumbers: true,
+					matchBrackets: true,
+					//lineWrapping: true,
+					extraKeys: {
+						"Ctrl-Enter": function(cm) { 
+							run(index, false); 
+						},     
+					},
+					theme: "lucario",	// dracula, lesser-dark
+				});
+				
+			} else {
+				code = codeEl.editor.getValue();
+			}
+			
+			var result = sysdiagram.render(graphEl, code, {}, function(element, graphviz) {
+				var elt = d3.select(element);
+				var nodes = elt.selectAll(".node");
+				var edges = elt.selectAll(".edge");
+				var clusters = elt.selectAll(".cluster");
+				
+				nodes.on("mouseover", mouseOver(0.2))
+				.on("mouseout", mouseOut);
+				
+				function isConnected(a, b) {
+					return a.sysdiagram_data.connectedNodes[b.key] != null || a.key == b.key;
+				}
+
+				function mouseOver(opacity) {
+					return function(event, d) {
+						nodes.style("stroke-opacity", function(o) {
+							var thisOpacity = isConnected(d, o) ? 1 : opacity;
+							return thisOpacity;
+						});
+
+						nodes.style("fill-opacity", function(o) {
+							var thisOpacity = isConnected(d, o) ? 1 : opacity;
+							return thisOpacity;
+						});
+						
+						edges.style("stroke-opacity", function(o) {
+							if (!this.path) {
+								this.path = this.querySelector("path");
+								this.polygon = this.querySelector("polygon");
+								
+								this.path_stroke = this.path.getAttribute("stroke");
+								this.polygon_stroke = this.polygon.getAttribute("stroke");
+								this.polygon_fill = this.polygon.getAttribute("fill");
+							}
+							
+							this.path.style.stroke = "blue";
+							this.polygon.style.stroke = "blue";
+							this.polygon.style.fill = "blue";
+							
+							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
+						});
+						
+						edges.style("fill-opacity", function(o){	// label color
+							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
+						});
+						
+						/*edges.style("stroke", function(o){	// label color
+							return o.key.indexOf(d.key) >= 0 ? "#0f0" : "";
+						});*/
+						
+					};
+				}
+
+				function mouseOut(event, d) {
+					nodes.style("stroke-opacity", 1);
+					nodes.style("fill-opacity", 1);
+					
+					edges.style("stroke-opacity", 1);
+					edges.style("fill-opacity", 1);
+					
+					edges.select(function(o) {
+						if (this.path) {
+							this.path.style.stroke = this.path_stroke;
+							this.polygon.style.stroke = this.polygon_stroke;
+							this.polygon.style.fill = this.polygon_fill;
+						}
+					});
+					
+					//edges.style("stroke", "");
+				}
+				
+			});
+			if (result){
+				var dot = result.dot;	// generated dot script
+				var graphviz = result.graphviz;
+			}
+		}
+	</script>
+</head>
+<body>
+	<h1>Sysdiagram Examples</h1>
+	
+	<h2>Table ERD</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+<!--
+ctx.attributes.verbose = true
+ctx.attributes.digraph.splines = "spline"
+ctx.attributes.digraph.nodesep="0.5"
+ctx.attributes.digraph.ranksep="2"
+ctx.attributes.td.WIDTH="120px"
+ctx.attributes.td.ALIGN="left"
+
+var th = {BGCOLOR: "lightgray", ALIGN: "center"}
+
+Diagram("장기 가입설계(청약) Data 흐름도", function() {
+	DummyCluster(() => {
+		Cluster("당사자 사항", () => {
+			ctx.PARTY = Table().td("당사자<BR/>PART", th).td("홍길동").td("김말자").td("김복동").td("이순신")
+			ctx.PARTY_INS_AGMT_RL = Table().td("당사자/보험계약<BR/>PARTY_INS_AGMT_RL", th).td("계약자").td("피보험자").td("친권자").td("취급자")
+			
+			ctx.PARTY.e({sport: 1, eport: 1, headlabel: "LT0002"})._$(ctx.PARTY_INS_AGMT_RL)
+			ctx.PARTY.e({sport: 2, eport: 2, headlabel: "LT0170"})._$(ctx.PARTY_INS_AGMT_RL)
+			ctx.PARTY.e({sport: 3, eport: 3, headlabel: "LT0105"})._$(ctx.PARTY_INS_AGMT_RL)
+			ctx.PARTY.e({sport: 4, eport: 4, headlabel: "LT0003"})._$(ctx.PARTY_INS_AGMT_RL)
+		})
+	
+		Cluster("간이가입설계 당사자", () => {
+			ctx.PLAN_TEMT_PARTY = Table().td("간이설계 당사자<BR/>PLAN_TEMT_PARTY", th).td("실명미확인1").td("실명미확인2")
+			
+			ctx.TEMP_PARTY_INAG_RL = Table().td("간이설계 당/보<BR/>TEMP_PARTY_INAG_RL", th).td("계약자").td("피보험자")
+			ctx.PLAN_TEMT_PARTY.e({sport: 1, eport: 1})._$(ctx.TEMP_PARTY_INAG_RL)
+			ctx.PLAN_TEMT_PARTY.e({sport: 2, eport: 2})._$(ctx.TEMP_PARTY_INAG_RL)
+			Custom("가입설계시 실명확인이 되지 않은 당사자 사항은 간이설계 당사자 Table에 저장됨")
+		})
+	})
+	
+	Cluster("자동이체 - 계좌정보", () => {
+		ctx.PARTY_REGST_RL = Table().td("당사자/등록<BR/>PARTY_REGST_RL", th).td("예금주임")
+		ctx.PARTY.e({sport: 1, eport: 1})._$(ctx.PARTY_REGST_RL)
+		
+		ctx.REGISTRATION = Table().td("등록<BR/>REGISTRATION", th).td("계좌등록")
+		ctx.PARTY_REGST_RL.e({sport: 1, eport: 1, constraint: true})._$(ctx.REGISTRATION)
+		
+		ctx.GEAG_REGST_RL = Table().td("일반계약/등록<BR/>GEAG_REGST_RL", th).td("연결됨")
+		ctx.REGISTRATION.e({sport: 1, eport: 1, constraint: false})._$(ctx.GEAG_REGST_RL)
+		
+		ctx.GENERAL_AGMT = Table().td("일반계약<BR/>GENERAL_AGMT", th).td("보험료 80")
+		ctx.GEAG_REGST_RL.e({sport: 1, eport: 1, constraint: true})._$(ctx.GENERAL_AGMT)
+		
+		ctx.PARTY_GEAG_RL = Table().td("당사자/일반<BR/>PARTY_GEAG_RL", th).td("계약자임")
+		ctx.GENERAL_AGMT.e({sport: 1, eport: 1, constraint: false})._$(ctx.PARTY_GEAG_RL)
+		
+		ctx.PARTY.e({sport: 1, eport: 1})._$(ctx.PARTY_GEAG_RL)
+	})
+  	
+	Cluster("계약사항", () => {
+		ctx.INSURANCE_AGMT = Table().td("보험계약<BR/>INSURANCE_AGMT", th).td("총CV").td("주피").td("종피")
+		ctx.PARTY_INS_AGMT_RL.e({sport: 1, eport: 1})._$(ctx.INSURANCE_AGMT)
+		ctx.PARTY_INS_AGMT_RL.e({sport: 2, eport: 2})._$(ctx.INSURANCE_AGMT)
+		ctx.PARTY_INS_AGMT_RL.e({sport: 3, eport: 1})._$(ctx.INSURANCE_AGMT)
+		ctx.PARTY_INS_AGMT_RL.e({sport: 4, eport: 1})._$(ctx.INSURANCE_AGMT)
+		
+		ctx.L_INAG_DETAIL = Table().td("장기보험계약내역<BR/>L_INAG_DETAIL", th).td("부담보").td("갱신담보")
+		ctx.INSURANCE_AGMT.e({sport: 2, eport: 1})._$(ctx.L_INAG_DETAIL)
+		ctx.INSURANCE_AGMT.e({sport: 3, eport: 2})._$(ctx.L_INAG_DETAIL)
+		
+		ctx.PREMIUM = Table().td("보험료<BR/>PREMIUM", th).td("총CV 합계보험료").td("주피 합계보험료")
+		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1})._$(ctx.PREMIUM)
+		ctx.INSURANCE_AGMT.e({sport: 2, eport: 2})._$(ctx.PREMIUM)
+		
+		ctx.PREMIUM_DISS_DETAIL = Table().td("보험료 분해내역<BR/>PREMIUM_DISS_DETAIL", th).td("보장보험료").td("적립보험료")
+		ctx.PREMIUM.e({sport: 1, eport: 1})._$(ctx.PREMIUM_DISS_DETAIL)
+		ctx.PREMIUM.e({sport: 1, eport: 2})._$(ctx.PREMIUM_DISS_DETAIL)
+		
+		ctx.AGMT_DATA = Table().td("계약데이터<BR/>AGMT_DATA", th).td("기계약자 할인율").td("소재지주소")
+		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1})._$(ctx.AGMT_DATA)
+		
+		ctx.PLAN_TEMT_PARTY.e({sport: 1, eport: 1})._$(ctx.INSURANCE_AGMT)
+		ctx.PLAN_TEMT_PARTY.e({sport: 2, eport: 2})._$(ctx.INSURANCE_AGMT)
+	})
+	
+	Cluster("특약 및 담보", () => {
+		ctx.ELEM_PACK_AGMT = Table().td("특약및담보<BR/>ELEM_PACK_AGMT", th).td("질병사망").td("만기환급금조항").td("통원의료").td("진단 담보조항").td("상품도난손해")
+		ctx.INSURANCE_AGMT.e({sport: 2, eport: 1})._$(ctx.ELEM_PACK_AGMT)
+		ctx.INSURANCE_AGMT.e({sport: 2, eport: 2})._$(ctx.ELEM_PACK_AGMT)
+		ctx.INSURANCE_AGMT.e({sport: 2, eport: 3})._$(ctx.ELEM_PACK_AGMT)
+		
+		ctx.PARTY_ELAG_RL = Table().td("당사자/특약담보<BR/>PARTY_ELAG_RL", th).td("사망 수익자").td("만기 수익자").td("기타 수익자")
+		ctx.ELEM_PACK_AGMT.e({sport: 1, eport: 1})._$(ctx.PARTY_ELAG_RL)
+		ctx.ELEM_PACK_AGMT.e({sport: 2, eport: 2})._$(ctx.PARTY_ELAG_RL)
+		
+		ctx.ELAG_PERIOD_DETAIL = Table().td("특약및담보내역<BR/>PARTY_ELAG_RL", th).td("담보별 납만기").td("담보별 납만기").td("담보별 납만기")
+		ctx.ELEM_PACK_AGMT.e({sport: 1, eport: 1})._$(ctx.ELAG_PERIOD_DETAIL)
+		ctx.ELEM_PACK_AGMT.e({sport: 2, eport: 2})._$(ctx.ELAG_PERIOD_DETAIL)
+		ctx.ELEM_PACK_AGMT.e({sport: 3, eport: 3})._$(ctx.ELAG_PERIOD_DETAIL)
+		
+		ctx.L_APPL_TARIFF_KEY = Table().td("장기적용요율인자<BR/>L_APPL_TARIFF_KEY", th).td("담보별 요율,할인/할증").td("담보별 요율,할인/할증").td("담보별 요율,할인/할증")
+		ctx.ELEM_PACK_AGMT.e({sport: 1, eport: 1})._$(ctx.L_APPL_TARIFF_KEY)
+		ctx.ELEM_PACK_AGMT.e({sport: 2, eport: 2})._$(ctx.L_APPL_TARIFF_KEY)
+		ctx.ELEM_PACK_AGMT.e({sport: 3, eport: 3})._$(ctx.L_APPL_TARIFF_KEY)
+	})
+	
+	Cluster("요청 및 승인", () => {
+		ctx.AGMT_REQUEST = Table().td("요청<BR/>AGMT_REQUEST", th).td("계약별 요청/승인 내역")
+		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1, constraint: false})._$(ctx.AGMT_REQUEST)
+		
+		ctx.REQUEST_DETAIL = Table().td("요청내역<BR/>REQUEST_DETAIL", th).td("요청사유1").td("요청사유2")
+		ctx.AGMT_REQUEST.e({sport: 1, eport: 1})._$(ctx.REQUEST_DETAIL)
+		ctx.AGMT_REQUEST.e({sport: 1, eport: 2})._$(ctx.REQUEST_DETAIL)
+		
+		ctx.L_REQ_DETAIL = Table().td("특인요청내역<BR/>L_REQ_DETAIL", th).td("특인사유1").td("특인사유2")
+		ctx.AGMT_REQUEST.e({sport: 1, eport: 1})._$(ctx.L_REQ_DETAIL)
+		ctx.AGMT_REQUEST.e({sport: 1, eport: 2})._$(ctx.L_REQ_DETAIL)
+		
+		ctx.AGMT_APPROVAL = Table().td("승인<BR/>AGMT_APPROVAL", th).td("승인상태")
+		ctx.AGMT_REQUEST.e({sport: 1, eport: 1, constraint: false})._$(ctx.AGMT_APPROVAL)
+		
+		ctx.AGMT_APPROV_DATA = Table().td("승인내역<BR/>AGMT_APPROV_DATA", th).td("승인상세내역")
+		ctx.AGMT_APPROVAL.e({sport: 1, eport: 1})._$(ctx.AGMT_APPROV_DATA)
+	})
+	
+	Cluster("기타", () => {
+		ctx.PARTY_HEALTH_TOT = Table().td("통합건강상태<BR/>PARTY_HEALTH_TOT", th).td("주피 설문서").td("종피 설문서")
+		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1})._$(ctx.PARTY_HEALTH_TOT)
+		ctx.INSURANCE_AGMT.e({sport: 2, eport: 2})._$(ctx.PARTY_HEALTH_TOT)
+		
+		ctx.L_RPYMT_INFO = Table().td("해약환급금 예시표<BR/>L_RPYMT_INFO", th).td("해지환급금 예시")
+	})
+	
+	Cluster("수납처리대상", () => {
+		ctx.L_BR_PAYMENT = Table().td("장기수납처리대상<BR/>L_BR_PAYMENT", th).td("수납대상")
+		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1, constraint: false})._$(ctx.L_BR_PAYMENT)
+		
+		ctx.ISSU_DOC_DUE = Table().td("증권발행<BR/>ISSU_DOC_DUE", th).td("재발행서류 예정")
+		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1, constraint: false})._$(ctx.ISSU_DOC_DUE)
+	})
+}, {rankdir: "LR"})
+-->
+			</code>
+		</div>
+		<div class="graphContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="sysdiagram"></div>
+		</div>
+	</div>
+</body>
+</html>

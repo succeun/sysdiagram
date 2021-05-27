@@ -28,6 +28,8 @@ Replace `<version>` with the desired version number.
 
 Latest Version: [https://unpkg.com/sysdiagram/dist/sysdiagram.min.js](https://unpkg.com/sysdiagram/dist/sysdiagram.min.js)
 
+
+
 ## Installing
 
 It can insert a `script` tag with an absolute address and a `sysdiagram` call into the HTML like so:
@@ -60,6 +62,13 @@ From these tags sysdiagram will try to read the diagram definitons and render th
 	})
 </div>
 ```
+When developing locally, you must have a local web server due to [hpcc-js/wasm](https://www.npmjs.com/package/@hpcc-js/wasm). In this case, you can load the server as follows.
+
+```bash
+npm run dev
+```
+After executing this command, open [http://localhost:4000/examples/](http://localhost:4000/examples/) in the browser.
+
 
 # basic.html
 
