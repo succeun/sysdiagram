@@ -4,37 +4,48 @@
 	<title></title>
 	<style>
 		body {
-			margin: 40px;
+			margin: 20px;
 		}
-		.group {
-			display: flex;
-			/*flex-direction: row;
-			justify-content: space-evenly;*/
-		}
-		
+
 		code {
 			display: none;
 		}
 		
+		.split {
+			display: flex;
+			flex-direction: row;
+			
+			height: calc(100% - 120px);
+			border: 1px solid #eee;
+		}
+
+		.gutter.gutter-horizontal {
+			background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+			cursor: col-resize;
+			
+			background-color: rgb(229, 231, 235);
+			background-repeat: no-repeat;
+			background-position: 50% center;
+			width: 10px;
+		}
+		
 		.CodeMirror {
 			border: 1px solid #444;
-			width: 700px;
-			height: 700px !important;
-			margin-bottom: 30px;
+			width: 100%;
+			height: 100% !important;
 			font-family: Operator Mono SSm A,Operator Mono SSm B,Source Code Pro,Menlo,Consolas,Monaco,monospace !important;
-			font-size: 16px;
+			font-size: 10pt;
 		}
 		
 		.codeContainer {
 			position: relative;
 		}
 		
-		.graphContainer {
+		.diagramContainer {
 			text-align: center; 
 			border: 1px solid #444;
-			width: calc(100% - 700px);
-			height: 700px;
-			margin-left: 50px;
+			width: 100%;
+			height: 100%;
 			position: relative;
 		}
 		
@@ -81,6 +92,7 @@
 			border-color: #ccc;
 		}
 		
+		/*= fullscreen ==============================================================*/
 		
 		div.sysdiagram_mask {
 			position: fixed;
@@ -133,11 +145,16 @@
 		}
 	</style>
 	
+	<script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+	
 	<!-- code mirror -->
 	<link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/dracula.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lesser-dark.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/lucario.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/ayu-mirage.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/bespin.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/idea.min.css">
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js"></script>
@@ -155,18 +172,22 @@
 	
 	<script>
 		window.addEventListener('DOMContentLoaded', function(event) {
+		
+			Split(['#split-code', '#split-diagram']);
+		
+		
 			// fullscreen mask
-			var mask = document.createElement("div");
-			mask.className = "sysdiagram_mask";
-			document.body.appendChild(mask);
+			//var mask = document.createElement("div");
+			//mask.className = "sysdiagram_mask";
+			//document.body.appendChild(mask);
 		
 			// code init
 			var codeEls = document.querySelectorAll("code");
 			for (var i = 0 ; i < codeEls.length; i++) {
 				run(i, true);
 				
-				var graphEl = document.querySelectorAll(".sysdiagram")[i];
-				graphEl.addEventListener("click", function(e) {
+				var diagramEl = document.querySelectorAll(".sysdiagram")[i];
+				diagramEl.addEventListener("click", function(e) {
 					this.classList.toggle("fullscreen");
 					document.querySelector(".sysdiagram_mask").classList.toggle("show");
 				});
@@ -193,36 +214,20 @@
 		function addButtonDownloadEvent(i) {
 			var btn = document.querySelectorAll("button.download")[i];
 			btn.addEventListener("click", function(evt) {
-				var graphEl = document.querySelectorAll(".sysdiagram")[i];
-				if (graphEl && graphEl.graphviz) {
-					graphEl.graphviz.toImage("example-" + i);
+				var diagramEl = document.querySelectorAll(".sysdiagram")[i];
+				if (diagramEl && diagramEl.graphviz) {
+					diagramEl.graphviz.toImage("example-" + i);
 				}
 			});
 		}
 		
-		function getTextCode(element) {
-			// If it is difficult to put it in a <div> like a table tag label, use <!-- --> to get the code if you put the code.
-			var code = element.textContent;
-			if (code.trim() == "") {
-				var node = element.firstChild;
-				while (node != null) {
-					if (node.nodeType == 8) {	// COMMENT_NODE
-						code = node.nodeValue;
-						break;
-					}
-					node = node.nextSibling;
-				}
-			}
-			return code;
-		}
-		
 		function run(index, init) {
 			var codeEl = document.querySelectorAll("code")[index];
-			var graphEl = document.querySelectorAll(".sysdiagram")[index];
+			var diagramEl = document.querySelectorAll(".sysdiagram")[index];
 			
 			var code = "";
 			if (init) {
-				code = getTextCode(codeEl);
+				code = sysdiagram.util.getTextCode(codeEl);
 				codeEl.innerHTML = null;
 				codeEl.style.display = "block";
 				codeEl.editor = CodeMirror(codeEl, {
@@ -235,107 +240,38 @@
 							run(index, false); 
 						},     
 					},
-					theme: "lucario",	// dracula, lesser-dark
+					theme: "idea",	// dracula, lesser-dark, lucario, bespin, ayu-mirage, idea
 				});
 				
 			} else {
 				code = codeEl.editor.getValue();
 			}
 			
-			var result = sysdiagram.render(graphEl, code, {}, function(element, graphviz) {
-				var elt = d3.select(element);
-				var nodes = elt.selectAll(".node");
-				var edges = elt.selectAll(".edge");
-				var clusters = elt.selectAll(".cluster");
-				
-				nodes.on("mouseover", mouseOver(0.2))
-				.on("mouseout", mouseOut);
-				
-				function isConnected(a, b) {
-					return a.sysdiagram_data.connectedNodes[b.key] != null || a.key == b.key;
-				}
-
-				function mouseOver(opacity) {
-					return function(event, d) {
-						nodes.style("stroke-opacity", function(o) {
-							var thisOpacity = isConnected(d, o) ? 1 : opacity;
-							return thisOpacity;
-						});
-
-						nodes.style("fill-opacity", function(o) {
-							var thisOpacity = isConnected(d, o) ? 1 : opacity;
-							return thisOpacity;
-						});
-						
-						edges.style("stroke-opacity", function(o) {
-							if (!this.path) {
-								this.path = this.querySelector("path");
-								this.polygon = this.querySelector("polygon");
-								
-								this.path_stroke = this.path.getAttribute("stroke");
-								this.polygon_stroke = this.polygon.getAttribute("stroke");
-								this.polygon_fill = this.polygon.getAttribute("fill");
-							}
-							
-							this.path.style.stroke = "blue";
-							this.polygon.style.stroke = "blue";
-							this.polygon.style.fill = "blue";
-							
-							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
-						});
-						
-						edges.style("fill-opacity", function(o){	// label color
-							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
-						});
-						
-						/*edges.style("stroke", function(o){	// label color
-							return o.key.indexOf(d.key) >= 0 ? "#0f0" : "";
-						});*/
-						
-					};
-				}
-
-				function mouseOut(event, d) {
-					nodes.style("stroke-opacity", 1);
-					nodes.style("fill-opacity", 1);
-					
-					edges.style("stroke-opacity", 1);
-					edges.style("fill-opacity", 1);
-					
-					edges.select(function(o) {
-						if (this.path) {
-							this.path.style.stroke = this.path_stroke;
-							this.polygon.style.stroke = this.polygon_stroke;
-							this.polygon.style.fill = this.polygon_fill;
-						}
-					});
-					
-					//edges.style("stroke", "");
-				}
-				
-			});
-			if (result){
-				var dot = result.dot;	// generated dot script
-				var graphviz = result.graphviz;
-			}
+			sysdiagram.render(diagramEl, code, {});
 		}
 	</script>
 </head>
 <body>
+	<div class="sysdiagram_mask"></div>
 	<h1>Sysdiagram Examples</h1>
 	
 	<h2>Table ERD</h2>
-	<div class="group">
-		<div class="codeContainer">
-			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
-			<code>
+	
+	<div class="split">
+		<div id="split-code">
+			<div class="codeContainer">
+				<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+				<code>
 <!--
+
 ctx.attributes.verbose = true
 ctx.attributes.digraph.splines = "spline"
-ctx.attributes.digraph.nodesep="0.5"
-ctx.attributes.digraph.ranksep="2"
-ctx.attributes.td.WIDTH="120px"
-ctx.attributes.td.ALIGN="left"
+ctx.attributes.digraph.nodesep = "0.5"
+ctx.attributes.digraph.ranksep = "2"
+ctx.attributes.td.WIDTH = "120px"
+ctx.attributes.td.ALIGN = "left"
+ctx.attributes.highlight.enable = true
+ctx.attributes.highlight.color = "red"
 
 var th = {BGCOLOR: "lightgray", ALIGN: "center"}
 
@@ -462,12 +398,16 @@ Diagram("장기 가입설계(청약) Data 흐름도", function() {
 		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1, constraint: false})._$(ctx.ISSU_DOC_DUE)
 	})
 }, {rankdir: "LR"})
+
 -->
-			</code>
+				</code>
+			</div>
 		</div>
-		<div class="graphContainer">
-			<button class="btn-default download badge">Image Download</button>
+		<div id="split-diagram">
+			<div class="diagramContainer">
+				<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
+		</div>
 		</div>
 	</div>
 </body>

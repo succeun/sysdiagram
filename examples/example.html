@@ -22,14 +22,14 @@
 			height: 400px !important;
 			margin-bottom: 30px;
 			font-family: Operator Mono SSm A,Operator Mono SSm B,Source Code Pro,Menlo,Consolas,Monaco,monospace !important;
-			font-size: 16px;
+			font-size: 10pt;
 		}
 		
 		.codeContainer {
 			position: relative;
 		}
 		
-		.graphContainer {
+		.diagramContainer {
 			text-align: center; 
 			border: 1px solid #444;
 			width: calc(100% - 700px);
@@ -165,8 +165,8 @@
 			for (var i = 0 ; i < codeEls.length; i++) {
 				run(i, true);
 				
-				var graphEl = document.querySelectorAll(".sysdiagram")[i];
-				graphEl.addEventListener("click", function(e) {
+				var diagramEl = document.querySelectorAll(".sysdiagram")[i];
+				diagramEl.addEventListener("click", function(e) {
 					this.classList.toggle("fullscreen");
 					document.querySelector(".sysdiagram_mask").classList.toggle("show");
 				});
@@ -193,36 +193,20 @@
 		function addButtonDownloadEvent(i) {
 			var btn = document.querySelectorAll("button.download")[i];
 			btn.addEventListener("click", function(evt) {
-				var graphEl = document.querySelectorAll(".sysdiagram")[i];
-				if (graphEl && graphEl.graphviz) {
-					graphEl.graphviz.toImage("example-" + i);
+				var diagramEl = document.querySelectorAll(".sysdiagram")[i];
+				if (diagramEl && diagramEl.graphviz) {
+					diagramEl.graphviz.toImage("example-" + i);
 				}
 			});
 		}
 		
-		function getTextCode(element) {
-			// If it is difficult to put it in a <div> like a table tag label, use <!-- --> to get the code if you put the code.
-			var code = element.textContent;
-			if (code.trim() == "") {
-				var node = element.firstChild;
-				while (node != null) {
-					if (node.nodeType == 8) {	// COMMENT_NODE
-						code = node.nodeValue;
-						break;
-					}
-					node = node.nextSibling;
-				}
-			}
-			return code;
-		}
-		
 		function run(index, init) {
 			var codeEl = document.querySelectorAll("code")[index];
-			var graphEl = document.querySelectorAll(".sysdiagram")[index];
+			var diagramEl = document.querySelectorAll(".sysdiagram")[index];
 			
 			var code = "";
 			if (init) {
-				code = getTextCode(codeEl);
+				code = sysdiagram.util.getTextCode(codeEl);
 				codeEl.innerHTML = null;
 				codeEl.style.display = "block";
 				codeEl.editor = CodeMirror(codeEl, {
@@ -246,82 +230,7 @@
 			// sysdiagram.attributes.graphviz.fit = false;
 			//sysdiagram.attributes.digraph.splines = "spline";
 			
-			var result = sysdiagram.render(graphEl, code, {}, function(element, graphviz) {
-				var elt = d3.select(element);
-				var nodes = elt.selectAll(".node");
-				var edges = elt.selectAll(".edge");
-				var clusters = elt.selectAll(".cluster");
-				
-				nodes.on("mouseover", mouseOver(0.2))
-				.on("mouseout", mouseOut);
-				
-				function isConnected(a, b) {
-					return a.sysdiagram_data.connectedNodes[b.key] != null || a.key == b.key;
-				}
-
-				function mouseOver(opacity) {
-					return function(event, d) {
-						nodes.style("stroke-opacity", function(o) {
-							var thisOpacity = isConnected(d, o) ? 1 : opacity;
-							return thisOpacity;
-						});
-
-						nodes.style("fill-opacity", function(o) {
-							var thisOpacity = isConnected(d, o) ? 1 : opacity;
-							return thisOpacity;
-						});
-						
-						edges.style("stroke-opacity", function(o) {
-							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
-						});
-						
-						edges.style("fill-opacity", function(o){	// label color
-							return o.key.indexOf(d.key) >= 0 ? 1 : opacity;
-						});
-						
-						/*edges.style("stroke", function(o){	// label color
-							return o.key.indexOf(d.key) >= 0 ? "#0f0" : "";
-						});*/
-					};
-				}
-
-				function mouseOut(event, d) {
-					nodes.style("stroke-opacity", 1);
-					nodes.style("fill-opacity", 1);
-					edges.style("stroke-opacity", 1);
-					//edges.style("stroke", "");
-				}
-				
-				/*nodes.on("click", function(event, element) {
-					//event.preventDefault();
-					//event.stopPropagation();
-					console.log("node:", element, element.sysdiagram_data);
-				});
-				
-				nodes.on("mouseover", function(event, element){
-					this.old_stroke = d3.select(this).style("stroke");
-					d3.select(this).style("stroke", "crimson");
-				})
-				.on("mouseout", function(event, element){
-					d3.select(this).style("stroke", this.old_stroke);
-				});
-				
-				edges.on("click", function(event, element) {
-					//event.preventDefault();
-					//event.stopPropagation();
-					console.log("edge:", element, element.sysdiagram_data);
-				});
-				
-				clusters.on("click", function(event, element) {
-					//event.preventDefault();
-					//event.stopPropagation();
-					console.log("cluster:", element, element.sysdiagram_data);
-				});*/
-			});
-			if (result){
-				var dot = result.dot;	// generated dot script
-				var graphviz = result.graphviz;
-			}
+			sysdiagram.render(diagramEl, code, {});
 		}
 	</script>
 </head>
@@ -348,7 +257,7 @@ Diagram("Grouped Workers", function() {
 }, {rankdir: "TB"})
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -390,7 +299,7 @@ Diagram("Clustered Web Services", function() {
 //ctx.onCompleted = function(element, graphviz) { graphviz.toImage('test') }
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -434,7 +343,7 @@ Diagram("Event Processing", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -491,7 +400,7 @@ Diagram("Message Collecting", () => {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -515,7 +424,7 @@ Diagram("Exposed Pod with 3 Replicas", () => {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -549,7 +458,7 @@ Diagram("Stateful Architecture", () => {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -602,7 +511,7 @@ Diagram("Advanced Web Service with On-Premise", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -655,7 +564,7 @@ Diagram("Advanced Web Service with On-Premise (colored)", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -686,7 +595,7 @@ Diagram("Broker Consumers", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -720,7 +629,7 @@ Diagram("Grouped Workers", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -782,7 +691,7 @@ Diagram("Organization", function() {
 		
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -808,7 +717,7 @@ Diagram("Grouped Workers", () => {
 }, {rankdir: 'TB'})
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -843,7 +752,7 @@ Diagram("Repeat Custom", () => {
 }, {rankdir: "LR" })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -895,7 +804,7 @@ Diagram("Build cloud native applications", () => {
 }, {rankdir: "LR", pad: "0.5", nodesep: "1", ranksep: "2", splines: "curved" })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -927,7 +836,7 @@ Diagram("Broker Consumers", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -962,7 +871,7 @@ Diagram("Social Media", function() {
 })
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
@@ -1036,7 +945,7 @@ Diagram("Social Media", function() {
 })	
 			</code>
 		</div>
-		<div class="graphContainer">
+		<div class="diagramContainer">
 			<button class="btn-default download badge">Image Download</button>
 			<div class="sysdiagram"></div>
 		</div>
