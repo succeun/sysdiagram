@@ -127,9 +127,9 @@ Diagram("Social Media", function() {
 })
 ```
 
-## AWS Case Study (Using DummyCluster, Dummy)
+## AWS Case Study (Using DummyCluster)
 
-?> `DummyCluster`, `Dummy` is invisible, but is a virtural cluster and node for grouping and spacing.
+?> `DummyCluster` is invisible, but is a virtural cluster for grouping.
 
 ```js
 var { Lambda, EC2 } = diagrams.aws.compute

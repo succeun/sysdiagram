@@ -95,60 +95,6 @@
 			background-color: #3F51B5;
 			border-color: #ccc;
 		}
-		
-		/*= fullscreen ==============================================================*/
-		
-		div.sysdiagram_mask {
-			position: fixed;
-			height: 100%;
-			z-index: 900;
-			background-color: #555;
-			opacity: 0.9;
-			left: 0px;
-			top: 0px;
-			width: 0%;
-		}
-
-		div.sysdiagram_mask.show {
-			width: 100%;
-		}
-		
-		div.sysdiagram[data-sysdiagram-processed=true].fullscreen {
-		  z-index: 999;
-		  position: fixed;
-		  margin: auto;
-		  width: calc(100% - 80px);
-		  height: calc(100% - 80px);
-		  left: 0;
-		  right: 0;
-		  top: 0;
-		  bottom: 0;
-		  cursor: pointer;
-		  border: 2px solid #ccc;
-		  box-shadow: 0 1px 1px rgba(0,0,0,0.5), 
-					  0 2px 2px rgba(0,0,0,0.5), 
-					  0 4px 4px rgba(0,0,0,0.5), 
-					  0 8px 8px rgba(0,0,0,0.5), 
-					  0 16px 16px rgba(0,0,0,0.5), 
-					  0 32px 32px rgba(0,0,0,0.5);
-		  min-width: calc(100% - 80px) !important;
-		  min-height: calc(100% - 80px) !important;
-		  background-color: white;
-		  border-radius: 4px;
-		}
-
-		div.sysdiagram[data-sysdiagram-processed=true].fullscreen svg {
-		  max-width: 100% !important;
-		  max-height: 100% !important;
-		  /*width: auto;*/
-		  height: auto;
-		  position: absolute;
-		  left: 50%;
-		  top: 50%;
-		  transform: translate(-50%, -50%);
-		  background-color: #fff;
-		  border-radius: 4px;
-		}
 	</style>
 	
 	<script src="https://unpkg.com/split.js/dist/split.min.js"></script>
@@ -213,18 +159,6 @@
 					if (diagramEl && diagramEl.graphviz) {
 						diagramEl.graphviz.toImage("sysdiagram-" + i);
 					}
-				});
-			});
-			
-			// fullscreen
-			var mask = document.createElement("div");
-			mask.className = "sysdiagram_mask";
-			document.body.appendChild(mask);
-			
-			document.querySelectorAll(".sysdiagram").forEach(function(el, i) {
-				el.addEventListener("click", function(e) {
-					this.classList.toggle("fullscreen");
-					document.querySelector(".sysdiagram_mask").classList.toggle("show");
 				});
 			});
 		});
@@ -990,13 +924,13 @@ Diagram("Video On Demand (VOD) solution for E-Learning", function() {
 			ctx.SLB2 = ServerLoadBalancer("Server Load Balancer")
 		})
 		
-		ctx.VFS._$(ctx.MT)
+		ctx.VFS.e({constraint: false})._$(ctx.MT)
         ctx.MT._$(ctx.DP)
 		
 		ctx.CDN = Cdn("CDN")
 		
       	ctx.VU._$(ctx.VFS)
-		ctx.VU._$(ctx.ID)
+		ctx.VU.e({constraint: false})._$(ctx.ID)
         ctx.VFS._$(ctx.CDN)
 		ctx.ID._$(ctx.DP)
 		ctx.DP._$(ctx.SLB2)
@@ -1016,6 +950,64 @@ Diagram("Video On Demand (VOD) solution for E-Learning", function() {
   
   	ctx.User2.$_(ctx.SLB3)
 })	
+			</code>
+		</div>
+		<div class="diagramContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="sysdiagram"></div>
+		</div>
+	</div>
+	
+	<h2>Test</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+ctx.attributes.graphviz.zoom = false
+			
+var { ECS, ServerLoadBalancer } = diagrams.alibabacloud.compute
+var { OSS } = diagrams.alibabacloud.storage
+var { Cdn } = diagrams.alibabacloud.network
+var { Rack } = diagrams.generic.compute	// Media Transcoding
+var { RDS } = diagrams.alibabacloud.database
+var { Usericon } = diagrams.azure.general
+
+Diagram("Video On Demand (VOD) solution for E-Learning", function() {
+    ctx.User = Usericon("User")
+	Cluster("ECS: Video Uploading", () => {
+		ctx.SLB = ServerLoadBalancer("Server Load Balancer")
+		ctx.VU = ECS("Video Uploading")
+	})
+  
+  	Cluster("Video Broadcasing", () => {
+      	ctx.VFS = OSS("OSS: Video File Storage")
+		ctx.MT = Rack("Media Transcoding")
+		ctx.DP = ECS("ECS: Data Processing")
+      	ctx.ID = RDS("RDS: Index DB")
+      	ctx.CDN = Cdn("CDN")
+		ctx.SLB2 = ServerLoadBalancer("Server Load Balancer")
+    })
+  
+  	ctx.User2 = Usericon("User")
+	
+	Cluster("Management", () => {
+		ctx.SLB3 = ServerLoadBalancer("Server Load Balancer")
+		ctx.USM = ECS("ECS: User & System Management")	
+		ctx.SD = RDS("RDS: System DB")
+    })
+  
+  	ctx.User._$(ctx.SLB)._$(ctx.VU)._$(ctx.VFS)
+  	ctx.VFS.e({constraint: false})._$(ctx.MT)
+  	ctx.VU.e({constraint: false})._$(ctx.ID)
+  	ctx.MT.e({constraint: false})._$(ctx.DP)
+  	ctx.ID.e({constraint: false})._$(ctx.DP)
+  	ctx.VFS._$(ctx.CDN)
+  	ctx.DP._$(ctx.SLB2)
+  	ctx.CDN._$(ctx.User2)
+    ctx.SLB3.$_(ctx.USM).$_(ctx.SD)
+  	ctx.User2.$_(ctx.SLB3)
+  	ctx.SLB2.e({constraint: false})._$(ctx.User2)
+})
 			</code>
 		</div>
 		<div class="diagramContainer">

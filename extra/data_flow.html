@@ -94,61 +94,7 @@
 			color: #fff;
 			background-color: #3F51B5;
 			border-color: #ccc;
-		}
-		
-		/*= fullscreen ==============================================================*/
-		
-		div.sysdiagram_mask {
-			position: fixed;
-			height: 100%;
-			z-index: 900;
-			background-color: #555;
-			opacity: 0.9;
-			left: 0px;
-			top: 0px;
-			width: 0%;
-		}
-
-		div.sysdiagram_mask.show {
-			width: 100%;
-		}
-		
-		div.sysdiagram[data-sysdiagram-processed=true].fullscreen {
-		  z-index: 999;
-		  position: fixed;
-		  margin: auto;
-		  width: calc(100% - 80px);
-		  height: calc(100% - 80px);
-		  left: 0;
-		  right: 0;
-		  top: 0;
-		  bottom: 0;
-		  cursor: pointer;
-		  border: 2px solid #ccc;
-		  box-shadow: 0 1px 1px rgba(0,0,0,0.5), 
-					  0 2px 2px rgba(0,0,0,0.5), 
-					  0 4px 4px rgba(0,0,0,0.5), 
-					  0 8px 8px rgba(0,0,0,0.5), 
-					  0 16px 16px rgba(0,0,0,0.5), 
-					  0 32px 32px rgba(0,0,0,0.5);
-		  min-width: calc(100% - 80px) !important;
-		  min-height: calc(100% - 80px) !important;
-		  background-color: white;
-		  border-radius: 4px;
-		}
-
-		div.sysdiagram[data-sysdiagram-processed=true].fullscreen svg {
-		  max-width: 100% !important;
-		  max-height: 100% !important;
-		  /*width: auto;*/
-		  height: auto;
-		  position: absolute;
-		  left: 50%;
-		  top: 50%;
-		  transform: translate(-50%, -50%);
-		  background-color: #fff;
-		  border-radius: 4px;
-		}
+		}		
 	</style>
 	
 	<script src="https://unpkg.com/split.js/dist/split.min.js"></script>
@@ -217,18 +163,6 @@
 					}
 				});
 			});
-			
-			// fullscreen
-			var mask = document.createElement("div");
-			mask.className = "sysdiagram_mask";
-			document.body.appendChild(mask);
-			
-			document.querySelectorAll(".sysdiagram").forEach(function(el, i) {
-				el.addEventListener("click", function(e) {
-					this.classList.toggle("fullscreen");
-					document.querySelector(".sysdiagram_mask").classList.toggle("show");
-				});
-			});
 		});
 		
 		function run(index) {
@@ -240,11 +174,11 @@
 			//sysdiagram.attributes.graphviz.fit = false;
 			//sysdiagram.attributes.digraph.splines = "spline";
 			
-			try {
+			//try {
 				sysdiagram.render(diagramEl, code, {});
-			} catch (e) {
-				alert(e.message + "\n" + e.detail);
-			}
+			//} catch (e) {
+				//alert(e.message + "\n" + e.detail);
+			//}
 		}
 	</script>
 </head>
@@ -257,13 +191,13 @@
 			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
 			<code>
 <!--
-
+ctx.attributes.graphviz.zoom = false
 ctx.attributes.verbose = true
 ctx.attributes.digraph.splines = "spline"
 ctx.attributes.digraph.nodesep = "0.5"
 ctx.attributes.digraph.ranksep = "2"
-ctx.attributes.td.WIDTH = "120px"
-ctx.attributes.td.ALIGN = "left"
+ctx.attributes.td.width = "120px"
+ctx.attributes.td.align = "left"
 
 var th = {BGCOLOR: "lightgray", ALIGN: "center"}
 
@@ -285,7 +219,6 @@ Diagram("장기 가입설계(청약) Data 흐름도", function() {
 			ctx.TEMP_PARTY_INAG_RL = Table().td("간이설계 당/보<BR/>TEMP_PARTY_INAG_RL", th).td("계약자").td("피보험자")
 			ctx.PLAN_TEMT_PARTY.e({sport: 1, eport: 1})._(ctx.TEMP_PARTY_INAG_RL)
 			ctx.PLAN_TEMT_PARTY.e({sport: 2, eport: 2})._(ctx.TEMP_PARTY_INAG_RL)
-			Custom("가입설계시 실명확인이 되지 않은 당사자 사항은 간이설계 당사자 Table에 저장됨")
 		})
 	})
 	
@@ -389,7 +322,7 @@ Diagram("장기 가입설계(청약) Data 흐름도", function() {
 		ctx.ISSU_DOC_DUE = Table().td("증권발행<BR/>ISSU_DOC_DUE", th).td("재발행서류 예정")
 		ctx.INSURANCE_AGMT.e({sport: 1, eport: 1, constraint: false})._(ctx.ISSU_DOC_DUE)
 	})
-}, {rankdir: "LR"})
+})
 
 -->
 			</code>
