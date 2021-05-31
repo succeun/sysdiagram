@@ -832,7 +832,7 @@ var { GenericDatabase, InternetAlt1 } = diagrams.aws.general
 
 Diagram("Social Media", function() {
 	ctx.CF = CloudFront("Amazon\nCloudFront", {height: 2.5})
-	Lambda("AWS\nLamda@Edge", {height: 2.5}).e({constraint: true}).$_$(ctx.CF)
+	Lambda("AWS\nLamda@Edge", {height: 2.5}).$_$(ctx.CF)
 	Cluster("  🏪 AWS Clound", () => {
 		ctx.S3 = SimpleStorageServiceS3("Amazon S3")
 		ctx.lambda = Lambda("Amazon\nLambda", {height: 2.5})
@@ -841,7 +841,7 @@ Diagram("Social Media", function() {
 		
 		Cluster("  📗 VPC", () => {
 			ctx.ELB = ELB("ELB")
-			ctx.CF.e({constraint: true})._$(ctx.ELB)
+			ctx.CF._$(ctx.ELB)
 			DummyCluster(()=> {
 				Cluster("  📗 Web subsets", ()=> {
 					ctx.FSG = EC2("Front Server Group")
@@ -893,72 +893,7 @@ Diagram("Social Media", function() {
 		</div>
 	</div>
 	
-	<h2>Alibaba Cloud E-Learning VOD Solution</h2>
-	<div class="group">
-		<div class="codeContainer">
-			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
-			<code>
-var { ECS, ServerLoadBalancer } = diagrams.alibabacloud.compute
-var { OSS } = diagrams.alibabacloud.storage
-var { Cdn } = diagrams.alibabacloud.network
-var { Rack } = diagrams.generic.compute	// Media Transcoding
-var { RDS } = diagrams.alibabacloud.database
-var { Usericon } = diagrams.azure.general
-
-Diagram("Video On Demand (VOD) solution for E-Learning", function() {
-  	ctx.User = Usericon("User")
-    Cluster("ECS: Video Uploading", () => {
-		ctx.VU = ECS("Video Uploading")
-		ctx.SLB = ServerLoadBalancer("Server Load Balancer")
-		
-		ctx.User._$(ctx.SLB)._$(ctx.VU)
-	})
-  
-  	Cluster("Video Broadcasing", () => {
-      	ctx.VFS = OSS("OSS: Video File Storage")
-      	ctx.ID = RDS("RDS: Index DB")
-		
-		DummyCluster(()=> {
-			ctx.MT = Rack("Media Transcoding")
-			ctx.DP = ECS("ECS: Data Processing")
-			ctx.SLB2 = ServerLoadBalancer("Server Load Balancer")
-		})
-		
-		ctx.VFS.e({constraint: false})._$(ctx.MT)
-        ctx.MT._$(ctx.DP)
-		
-		ctx.CDN = Cdn("CDN")
-		
-      	ctx.VU._$(ctx.VFS)
-		ctx.VU.e({constraint: false})._$(ctx.ID)
-        ctx.VFS._$(ctx.CDN)
-		ctx.ID._$(ctx.DP)
-		ctx.DP._$(ctx.SLB2)
-    })
-	
-	ctx.User2 = Usericon("User")
-	ctx.CDN.e({constraint: false})._$(ctx.User2)
-  	ctx.SLB2._$(ctx.User2)
-  
-	Cluster("Management", () => {
-		ctx.SLB3 = ServerLoadBalancer("Server Load Balancer")
-		ctx.USM = ECS("ECS: User & System Management")	
-		ctx.SD = RDS("RDS: System DB")
-		
-		ctx.SLB3.$_(ctx.USM).$_(ctx.SD)
-    })
-  
-  	ctx.User2.$_(ctx.SLB3)
-})	
-			</code>
-		</div>
-		<div class="diagramContainer">
-			<button class="btn-default download badge">Image Download</button>
-			<div class="sysdiagram"></div>
-		</div>
-	</div>
-	
-	<h2>Test</h2>
+	<h2>Alibaba, Cloud E-Learning VOD Solution</h2>
 	<div class="group">
 		<div class="codeContainer">
 			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
@@ -1007,6 +942,115 @@ Diagram("Video On Demand (VOD) solution for E-Learning", function() {
     ctx.SLB3.$_(ctx.USM).$_(ctx.SD)
   	ctx.User2.$_(ctx.SLB3)
   	ctx.SLB2.e({constraint: false})._$(ctx.User2)
+})
+			</code>
+		</div>
+		<div class="diagramContainer">
+			<button class="btn-default download badge">Image Download</button>
+			<div class="sysdiagram"></div>
+		</div>
+	</div>
+	
+	<h2>AWS, Smart Products Platform</h2>
+	<div class="group">
+		<div class="codeContainer">
+			<button class="btn-default run badge">Run(Ctrl-Enter)</button>
+			<code>
+ctx.attributes.digraph.nodesep = 1.2
+ctx.attributes.digraph.ranksep = 1
+			
+var { IotAlexaEnabledDevice, IotCore, IotDeviceDefender, IotAnalytics } = diagrams.aws.iot
+var { Lambda } = diagrams.aws.compute
+var { SNS } = diagrams.aws.integration
+var { Quicksight } = diagrams.aws.analytics
+var { Dynamodb } = diagrams.aws.database
+var { SimpleStorageServiceS3 } = diagrams.aws.storage
+var { CloudFront, APIGateway } = diagrams.aws.network
+var { Amplify } = diagrams.aws.mobile
+var { Cognito } = diagrams.aws.security
+var { Users } = diagrams.onprem.client
+
+Diagram("Video On Demand (VOD) solution for E-Learning", function() {
+    Cluster("CONNECTED DEVICES", () => {
+		ctx.Devices = [IotAlexaEnabledDevice(), 
+					   IotAlexaEnabledDevice(), 
+					   IotAlexaEnabledDevice()]
+    })
+	
+  	DummyCluster(() => {
+		Cluster("COMMAND STATUS", () => {
+			ctx.CS = Lambda()
+		})
+
+		Cluster("", () => {
+			ctx.IC = IotCore("IoT Core")
+		})
+
+		Cluster("JUST-IN-TIME REGISTRATION", () => {
+			ctx.JITR = Lambda()
+		})
+    })
+  
+  	DummyCluster(() => {
+		DummyCluster(() => {
+			Cluster("DEVICE DEFENDER", () => {
+				ctx.IDD = IotDeviceDefender("IoT Device Defender")
+				ctx.IDD._$(SNS())
+			})
+
+			Cluster("TELEMETRY ANALYTICS PIPELINE", () => {
+				ctx.IA = IotAnalytics("IoT Analytics")
+				ctx.IA._$(Quicksight())
+			})
+
+			Cluster("MESSAGE PROXY", () => {
+				ctx.MP = Lambda()
+			})
+
+			Cluster("PRODUCT DATA", () => {
+				ctx.PD = Dynamodb()
+			})
+
+			Cluster("NOTIFICATIONS", () => {
+				ctx.NF = Lambda()
+				ctx.NF._$(SNS())
+			})
+		})
+
+		DummyCluster(() => {
+			Cluster("WEB CONSOLE", () => {
+				ctx.S3 = SimpleStorageServiceS3("S3")
+				ctx.AMP = Amplify()
+				ctx.CF = CloudFront()
+				ctx.S3.$_(ctx.CF)
+				ctx.S3.e({constraint: false})._$(ctx.AMP)
+			})
+
+			Cluster("AUTHENTICATION", () => {
+				ctx.AG = APIGateway("API Gateway")
+				ctx.AU = Lambda()
+				ctx.AG.$_(Cognito())
+				ctx.AG.e({constraint: false})._$(ctx.AU)
+			})
+		})
+    })
+	
+	ctx.Users = Users()
+	
+	ctx.Devices._$(ctx.IC)
+  	ctx.CS.e({constraint: false}).$_$(ctx.IC)
+  	ctx.IC.e({constraint: false}).$_$(ctx.JITR)
+  	ctx.IC.$_$(ctx.IDD)
+  	ctx.IC.$_$(ctx.IA)
+  	ctx.IC.$_$(ctx.MP)
+  	ctx.MP.$_$(ctx.PD)
+  	ctx.MP.e({constraint: false}).$_$(ctx.NF)
+	
+  	
+	ctx.AMP.e({constraint: false}).$_$(ctx.AG)
+  	ctx.IC.e({constraint: false}).$_$(ctx.AU)
+  	ctx.PD.$_$(ctx.AU)
+	ctx.CF.$_(ctx.Users)
 })
 			</code>
 		</div>
