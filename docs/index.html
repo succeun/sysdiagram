@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   
   <style>
+	main {
+	  z-index: unset;
+	}
+	
     .sysdiagram {
 	  text-align: center;
 	  border: 1px solid #aaa;
@@ -100,7 +104,12 @@
 			});
 
 			hook.doneEach(function () {
-				sysdiagram.init({}, '.sysdiagram');
+				var attrs = {
+					fullscreen: {
+						enable: true
+					}
+				};
+				sysdiagram.init(attrs, '.sysdiagram');
 			});
 		},
 		function(hook) {
