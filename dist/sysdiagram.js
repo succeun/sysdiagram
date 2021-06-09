@@ -1,5 +1,5 @@
 //! sysdiagram.js
-//! version : 0.1.22
+//! version : 0.1.23
 //! authors : Jeong-Ho, Eun
 //! license : MIT
 //! https://succeun.github.io/sysdiagram
@@ -136,7 +136,7 @@
 			shadow: true,
 		},
 		fullscreen: {
-			enable: true,
+			enable: false,
 			event: "click",
 			css: {
 				".sysdiagram_mask": {
