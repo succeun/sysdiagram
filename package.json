@@ -1,7 +1,7 @@
 {
 	"name": "sysdiagram",
-	"version": "0.1.22",
-	"description": "Sysdiagram draw the system architecture using JavaScript.",
+	"version": "0.1.21",
+	"description": "Diagram the system architecture using JavaScript syntax.",
 	"main": "dist/sysdiagram.js",
 	"unpkg": "dist/sysdiagram.min.js",
 	"files": [
@@ -41,9 +41,9 @@
 		"concat": "^1.0.3",
 		"http-server": "^0.12.3",
 		"replace-in-file": "^6.2.0",
-		"d3": "6.7.0",
-		"@hpcc-js/wasm": "1.5.2",
-		"d3-graphviz": "4.0.0",
-		"canvg": "3.0.7"
+		"d3": "^6.7.0",
+		"@hpcc-js/wasm": "^1.5.2",
+		"d3-graphviz": "^4.0.0",
+		"canvg": "^3.0.7"
 	}
 }
