@@ -1,12 +1,10 @@
 # About
 
-**Diagram the system architecture using JavaScript syntax.**
+**Sysdiagram draw the system architecture using JavaScript.**
 
 [![npm version](https://img.shields.io/npm/v/sysdiagram.svg?style=flat)](https://www.npmjs.com/package/sysdiagram)
 [![unpkg](http://img.badgesize.io/https://unpkg.com/sysdiagram/dist/sysdiagram.js?compression=gzip&label=unpkg&style=flat&cache=false)](https://unpkg.com/sysdiagram/dist/sysdiagram.js)
 [![unpkg min](https://img.badgesize.io/https:/unpkg.com/sysdiagram/dist/sysdiagram.min.js?label=unpkg%20min&compression=gzip&cache=false&style=flat)](https://unpkg.com/sysdiagram/dist/sysdiagram.min.js)
-
-Sysdiagram was developed inspired by [Diagrams using Python](https://diagrams.mingrammer.com/), thanks to [mingrammer(MinJae Kwon)](https://github.com/mingrammer).
 
 It is a Javascript based diagramming tool that renders text like Markdown definitions to create and modify diagrams dynamically. 
 
@@ -36,12 +34,12 @@ It can insert a `script` tag with an absolute address and a `sysdiagram` call in
 
 ```html
 <!-- canvg for converting image (Optional) -->
-<script src="https://unpkg.com/canvg@^3.0.7/lib/umd.js"></script> 
+<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
 <!-- d3 & d3-graphviz (Mandatory) -->
-<script src="https://unpkg.com/d3@^6.7.0/dist/d3.min.js"></script>
-<script src="https://unpkg.com/@hpcc-js/wasm@^1.5.2/dist/index.min.js"></script>
-<script src="https://unpkg.com/d3-graphviz@^4.0.0/build/d3-graphviz.js"></script>
+<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
+<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
+<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 
 <!-- sysdiagram (latest) -->
 <script src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
@@ -79,12 +77,12 @@ Below is the most basic and simple example html.
 <html>
 <head>
 	<!-- canvg for converting image (Optional) -->
-	<script src="https://unpkg.com/canvg@^3.0.7/lib/umd.js"></script> 
+	<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
 
 	<!-- d3 & d3-graphviz (Mandatory) -->
-	<script src="https://unpkg.com/d3@^6.7.0/dist/d3.min.js"></script>
-	<script src="https://unpkg.com/@hpcc-js/wasm@^1.5.2/dist/index.min.js"></script>
-	<script src="https://unpkg.com/d3-graphviz@^4.0.0/build/d3-graphviz.js"></script>
+	<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
+	<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
+	<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 
 	<!-- sysdiagram (latest) -->
 	<script src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
