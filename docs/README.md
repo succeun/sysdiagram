@@ -1,6 +1,6 @@
 # About Sysdiagram
 
-**Diagram the system architecture using JavaScript syntax.**
+**Sysdiagram draw the system architecture using JavaScript.**
 
 Sysdiagram was developed inspired by [Diagrams using Python](https://diagrams.mingrammer.com/), thanks to [mingrammer(MinJae Kwon)](https://github.com/mingrammer).
 
