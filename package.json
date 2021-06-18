@@ -2,18 +2,16 @@
 	"name": "sysdiagram",
 	"version": "0.1.23",
 	"description": "Sysdiagram draw the system architecture using JavaScript.",
-	"main": "dist/sysdiagram.js",
-	"unpkg": "dist/sysdiagram.min.js",
+	"main": "dist/sysdiagram.bundle.js",
+	"unpkg": "dist/sysdiagram.min.bundle.js",
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"version": "node ./lib/version.js",
-		"minify": "minify ./lib/sysdiagram.js > ./dist/sysdiagram.min.js",
-		"concat": "concat -o ./dist/sysdiagram.js ./lib/sysdiagram.js",
 		"docs": "docsify serve ./docs",
-		"dev": "http-server -p 4000",
-		"build": "npm run concat && npm run minify && npm run version"
+		"dev": "http-server -p 40000",
+		"build": "webpack && npm run copy:wasm",
+		"copy:wasm": "cpx -p node_modules/d3-graphviz/node_modules/@hpcc-js/wasm/dist/graphvizlib.wasm ./dist"
 	},
 	"repository": {
 		"type": "git",
@@ -37,13 +35,19 @@
 	"homepage": "https://succeun.github.io/sysdiagram",
 	"dependencies": {
 		"docsify": "^4.4.3",
-		"minify": "^4.1.1",
-		"concat": "^1.0.3",
 		"http-server": "^0.12.3",
-		"replace-in-file": "^6.2.0",
 		"d3": "6.7.0",
 		"@hpcc-js/wasm": "1.5.2",
 		"d3-graphviz": "4.0.0",
 		"canvg": "3.0.7"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.14.6",
+		"@babel/preset-env": "^7.14.5",
+		"babel-loader": "^8.2.2",
+		"clean-webpack-plugin": "^4.0.0-alpha.0",
+		"cpx": "^1.5.0",
+		"webpack": "^5.39.1",
+		"webpack-cli": "^4.7.2"
 	}
 }
