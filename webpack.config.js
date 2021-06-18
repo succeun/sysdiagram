@@ -8,8 +8,8 @@ var pkgson = require('./package.json');
 module.exports = {
     mode: 'none',    // none, development, production
     entry: {
-        sysdiagram: "./src/sysdiagram.js",
-        "sysdiagram.min": "./src/sysdiagram.js",
+        sysdiagram: './src/sysdiagram.js',
+        'sysdiagram.min': './src/sysdiagram.js',
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -56,5 +56,16 @@ module.exports = {
     resolve: {
       modules: ['node_modules'],
       extensions: ['.js', '.json', '.jsx', '.css'],
+    },
+    devServer: {
+        host : 'localhost',
+        contentBase: path.join(__dirname, '/'),
+        compress: true,
+        hot : true,
+        inline: true,
+        port: 9000,
+        open : true,
+        index: 'index.html',
+        writeToDisk: true,
     },
 };

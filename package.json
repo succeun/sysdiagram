@@ -11,7 +11,8 @@
 		"docs": "docsify serve ./docs",
 		"dev": "http-server -p 40000",
 		"build": "webpack && npm run copy:wasm",
-		"copy:wasm": "cpx -p node_modules/d3-graphviz/node_modules/@hpcc-js/wasm/dist/graphvizlib.wasm ./dist"
+		"copy:wasm": "cpx -p node_modules/d3-graphviz/node_modules/@hpcc-js/wasm/dist/graphvizlib.wasm ./dist",
+		"svc": "webpack serve"
 	},
 	"repository": {
 		"type": "git",
