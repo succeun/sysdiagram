@@ -1,5 +1,5 @@
 import Canvg from 'canvg';
-import * as d3 from 'd3';
+import * as d3 from 'd3-selection';
 import * as d3Graphviz from 'd3-graphviz';
 const _ = d3Graphviz.graphviz;
 
@@ -120,6 +120,8 @@ var defaultAttrs = {
 		fit: true, 
 		engine: "dot",				// circo, dot (default), fdp, neato, osage, patchwork, twopi
 		zoom: true,					// drag & zoom enable/disable
+		useWorker: false,
+		useSharedWorker: false,
 	},
 	iconSize: {
 		width: "256px",
@@ -137,7 +139,7 @@ var defaultAttrs = {
 		shadow: true,
 	},
 	fullscreen: {
-		enable: false,
+		enable: true,
 		event: "click",
 		css: {
 			".sysdiagram_mask": {
@@ -819,10 +821,6 @@ function generate(scriptOrFunction) {
 	
 	reset();
 	
-	if (ctx.attributes.fullscreen.enable) {
-		initFullscreen();
-	}
-	
 	try {
 		ctx.eval(script);
 	} catch(e) {
@@ -832,6 +830,10 @@ function generate(scriptOrFunction) {
 		} else {
 			throw e;
 		}
+	}
+	
+	if (ctx.attributes.fullscreen.enable) {
+		initFullscreen();
 	}
 	
 	var dot = generateDot();

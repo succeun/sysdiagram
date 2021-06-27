@@ -11,8 +11,7 @@
 		"docs": "docsify serve ./docs",
 		"dev": "http-server -p 40000",
 		"build": "webpack && npm run copy:wasm",
-		"copy:wasm": "cpx -p node_modules/d3-graphviz/node_modules/@hpcc-js/wasm/dist/graphvizlib.wasm ./dist",
-		"svc": "webpack serve"
+		"copy:wasm": "cpx -p node_modules/d3-graphviz/node_modules/@hpcc-js/wasm/dist/graphvizlib.wasm ./dist"
 	},
 	"repository": {
 		"type": "git",
@@ -35,12 +34,9 @@
 	},
 	"homepage": "https://succeun.github.io/sysdiagram",
 	"dependencies": {
-		"docsify": "^4.4.3",
-		"http-server": "^0.12.3",
+		"canvg": "3.0.7",
 		"d3": "6.7.0",
-		"@hpcc-js/wasm": "1.5.2",
-		"d3-graphviz": "4.0.0",
-		"canvg": "3.0.7"
+		"d3-graphviz": "4.0.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.14.6",
@@ -48,6 +44,8 @@
 		"babel-loader": "^8.2.2",
 		"clean-webpack-plugin": "^4.0.0-alpha.0",
 		"cpx": "^1.5.0",
+		"docsify": "^4.4.3",
+		"http-server": "^0.12.3",
 		"webpack": "^5.39.1",
 		"webpack-cli": "^4.7.2"
 	}

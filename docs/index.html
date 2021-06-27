@@ -73,20 +73,6 @@
 		function(hook, vm) {
 			hook.afterEach(function (html, next) {
 				// We load the HTML inside a DOM node to allow for manipulation
-				/*var htmlElement = document.createElement('div');
-				htmlElement.innerHTML = html;
-
-				htmlElement.querySelectorAll('pre[data-lang=sysdiagram]').forEach((element, index) => {
-					// Create a <div class="sysdiagram"> to replace the <pre> 
-					var replacement = document.createElement('div');
-					replacement.textContent = element.textContent;
-					replacement.classList.add('sysdiagram');
-
-					// Replace
-					element.parentNode.replaceChild(replacement, element);
-				});*/
-				
-				// We load the HTML inside a DOM node to allow for manipulation
 				var htmlElement = document.createElement('div');
 				htmlElement.innerHTML = html;
 				
