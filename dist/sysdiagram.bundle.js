@@ -37540,7 +37540,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 function getDiagramResources() {
   var resources = {
-    baseUrl: "https://cdn.jsdelivr.net/gh/mingrammer/diagrams/resources/",
+    baseUrl: "https://raw.githubusercontent.com/mingrammer/diagrams/master/resources/",
     alibabacloud: {
       analytics: {
         AnalyticDb: "analytic-db.png",
@@ -38341,7 +38341,7 @@ function getDiagramResources() {
         MachineLearningStudioWorkspaces: "machine-learning-studio-workspaces.png"
       },
       mobile: {
-        AppServiceMobile: "app-service---mobile.png",
+        AppServiceMobile: "app-service-mobile.png",
         MobileEngagement: "mobile-engagement.png",
         NotificationHubs: "notification-hubs.png"
       },
@@ -38977,6 +38977,7 @@ function getDiagramResources() {
         Ansible: "ansible.png",
         Atlantis: "atlantis.png",
         Awx: "awx.png",
+        Puppet: "puppet.png",
         Terraform: "terraform.png"
       },
       identity: {
@@ -39001,6 +39002,7 @@ function getDiagramResources() {
       monitoring: {
         Cortex: "cortex.png",
         Datadog: "datadog.png",
+        Dynatrace: "dynatrace.png",
         Grafana: "grafana.png",
         Humio: "humio.png",
         Newrelic: "newrelic.png",
@@ -39037,6 +39039,7 @@ function getDiagramResources() {
         Powerdns: "powerdns.png",
         Tomcat: "tomcat.png",
         Traefik: "traefik.png",
+        Tyk: "tyk.png",
         Vyos: "vyos.png",
         Wildfly: "wildfly.png",
         Zookeeper: "zookeeper.png"
@@ -39072,7 +39075,8 @@ function getDiagramResources() {
         Git: "git.png",
         Gitea: "gitea.png",
         Github: "github.png",
-        Gitlab: "gitlab.png"
+        Gitlab: "gitlab.png",
+        Svn: "svn.png"
       },
       workflow: {
         Airflow: "airflow.png",
@@ -39358,8 +39362,8 @@ function getDiagramResources() {
       "compute": {
         BareMetalServer: "bare-metal-server.png",
         ImageService: "image-service.png",
-        Instance: "Instance.png",
-        Key: "Key.png",
+        Instance: "instance.png",
+        Key: "key.png",
         PowerInstance: "power-instance.png"
       },
       "data": {
@@ -39395,14 +39399,14 @@ function getDiagramResources() {
         Cloudant: "cloudant.png",
         CognitiveServices: "cognitive-services.png",
         DataSecurity: "data-security.png",
-        Enterprise: "Enterprise.png",
+        Enterprise: "enterprise.png",
         GovernanceRiskCompliance: "governance-risk-compliance.png",
         IBMContainers: "ibm-containers.png",
         IBMPublicCloud: "ibm-public-cloud.png",
         IdentityAccessManagement: "identity-access-management.png",
         IdentityProvider: "identity-provider.png",
         InfrastructureSecurity: "infrastructure-security.png",
-        Internet: "Internet.png",
+        Internet: "internet.png",
         IotCloud: "iot-cloud.png",
         MicroservicesApplication: "microservices-application.png",
         MicroservicesMesh: "microservices-mesh.png",
@@ -39456,24 +39460,24 @@ function getDiagramResources() {
         ServiceManagementTools: "service-management-tools.png"
       },
       "network": {
-        Bridge: "Bridge.png",
+        Bridge: "bridge.png",
         DirectLink: "direct-link.png",
-        Enterprise: "Enterprise.png",
-        Firewall: "Firewall.png",
+        Enterprise: "rnterprise.png",
+        Firewall: "firewall.png",
         FloatingIp: "floating-ip.png",
-        Gateway: "Gateway.png",
+        Gateway: "gateway.png",
         InternetServices: "internet-services.png",
         LoadBalancerListener: "load-balancer-listener.png",
         LoadBalancerPool: "load-balancer-pool.png",
         LoadBalancer: "load-balancer.png",
         LoadBalancingRouting: "load-balancing-routing.png",
         PublicGateway: "public-gateway.png",
-        Region: "Region.png",
-        Router: "Router.png",
-        Rules: "Rules.png",
-        Subnet: "Subnet.png",
+        Region: "region.png",
+        Router: "router.png",
+        Rules: "rules.png",
+        Subnet: "subnet.png",
         TransitGateway: "transit-gateway.png",
-        Vpc: "VPC.png",
+        Vpc: "vpc.png",
         VpnConnection: "vpn-connection.png",
         VpnGateway: "vpn-gateway.png",
         VpnPolicy: "vpn-policy.png"
@@ -40638,7 +40642,7 @@ var defaultAttrs = {
       ".sysdiagram_mask.show": {
         "width": "100%"
       },
-      ".sysdiagram[data-sysdiagram-processed=true].fullscreen": {
+      "[data-sysdiagram-processed=true].fullscreen": {
         "z-index": "999",
         "position": "fixed",
         "margin": "auto",
@@ -40656,10 +40660,10 @@ var defaultAttrs = {
         "background-color": "white",
         "border-radius": "4px"
       },
-      ".sysdiagram[data-sysdiagram-processed=true].fullscreen svg": {
+      "[data-sysdiagram-processed=true].fullscreen svg": {
         "max-width": "100% !important",
         "max-height": "100% !important",
-        "height": "auto",
+        //"height": "auto",
         "position": "absolute",
         "left": "50%",
         "top": "50%",
@@ -41379,7 +41383,7 @@ function generate(scriptOrFunction) {
   reset();
 
   try {
-    ctx.eval(script);
+    ctx['eval'](script);
   } catch (e) {
     printError(e, script);
 
@@ -41595,7 +41599,7 @@ function initialize(attributes, callbackFunc) {
   if (startOnLoad) {
     if (!isLoaded) {
       window.addEventListener('DOMContentLoaded', function (event) {
-        init(attributes, selector);
+        init(selector, attributes);
       });
     } else {
       console.warn("Sysdiagram is already running on load.");
@@ -41603,25 +41607,46 @@ function initialize(attributes, callbackFunc) {
 
     isLoaded = true;
   } else {
-    init(attributes, selector, callbackFunc);
+    init(selector, attributes, callbackFunc);
   }
 }
 
-function init(attributes, selector, callbackFunc) {
+function init(selector, attributes, callbackFunc) {
   // Change default attributes
   defaultAttrs = mergeAttrs(defaultAttrs, attributes);
-  var diagrams = document.querySelectorAll(selector);
+  var elements = document.querySelectorAll(selector);
 
-  for (var i = 0; i < diagrams.length; i++) {
-    var diagram = diagrams[i];
-    var code = getTextCode(diagram);
-    diagram.innerHTML = "";
-    render(diagram, code, {}, function (element, graphviz) {
+  for (var i = 0; i < elements.length; i++) {
+    var element = elements[i];
+    var code = getTextCode(element);
+
+    if (!code) {
+      code = element.getAttribute("data-sysdiagram-function");
+      code = window[code]; // get function object from function name(string)
+    }
+
+    if (!code) {
+      throw new Error("Not found script code from inner html or attribute.");
+    }
+
+    element.innerHTML = "";
+    render(element, code, {}, function (element, graphviz) {
       if (callbackFunc) {
         callbackFunc(element, graphviz);
       }
     });
   }
+}
+
+function initWithCode(code, selector, attributes, callbackFunc) {
+  // Change default attributes
+  defaultAttrs = mergeAttrs(defaultAttrs, attributes);
+  var element = typeof selector == "string" ? document.querySelector(selector) : selector;
+  render(element, code, {}, function (element, graphviz) {
+    if (callbackFunc) {
+      callbackFunc(element, graphviz);
+    }
+  });
 } ///////////////////////////////////////////////////////////////////////////
 // Load Resources
 
@@ -41632,7 +41657,7 @@ function loadResources(resourceJson, baseUrl) {
   if (!isLoadedResources) {
     resourceJson = resourceJson || _sysdiagram_resources__WEBPACK_IMPORTED_MODULE_2__.default;
     baseUrl = baseUrl || _sysdiagram_resources__WEBPACK_IMPORTED_MODULE_2__.default.baseUrl;
-    var baseUrl = baseUrl || "https://github.com/mingrammer/diagrams/raw/master/resources";
+    var baseUrl = baseUrl || "https://raw.githubusercontent.com/mingrammer/diagrams/master/resources";
     baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
 
     for (var x in resourceJson) {
@@ -41972,9 +41997,10 @@ function addCSSRule(rule) {
 
 
 var sysdiagram = {
-  version: "0.1.23",
+  version: "0.1.24",
   initialize: initialize,
   init: init,
+  initWithCode: initWithCode,
   loadResources: loadResources,
   attributes: defaultAttrs,
   generate: generate,

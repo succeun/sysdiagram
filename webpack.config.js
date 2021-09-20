@@ -50,6 +50,7 @@ module.exports = {
         minimizer: [
             new TerserPlugin({
                 test: /\.min\.js(\?.*)?$/i,
+                extractComments: false,
             }),
         ],
     },

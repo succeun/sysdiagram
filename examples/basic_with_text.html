@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../dist/sysdiagram.bundle.js"></script>
+<head>
+<body>
+	<div class="sample"></div>
+	<script>
+		var content = `
+			var EC2 = diagrams.aws.compute.EC2
+			var RDS = diagrams.aws.database.RDS
+			var ELB = diagrams.aws.network.ELB
+
+			Diagram("Web Service", function() {
+				ELB("lb")._$(EC2("web"))._$(RDS("userdb"))
+			})
+		`;
+
+		sysdiagram.initWithCode(content, '.sample', {
+			fullscreen : {enable : false }
+		});
+	</script>
+</body>
+</html>

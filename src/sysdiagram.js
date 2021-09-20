@@ -155,7 +155,7 @@ var defaultAttrs = {
 			".sysdiagram_mask.show": {
 				"width": "100%"
 			},
-			".sysdiagram[data-sysdiagram-processed=true].fullscreen": {
+			"[data-sysdiagram-processed=true].fullscreen": {
 				"z-index": "999",
 				"position": "fixed",
 				"margin": "auto",
@@ -173,10 +173,10 @@ var defaultAttrs = {
 				"background-color": "white",
 				"border-radius": "4px",
 			},
-			".sysdiagram[data-sysdiagram-processed=true].fullscreen svg": {
+			"[data-sysdiagram-processed=true].fullscreen svg": {
 				"max-width": "100% !important",
 				"max-height": "100% !important",
-				"height": "auto",
+				//"height": "auto",
 				"position": "absolute",
 				"left": "50%",
 				"top": "50%",
@@ -215,15 +215,15 @@ var context = {
 
 var ctx = new Proxy(context, {
 	get: function(target, prop) {
-	return Reflect.get(target, prop);
+		return Reflect.get(target, prop);
 	},
 	set: function(target, prop, value) {
-	if (prop) {
-		if (Array.isArray(value)) {
-			value = ArrayNode(value);
+		if (prop) {
+			if (Array.isArray(value)) {
+				value = ArrayNode(value);
+			}
 		}
-	}
-	return Reflect.set(target, prop, value);
+		return Reflect.set(target, prop, value);
 	}
 });
 
@@ -822,7 +822,7 @@ function generate(scriptOrFunction) {
 	reset();
 	
 	try {
-		ctx.eval(script);
+		ctx['eval'](script);
 	} catch(e) {
 		printError(e, script);
 		if (ctx.onErrorOccurred) {
@@ -1033,34 +1033,53 @@ function initialize(attributes, callbackFunc) {
 	if (startOnLoad) {
 		if (!isLoaded) {
 			window.addEventListener('DOMContentLoaded', function(event) {
-				init(attributes, selector);
+				init(selector, attributes);
 			});
 		} else {
 			console.warn("Sysdiagram is already running on load.");
 		}
 		isLoaded = true;
 	} else {
-		init(attributes, selector, callbackFunc);
+		init(selector, attributes, callbackFunc);
 	}
 }
 
-function init(attributes, selector, callbackFunc) {
+function init(selector, attributes, callbackFunc) {
 	// Change default attributes
 	defaultAttrs = mergeAttrs(defaultAttrs, attributes);
 	
-	var diagrams = document.querySelectorAll(selector);
-	for (var i = 0 ; i < diagrams.length; i++) {
-		var diagram = diagrams[i];
-		var code = getTextCode(diagram);
-		diagram.innerHTML = "";
-		render(diagram, code, {}, function(element, graphviz) {
+	var elements = document.querySelectorAll(selector);
+	for (var i = 0 ; i < elements.length; i++) {
+		var element = elements[i];
+		var code = getTextCode(element);
+		if (!code) {
+			code = element.getAttribute("data-sysdiagram-function");
+			code = window[code];	// get function object from function name(string)
+		}
+		if (!code) {
+			throw new Error("Not found script code from inner html or attribute.");
+		}
+		element.innerHTML = "";
+		render(element, code, {}, function(element, graphviz) {
 			if (callbackFunc) {
 				callbackFunc(element, graphviz);
 			}
 		});
 	}
 }
+
+function initWithCode(code, selector, attributes, callbackFunc) {
+	// Change default attributes
+	defaultAttrs = mergeAttrs(defaultAttrs, attributes);
 	
+	var element = (typeof selector == "string") ? document.querySelector(selector) : selector;
+	render(element, code, {}, function(element, graphviz) {
+		if (callbackFunc) {
+			callbackFunc(element, graphviz);
+		}
+	});
+}
+
 	
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1073,7 +1092,7 @@ function loadResources(resourceJson, baseUrl) {
 		resourceJson = resourceJson || diagramResources;
 		baseUrl = baseUrl || diagramResources.baseUrl;
 		
-		var baseUrl = baseUrl || "https://github.com/mingrammer/diagrams/raw/master/resources";
+		var baseUrl = baseUrl || "https://raw.githubusercontent.com/mingrammer/diagrams/master/resources";
 		baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
 		for (var x in resourceJson) {
 			if (x == 'baseUrl') continue;
@@ -1401,6 +1420,7 @@ var sysdiagram = {
 	version: SYSDIAGRAM_VERSION,
 	initialize: initialize,
 	init: init,
+	initWithCode: initWithCode,
 	loadResources: loadResources,
 	attributes: defaultAttrs,
 	generate: generate,

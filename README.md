@@ -3,15 +3,25 @@
 **Sysdiagram draw the system architecture using JavaScript.**
 
 [![npm version](https://img.shields.io/npm/v/sysdiagram.svg?style=flat)](https://www.npmjs.com/package/sysdiagram)
-[![unpkg](http://img.badgesize.io/https://unpkg.com/sysdiagram/dist/sysdiagram.js?compression=gzip&label=unpkg&style=flat&cache=false)](https://unpkg.com/sysdiagram/dist/sysdiagram.js)
+[![unpkg](https://img.badgesize.io/https://unpkg.com/sysdiagram/dist/sysdiagram.js?compression=gzip&label=unpkg&style=flat&cache=false)](https://unpkg.com/sysdiagram/dist/sysdiagram.js)
 [![unpkg min](https://img.badgesize.io/https:/unpkg.com/sysdiagram/dist/sysdiagram.min.js?label=unpkg%20min&compression=gzip&cache=false&style=flat)](https://unpkg.com/sysdiagram/dist/sysdiagram.min.js)
 
-It is a Javascript based diagramming tool that renders text like Markdown definitions to create and modify diagrams dynamically. 
+It is a Javascript based diagramming tool that renders from javascript syntax to create and modify diagrams dynamically. 
 
 
-> Sysdiagram currently supports six major providers: [`AWS`](https://succeun.github.io/sysdiagram/#/nodes/aws), [`Azure`](https://succeun.github.io/sysdiagram/#/nodes/azure), [`GCP`](https://succeun.github.io/sysdiagram/#/nodes/gcp), [`Kubernetes`](https://succeun.github.io/sysdiagram/#/nodes/k8s), [`Alibaba Cloud`](https://succeun.github.io/sysdiagram/#/nodes/alibabacloud) and [`Oracle Cloud`](https://succeun.github.io/sysdiagram/#/nodes/oci). <br>
-It now also supports [`On-Premise`](https://succeun.github.io/sysdiagram/#/nodes/onprem) nodes as well as [`Programming Languages`](https://succeun.github.io/sysdiagram/#/nodes/programming?id=programminglanguage), [`Frameworks`](https://succeun.github.io/sysdiagram/#/nodes/programming?id=programmingframework) and [`Programs`](https://succeun.github.io/sysdiagram/#/nodes/program).
-
+## Sysdiagram currently supports seven major providers and others: 
+- [`AWS`](https://succeun.github.io/sysdiagram/#/nodes/aws)
+- [`Azure`](https://succeun.github.io/sysdiagram/#/nodes/azure)
+- [`GCP`](https://succeun.github.io/sysdiagram/#/nodes/gcp)
+- [`Kubernetes`](https://succeun.github.io/sysdiagram/#/nodes/k8s)
+- [`Alibaba Cloud`](https://succeun.github.io/sysdiagram/#/nodes/alibabacloud)
+- [`Oracle Cloud`](https://succeun.github.io/sysdiagram/#/nodes/ibmcloud)
+- [`IBM Cloud`](https://succeun.github.io/sysdiagram/#/nodes/oci)
+- [`On-Premise`](https://succeun.github.io/sysdiagram/#/nodes/onprem) 
+- [`Programming Languages`](https://succeun.github.io/sysdiagram/#/nodes/programming?id=programminglanguage)
+- [`Frameworks`](https://succeun.github.io/sysdiagram/#/nodes/programming?id=programmingframework)
+- [`Programs`](https://succeun.github.io/sysdiagram/#/nodes/program).
+ 
 # Installation
 
 ## CDN
@@ -33,33 +43,45 @@ Latest Version: [https://unpkg.com/sysdiagram/dist/sysdiagram.min.js](https://un
 It can insert a `script` tag with an absolute address and a `sysdiagram` call into the HTML like so:
 
 ```html
-<!-- canvg for converting image (Optional) -->
-<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
-
-<!-- d3 & d3-graphviz (Mandatory) -->
-<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
-<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
-<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
-
 <!-- sysdiagram (latest) -->
 <script src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
-  
-<script>sysdiagram.initialize({startOnLoad:true});</script>
+<script>
+function drawSample() {
+    var EC2 = diagrams.aws.compute.EC2
+
+	Diagram("Simple Diagram", function() {
+		EC2("web")
+	})
+}
+sysdiagram.initialize({startOnLoad:true});
+</script>
+
+<div class="sysdiagram" data-sysdiagram-function="drawSample"></div>
 ```
 
 Doing so will command the sysdiagram parser to look for the `<div>` tags with `class="sysdiagram"`. 
 
 From these tags sysdiagram will try to read the diagram definitons and render them into `<svg>`.
 
+Or 함수를 전달하여 `<div>`와 같은 특정 태그로 결과를 나타낼 수 있습니다.
 ```html
-<div class="sysdiagram">
-	var EC2 = diagrams.aws.compute.EC2
+<script src="../dist/sysdiagram.bundle.js"></script>
+<script>
+    function drawSample() {
+        var EC2 = diagrams.aws.compute.EC2
 
-	Diagram("Simple Diagram", function() {
-		EC2("web")
-	})
-</div>
+        Diagram("Simple Diagram", function() {
+            EC2("web")
+        })
+    }
+    window.addEventListener('DOMContentLoaded', function(event) {
+        sysdiagram.initWithCode(drawSample, '.sample');
+    });
+</script>
+
+<div class="sample"></div>
 ```
+
 When developing locally, you must have a local web server due to [hpcc-js/wasm](https://www.npmjs.com/package/@hpcc-js/wasm). In this case, you can load the server as follows.
 
 ```bash
@@ -76,17 +98,8 @@ Below is the most basic and simple example html.
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- canvg for converting image (Optional) -->
-	<script src="https://unpkg.com/canvg@3.0.7/lib/umd.js"></script> 
-
-	<!-- d3 & d3-graphviz (Mandatory) -->
-	<script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
-	<script src="https://unpkg.com/@hpcc-js/wasm@1.5.2/dist/index.min.js"></script>
-	<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
-
 	<!-- sysdiagram (latest) -->
 	<script src="https://unpkg.com/sysdiagram/dist/sysdiagram.min.js"></script>
-	  
 	<script>sysdiagram.initialize({startOnLoad:true});</script>
 <head>
 <body>
